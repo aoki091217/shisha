@@ -22,4 +22,6 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::post('/line/webhook', [\App\Http\Controllers\Line\MessageController::class, 'webhook'])->name('line.webhook');
+Route::middleware('line.signed')->group(function () {
+    Route::post('/line/webhook', [\App\Http\Controllers\Line\MessageController::class, 'webhook'])->name('line.webhook');
+});

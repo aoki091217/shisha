@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Customer;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -24,11 +25,12 @@ class CustomerService
         });
     }
 
-    public function setIsFollowed($line_token)
+    public function storeNextStep($line_token, $step)
     {
         DB::transaction(function () use ($line_token) {
             Customer::create([
                 'line_token' => $line_token,
+                'customer_date' => Carbon::today()->toDateString(),
                 'is_followed' => 1
             ]);
         });
