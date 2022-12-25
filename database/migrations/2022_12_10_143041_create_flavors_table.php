@@ -14,8 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('flavors', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('flavor_id');
+            $table->bigInteger('bland_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -15,7 +15,9 @@ return new class extends Migration
     {
         Schema::create('blands', function (Blueprint $table) {
             $table->bigIncrements('bland_id');
+            $table->string('name');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

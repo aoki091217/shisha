@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\HomeViewController;
+use App\Http\Controllers\Admin\ShopController;
+use App\Http\Controllers\Line\MessageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -20,8 +23,10 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
 Route::middleware('line.signed')->group(function () {
-    Route::post('/line/webhook', [\App\Http\Controllers\Line\MessageController::class, 'webhook'])->name('line.webhook');
+    Route::post('/line/webhook', [MessageController::class, 'webhook'])->name('line.webhook');
 });
+
+Route::get('/home', [HomeViewController::class, 'index'])->name('home.index');
+
+Route::resource('/shop', ShopController::class)->except(['create', 'show'])->parameters(['shop' => 'id']);

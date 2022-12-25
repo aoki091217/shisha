@@ -1,0 +1,26 @@
+body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow: hidden;
+}
+
+html {
+    height: -webkit-fill-available;
+}
+
+main {
+    height: 100vh;
+    height: -webkit-fill-available;
+    max-height: 100vh;
+    position: relative;
+    overflow: auto;
+}
+.main-contents {
+    height: calc(100vh - 5rem);
+    min-height: calc(100vh - 5rem);
+    margin-left: 300px;
+    padding: 2rem 0;
+}
+.breadcrumb {
+    font-size: 1.3rem;
+}

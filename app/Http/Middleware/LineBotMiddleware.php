@@ -30,6 +30,7 @@ class LineBotMiddleware
     */
     public function validateSignature(Request $request) : void
     {
+        dd($request);
         $signature = $request->header('x-line-signature');
         if ($signature === null) {
             abort(400);
