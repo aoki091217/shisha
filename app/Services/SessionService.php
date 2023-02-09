@@ -11,6 +11,11 @@ class SessionService
             session()->put($line_id, ['is_follow' => 1]);
         }
     }
+
+    public function putFlashMessage($message)
+    {
+        session()->flash('message', $message);
+    }
 }
 
 ?>
