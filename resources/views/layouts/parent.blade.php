@@ -41,4 +41,5 @@
     </body>
 
     @stack('jquery')
+    @vite('resources/js/common.js')
 </html>
