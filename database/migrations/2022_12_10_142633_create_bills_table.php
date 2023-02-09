@@ -15,22 +15,16 @@ return new class extends Migration
     {
         Schema::create('bills', function (Blueprint $table) {
             $table->bigIncrements('bill_id');
-            $table->bigInteger('costomer_id', false, true);
+            $table->bigInteger('customer_id', false, true);
             $table->integer('amount', false, true);
-            $table->integer('member_id', false, true);
+            $table->integer('shop_id', false, true);
+            $table->bigInteger('member_id', false, true);
+            $table->bigInteger('bill_order_id', false, true);
             $table->boolean('share');
+            $table->tinyInteger('top_change', false, true);
             $table->dateTime('bill_date');
-            $table->integer('order_id_1', false, true);
-            $table->integer('order_id_2', false, true);
-            $table->integer('order_id_3', false, true);
-            $table->integer('order_id_4', false, true);
-            $table->integer('order_id_5', false, true);
-            $table->integer('order_id_6', false, true);
-            $table->integer('order_id_7', false, true);
-            $table->integer('order_id_8', false, true);
-            $table->integer('order_id_9', false, true);
-            $table->integer('order_id_10', false, true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -23,7 +23,6 @@ return new class extends Migration
             $table->date('customer_date')->nullable();
             $table->tinyInteger('step', false, true)->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

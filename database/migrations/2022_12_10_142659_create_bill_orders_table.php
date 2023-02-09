@@ -13,12 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('members', function (Blueprint $table) {
-            $table->bigIncrements('member_id');
-            $table->integer('shop_id', false, true);
-            $table->string('name', 50);
+        Schema::create('bill_orders', function (Blueprint $table) {
+            $table->bigInteger('bill_order_id', false, true);
+            $table->bigInteger('order_id', false, true);
+            $table->foreignId('flavor_id');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('members');
+        Schema::dropIfExists('bill_orders');
     }
 };
