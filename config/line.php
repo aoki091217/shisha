@@ -45,7 +45,7 @@ return [
             ],
             'other' => [
                 'value' => 4,
-                'string' => 'その他'
+                'string' => '徒歩'
             ]
         ]
     ]

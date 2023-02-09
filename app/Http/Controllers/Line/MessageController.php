@@ -120,22 +120,15 @@ class MessageController extends Controller
 
                         $this->customer->storeStep($customer, 5);
 
-                        if ($text === 'その他') {
-                            $question = 'ご自由に来店経路を入力ください。';
-                            $this->line_service->buildReplyMessage($reply_token, $question);
-                        }
-                    }
-
-                    if (!$replies->reason && $customer->step === 5) {
                         $this->customer->updateCustomer($customer, $fills);
 
                         $question = 'アンケートへのご協力ありがとうございました。';
                         $this->line_service->buildPushMessage($line_token, $question);
                     }
 
-                case ($event instanceof UnfollowEvent):
-                    $this->customer->deleteCustomer($line_token);
-                    return;
+                // case ($event instanceof UnfollowEvent):
+                //     $this->customer->deleteCustomer($line_token);
+                //     return;
             }
         }
 
