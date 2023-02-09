@@ -20,11 +20,18 @@ class Shop extends Model
 
     public function members()
     {
-        return $this->hasMany('members', 'shop_id', 'shop_id');
+        return $this->hasMany(Member::class, 'shop_id', 'shop_id');
     }
 
     public function getCreatedDatetimeAttribute()
     {
         return Carbon::parse($this->created_at)->format('Y年m月d日 H時i分');
+    }
+
+    public function scopeSearch($query, $words)
+    {
+        if (isset($words['name'])) {
+            return $query->where('name', 'LIKE', "%{$words['name']}%");
+        }
     }
 }

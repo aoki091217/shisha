@@ -7,14 +7,34 @@ use Illuminate\Support\Facades\DB;
 
 class ShopRepository
 {
+    public function get()
+    {
+        return Shop::get();
+    }
+
     public function paginate()
     {
         return Shop::paginate(10);
     }
 
+    public function relate()
+    {
+        return Shop::with('members');
+    }
+
+    public function search($words)
+    {
+        return Shop::search($words);
+    }
+
     public function find($id)
     {
         return Shop::find($id);
+    }
+
+    public function getMembers($shop)
+    {
+        return optional($shop)->members;
     }
 
     public function store($request)
