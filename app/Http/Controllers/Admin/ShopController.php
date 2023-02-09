@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreRequest;
+use App\Http\Requests\ShopRequest;
 use App\Repositories\ShopRepository;
 use App\Services\SessionService;
 use Illuminate\Http\Request;
@@ -26,7 +26,7 @@ class ShopController extends Controller
         return view('shop.create');
     }
 
-    public function store(StoreRequest $request)
+    public function store(ShopRequest $request)
     {
         $this->shopRepository->store($request->shop);
         $this->sessionService->putFlashMessage(config('const.session.flash.stored'));
@@ -39,7 +39,7 @@ class ShopController extends Controller
         return view('shop.edit', compact('shop'));
     }
 
-    public function update(StoreRequest $request, $id)
+    public function update(ShopRequest $request, $id)
     {
         $this->shopRepository->update($request->shop, $id);
         $this->sessionService->putFlashMessage(config('const.session.flash.updated'));
