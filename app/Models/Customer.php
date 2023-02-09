@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Customer extends Model
 {
     use HasFactory;
-    use SoftDeletes;
 
     protected $primaryKey = 'customer_id';
 
@@ -26,7 +25,7 @@ class Customer extends Model
 
     public function findCustomer($line_token)
     {
-        return $this->withTrashed()->where('line_token', $line_token)->first();
+        return $this->where('line_token', $line_token)->first();
     }
 
     public function storeCustomer($line_token)
@@ -59,11 +58,12 @@ class Customer extends Model
         $customer->save();
     }
 
-    public function deleteCustomer($line_token)
-    {
-        $customer = $this->findCustomer($line_token);
-        if (!is_null($customer)) {
-            $customer->delete();
-        }
-    }
+    // public function deleteCustomer($line_token)
+    // {
+    //     \Log::debug(111111);
+    //     $customer = $this->findCustomer($line_token);
+    //     if (!is_null($customer)) {
+    //         $customer->delete();
+    //     }
+    // }
 }
