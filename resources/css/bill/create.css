@@ -1,0 +1,13 @@
+.tab-wrapper {
+    height: 14rem;
+    width: 100%;
+}
+.tab-content {
+    overflow-y: auto;
+}
+.tab-pane {
+    padding: 0.5rem 1rem;
+}
+.tab-pane .form-select {
+    width: 23%;
+}
