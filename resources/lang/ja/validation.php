@@ -137,8 +137,8 @@ return [
     */
 
     'custom' => [
-        'shop.name' => [
-            'required' => ':attributeは必ず入力してください。',
+        '属性名' => [
+            'ルール名' => 'カスタムメッセージ',
         ],
     ],
 
@@ -154,6 +154,19 @@ return [
     */
 
     'attributes' => [
-        'shop.name' => '店舗名'
+        'shop.name' => '店舗',
+        'member.shop_id' => '店舗',
+        'member.name' => 'スタッフ',
+        'bland.name' => 'ブランド名',
+        'flavor.bland_id' => 'ブランド名',
+        'flavor.names.*' => 'フレーバー名',
+        'flavor.name' => 'フレーバー名',
+        'bill.shop_id' => '店舗',
+        'bill.member_id' => 'メイカー',
+        'bill.customer_id' => '顧客ニックネーム',
+        'bill.top_change' => 'トップ替え',
+        'bill.amount' => '会計金額',
+        'bill.date' => '会計日付',
+        'bill.time' => '会計時間',
     ],
 ];
