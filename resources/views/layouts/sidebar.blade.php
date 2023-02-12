@@ -36,5 +36,11 @@
                 会計
             </a>
         </li>
+        <li>
+            <a href="{{ route('user.index') }}" class="nav-link {{ $routeService->getActiveForTab('user.*') }}">
+                <i class="fa-solid fa-users-gear"></i>
+                ユーザー
+            </a>
+        </li>
     </ul>
 </div>

@@ -56,6 +56,8 @@ Breadcrumbs::for('flavor.edit', function ($trail, $flavor_id) {
     $trail->push('編集', route('flavor.edit', $flavor_id));
 });
 
+
+
 Breadcrumbs::for('bill.index', function ($trail) {
     $trail->push('一覧', route('bill.index'));
 });
@@ -70,6 +72,20 @@ Breadcrumbs::for('bill.show', function ($trail, $bill_id) {
 Breadcrumbs::for('bill.edit', function ($trail, $bill_id) {
     $trail->parent('bill.show', $bill_id);
     $trail->push('編集', route('bill.edit', $bill_id));
+});
+
+
+
+Breadcrumbs::for('user.index', function ($trail) {
+    $trail->push('一覧', route('user.index'));
+});
+Breadcrumbs::for('user.create', function ($trail) {
+    $trail->parent('user.index');
+    $trail->push('登録', route('user.create'));
+});
+Breadcrumbs::for('user.edit', function ($trail, $code) {
+    $trail->parent('user.index');
+    $trail->push('編集', route('user.edit', $code));
 });
 
 ?>
