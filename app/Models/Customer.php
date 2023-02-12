@@ -34,6 +34,8 @@ class Customer extends Model
         $this->customer_date = Carbon::today()->toDateString();
         $this->step = 1;
         $this->save();
+
+        return $this;
     }
 
     public function storeStep($customer, $step)

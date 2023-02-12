@@ -31,24 +31,25 @@ return [
             ],
         ],
         'reason' => [
-            'taxi' => [
+            'walk' => [
                 'value' => 1,
+                'string' => '徒歩'
+            ],
+            'taxi' => [
+                'value' => 2,
                 'string' => 'タクシー'
             ],
             'bus' => [
-                'value' => 2,
+                'value' => 3,
                 'string' => 'バス'
             ],
             'train' => [
-                'value' => 3,
+                'value' => 4,
                 'string' => '電車'
             ],
-            'other' => [
-                'value' => 4,
-                'string' => '徒歩'
-            ]
         ]
-    ]
+    ],
+    'message' => 'チェックインのために、本メッセージをそのまま送信してください。'
 ];
 
 ?>

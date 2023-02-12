@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Shop;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use LINE\LINEBot;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 use LINE\LINEBot\MessageBuilder\TemplateBuilder\ButtonTemplateBuilder;
@@ -15,11 +18,14 @@ use LINE\LINEBot\TemplateActionBuilder\PostbackTemplateActionBuilder;
 class LineBotService
 {
     protected $bot;
+    private $shop_id;
 
     public function __construct()
     {
         $client = new CurlHTTPClient(config('services.line.access_token'));
         $this->bot = new LINEBot($client, ['channelSecret' => config('services.line.channel_secret')]);
+
+        $this->shop_id = Shop::first()->shop_id;
     }
 
     /**
@@ -127,6 +133,46 @@ class LineBotService
         return collect(config("line.questions.{$type}"))->filter(function ($item) use ($text) {
             return $item['string'] === $text;
         })->first();
+    }
+
+    public function createUri($shop_id = null)
+    {
+        $line_id = urlencode(config('services.line.account_id'));
+        $message = $this->getEncodeMessage($shop_id);
+        $uri = "https://line.me/R/oaMessage/@{$line_id}/?{$message->encode}";
+
+        return (object) [
+            'uri' => $uri,
+            'message' => $message
+        ];
+    }
+
+    private function getEncodeMessage($shop_id)
+    {
+        if (is_null($shop_id)) {
+            $shop_id = $this->shop_id;
+        }
+        $now = Carbon::now()->format('Y-m-d H:i:s');
+        $message = config('line.message');
+        $encode = urlencode(sprintf('%s%s%s&%s', $message, 'checkin:', "shop_id={$shop_id}", "datetime={$now}"));
+
+        return (object) [
+            'native' => sprintf('%s%s&%s', 'checkin:', "shop_id={$shop_id}", "datetime={$now}"),
+            'encode' => $encode
+        ];
+    }
+
+    public function getParamsFromCheckin($text)
+    {
+        $checkin = Str::after($text, 'checkin:');
+        $shop_id = Str::between($checkin, 'shop_id=', '&');
+        $datetime = explode('+', Str::after($checkin, 'datetime='));
+        $visit = Carbon::parse($datetime[0])->setTimeFromTimeString($datetime[1])->format('Y-m-d H:i:s');
+
+        return [
+            'shop_id' => $shop_id,
+            'visit' => $visit
+        ];
     }
 }
 
