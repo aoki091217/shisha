@@ -25,4 +25,6 @@ return [
     'password_confirmation' => 'パスワード（確認用）',
     'password_forgot' => 'パスワードを忘れた場合',
     'keeping' => 'ログイン状態を保存する',
+    'password_reset' => 'パスワードリセット',
+    'password_reset_send' => 'パスワードリセットメールを送信'
 ];

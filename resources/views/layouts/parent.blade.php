@@ -39,7 +39,7 @@
                 </div>
             </div>
             @else
-            @yield('login')
+            @yield('auth')
             @endif
         </main>
     </body>
