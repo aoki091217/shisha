@@ -6,7 +6,8 @@ use App\Http\Controllers\Admin\BillController;
 use App\Http\Controllers\Admin\FlavorController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\MemberController;
-use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Line\LoginController as LineLoginController;
 use App\Http\Controllers\Line\MessageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -26,7 +27,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+Route::controller(LineLoginController::class)->as('line.')->prefix('line')->group(function () {
+    Route::get('/checkin', 'checkin')->name('checkin');
+    // Route::get('/complete', 'complete')->name('complete');
+    // Route::post('/auth', 'auth')->name('auth');
+});
 
 Route::middleware('line.signed')->group(function () {
     Route::post('/line/webhook', [MessageController::class, 'webhook'])->name('line.webhook');
@@ -42,11 +47,7 @@ Route::resource('/bland', BlandController::class)->except('show')->parameters(['
 
 Route::resource('/flavor', FlavorController::class)->except('show')->parameters(['flavor' => 'id']);
 
-Route::resource('/order', OrderController::class)->parameters(['order' => 'id']);
+Route::resource('/user', UserController::class)->except('show')->parameters(['user' => 'id']);
 
 Route::resource('/bill', BillController::class)->parameters(['bill' => 'id']);
 Route::post('/bill/get_members', [BillController::class, 'getMembers'])->name('bill.getMembers');
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

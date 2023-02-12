@@ -11,9 +11,9 @@ export default defineConfig({
                 'resources/css/layouts/common.css',
                 'resources/css/layouts/header.css',
                 'resources/css/layouts/sidebar.css',
-                'resources/css/shop/index.css',
-                'resources/js/shop/index.js',
-                'resources/js/shop/edit.js',
+                'resources/css/home/index.css',
+                'resources/js/home.js',
+                'resources/js/user.js'
             ],
             refresh: true,
         }),
