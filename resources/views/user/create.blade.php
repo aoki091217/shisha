@@ -43,13 +43,13 @@
         <label for="userPassConfirm" class="form-label">パスワード（確認用）<span class="text-danger">※</span></label>
         <div class="col-8 mb-3">
             {{ Form::password(
-                'user[password_confirm]',
+                'user[password_confirmation]',
                 [
                     'class' => 'form-control',
                     'id' => 'userPassConfirm'
                 ]
             ) }}
-            <span class="text-danger">{{ $errors->first('user.password_confirm') }}</span>
+            <span class="text-danger">{{ $errors->first('user.password_confirmation') }}</span>
         </div>
         <label for="userEmail" class="form-label">メールアドレス<span class="text-danger">※</span></label>
         <div class="col-8 mb-3">

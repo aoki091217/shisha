@@ -17,9 +17,9 @@ class UserRepository
         return User::search($words);
     }
 
-    public function find($code)
+    public function find($id)
     {
-        return User::where('code', $code)->first();
+        return User::find($id);
     }
 
     public function store($request)
@@ -30,17 +30,19 @@ class UserRepository
         });
     }
 
-    public function update($request, $code)
+    public function update($request, $id)
     {
-        DB::transaction(function () use ($request, $code) {
-            DB::table('users')->where('code', $code)->update($request);
+        DB::transaction(function () use ($request, $id) {
+            $user = $this->find($id);
+            $user->fill($request)->save();
         });
     }
 
-    public function delete($code)
+    public function delete($id)
     {
-        DB::transaction(function () use ($code) {
-            DB::table('users')->where('code', $code)->delete();
+        DB::transaction(function () use ($id) {
+            $user = $this->find($id);
+            $user->delete();
         });
     }
 }

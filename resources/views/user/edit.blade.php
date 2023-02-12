@@ -1,8 +1,8 @@
 @extends('layouts.parent')
 
 @section('content')
-{{ Breadcrumbs::render('user.edit', $user->code) }}
-<form action="{{ route('user.update', $user->code) }}" method="POST" autocomplete="off">
+{{ Breadcrumbs::render('user.edit', $user->id) }}
+<form action="{{ route('user.update', $user->id) }}" method="POST" autocomplete="off">
     @csrf
     @method('PATCH')
     <div>
@@ -59,14 +59,14 @@
         <label for="userPassConfirm" class="form-label">パスワード（確認用）<span class="text-danger">※</span></label>
         <div class="col-8 mb-3">
             {{ Form::password(
-                'user[password_confirm]',
+                'user[password_confirmation]',
                 [
                     'class' => 'form-control',
                     'id' => 'userPassConfirm',
                     'disabled'
                 ]
             ) }}
-            <span class="text-danger">{{ $errors->first('user.password_confirm') }}</span>
+            <span class="text-danger">{{ $errors->first('user.password_confirmation') }}</span>
         </div>
         <label for="userEmail" class="form-label">メールアドレス<span class="text-danger">※</span></label>
         <div class="col-8 mb-3">

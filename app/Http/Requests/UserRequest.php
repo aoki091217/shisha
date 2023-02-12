@@ -36,13 +36,13 @@ class UserRequest extends FormRequest
             return array_merge($rules, [
                 'user.code' => 'required|regex:/^[a-zA-Z0-9]+$/|max:20',
                 'user.password' => 'sometimes|required|regex:/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z\-]{8,24}$/',
-                'user.password_confirm' => 'sometimes|required|same:user.password',
+                'user.password_confirmation' => 'sometimes|required|same:user.password',
             ]);
         } else {
             return array_merge($rules, [
                 'user.code' => 'required|unique:users,code|regex:/^[a-zA-Z0-9]+$/|max:20',
                 'user.password' => 'required|regex:/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z\-]{8,24}$/',
-                'user.password_confirm' => 'required|same:user.password',
+                'user.password_confirmation' => 'required|same:user.password',
             ]);
         }
     }
@@ -50,14 +50,14 @@ class UserRequest extends FormRequest
     public function passedValidation()
     {
         $user = $this->user;
-        unset($user['password_confirm']);
+        unset($user['password_confirmation'], $user['is_change']);
 
         if (!isset($this->user['password'])) {
             $password = User::where('code', $this->user['code'])->first()->password;
             $user = array_merge($user, ['password' => $password]);
             $this->merge(['user' => $user]);
         } else {
-            $user = array_merge($user, ['password' => Hash::make($this->password)]);
+            $user = array_merge($user, ['password' => Hash::make($this->user['password'])]);
             $this->merge(['user' => $user]);
         }
     }

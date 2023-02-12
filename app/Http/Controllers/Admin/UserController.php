@@ -33,23 +33,27 @@ class UserController extends Controller
         return redirect()->route('user.index');
     }
 
-    public function edit($code)
+    public function edit($id)
     {
-        $user = $this->userRepository->find($code);
+        $user = $this->userRepository->find($id);
         return view('user.edit', compact('user'));
     }
 
-    public function update(UserRequest $request, $code)
+    public function update(UserRequest $request, $id)
     {
-        $this->userRepository->update($request->user, $code);
+        $this->userRepository->update($request->user, $id);
         $this->sessionService->putFlashMessage(config('const.session.flash.updated'));
         return redirect()->route('user.index');
     }
 
-    public function destroy($code)
+    public function destroy($id)
     {
-        $this->userRepository->delete($code);
-        $this->sessionService->putFlashMessage(config('const.session.flash.deleted'));
+        if (auth()->user()->id == $id) {
+            $this->userRepository->delete($id);
+            $this->sessionService->putFlashMessage(config('const.session.flash.deleted'));
+        } else {
+            $this->sessionService->putFlashMessage(config('const.session.flash.auth'));
+        }
         return redirect()->route('user.index');
     }
 }

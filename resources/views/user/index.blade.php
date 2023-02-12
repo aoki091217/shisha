@@ -60,7 +60,7 @@
                     <td>{{ $user->created_datetime }}</td>
                     <td>
                         <div class="col-12">
-                            <a href="{{ route('user.edit', $user->code) }}" class="btn btn-sm btn-success w-100">編集</a>
+                            <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-success w-100">編集</a>
                         </div>
                     </td>
                     <td>
@@ -69,7 +69,8 @@
                                 '削除',
                                 [
                                     'class' => 'btn btn-sm btn-danger w-100 btn-delete',
-                                    'formaction' => route('user.destroy', $user->code)
+                                    'formaction' => route('user.destroy', $user->id),
+                                    auth()->user()->id != $user->id ? 'disabled' : ''
                                 ]
                             ) }}
                         </div>

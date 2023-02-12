@@ -83,9 +83,9 @@ Breadcrumbs::for('user.create', function ($trail) {
     $trail->parent('user.index');
     $trail->push('登録', route('user.create'));
 });
-Breadcrumbs::for('user.edit', function ($trail, $code) {
+Breadcrumbs::for('user.edit', function ($trail, $id) {
     $trail->parent('user.index');
-    $trail->push('編集', route('user.edit', $code));
+    $trail->push('編集', route('user.edit', $id));
 });
 
 ?>
