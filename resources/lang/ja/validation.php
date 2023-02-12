@@ -177,7 +177,12 @@ return [
         'user.code' => 'ユーザーID',
         'user.name' => 'ユーザー名',
         'user.password' => 'パスワード',
-        'user.password_confirm' => 'パスワード（確認用）',
-        'user.email' => 'メールアドレス'
+        'user.password_confirmation' => 'パスワード（確認用）',
+        'user.email' => 'メールアドレス',
+        'code' => 'ユーザーID',
+        'name' => 'ユーザー名',
+        'password' => 'パスワード',
+        'password_confirmation' => 'パスワード（確認用）',
+        'email' => 'メールアドレス'
     ],
 ];

@@ -7,6 +7,10 @@ use App\Http\Controllers\Admin\FlavorController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Line\LoginController as LineLoginController;
 use App\Http\Controllers\Line\MessageController;
 use Illuminate\Support\Facades\Auth;
@@ -23,8 +27,27 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::controller(LoginController::class)->group(function () {
+    Route::get('login', 'showLoginForm')->name('form');
+    Route::post('login', 'login')->name('login');
+    Route::post('logout', 'logout')->name('logout');
+});
+
+Route::controller(RegisterController::class)->group(function () {
+    Route::get('register', 'showRegistrationForm')->name('form');
+    Route::post('register', 'register')->name('register');
+});
+
+Route::as('password.')->prefix('password')->group(function () {
+    Route::controller(ForgotPasswordController::class)->group(function () {
+        Route::get('/reset', 'showLinkRequestForm')->name('request');
+        Route::post('/email', 'sendResetLinkEmail')->name('email');
+    });
+
+    Route::controller(ResetPasswordController::class)->group(function () {
+        Route::get('/reset/{token}', 'showResetForm')->name('reset');
+        Route::post('/update', 'reset')->name('update');
+    });
 });
 
 Route::controller(LineLoginController::class)->as('line.')->prefix('line')->group(function () {
@@ -37,17 +60,19 @@ Route::middleware('line.signed')->group(function () {
     Route::post('/line/webhook', [MessageController::class, 'webhook'])->name('line.webhook');
 });
 
-Route::get('/home', [HomeViewController::class, 'index'])->name('home.index');
+Route::middleware('auth')->group(function () {
+    Route::get('/home', [HomeViewController::class, 'index'])->name('home.index');
 
-Route::resource('/shop', ShopController::class)->except('show')->parameters(['shop' => 'id']);
+    Route::resource('/shop', ShopController::class)->except('show')->parameters(['shop' => 'id']);
 
-Route::resource('/member', MemberController::class)->except('show')->parameters(['member' => 'id']);
+    Route::resource('/member', MemberController::class)->except('show')->parameters(['member' => 'id']);
 
-Route::resource('/bland', BlandController::class)->except('show')->parameters(['bland' => 'id']);
+    Route::resource('/bland', BlandController::class)->except('show')->parameters(['bland' => 'id']);
 
-Route::resource('/flavor', FlavorController::class)->except('show')->parameters(['flavor' => 'id']);
+    Route::resource('/flavor', FlavorController::class)->except('show')->parameters(['flavor' => 'id']);
 
-Route::resource('/user', UserController::class)->except('show')->parameters(['user' => 'id']);
+    Route::resource('/user', UserController::class)->except('show')->parameters(['user' => 'id']);
 
-Route::resource('/bill', BillController::class)->parameters(['bill' => 'id']);
-Route::post('/bill/get_members', [BillController::class, 'getMembers'])->name('bill.getMembers');
+    Route::resource('/bill', BillController::class)->parameters(['bill' => 'id']);
+    Route::post('/bill/get_members', [BillController::class, 'getMembers'])->name('bill.getMembers');
+});

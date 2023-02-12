@@ -30,6 +30,7 @@
         @include('layouts.header')
 
         <main>
+            @if (auth()->check())
             @include('layouts.sidebar')
 
             <div class="main-contents">
@@ -37,6 +38,9 @@
                     @yield('content')
                 </div>
             </div>
+            @else
+            @yield('login')
+            @endif
         </main>
     </body>
 
