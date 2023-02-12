@@ -17,7 +17,7 @@
             'resources/sass/app.scss',
             'resources/js/app.js',
             'resources/css/all.min.css',
-            'resources/css/line/login.css'
+            'resources/css/line/checkin.css'
         ])
     </head>
     <body>
