@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Line;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Repositories\CustomerShopRepository;
 use App\Services\LineBotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,14 +16,11 @@ use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 
 class MessageController extends Controller
 {
-    private $customer;
-    private $line_service;
-
-    public function __construct()
-    {
-        $this->customer = new Customer();
-        $this->line_service = new LineBotService();
-    }
+    public function __construct(
+        private Customer $customer,
+        private LineBotService $lineBotService,
+        private CustomerShopRepository $customerShopRepository
+    ){}
 
     public function webhook(Request $request)
     {
@@ -38,28 +36,38 @@ class MessageController extends Controller
             switch ($event) {
                 case ($event instanceof FollowEvent):
                     $customer = $this->customer->findCustomer($line_token);
-
                     if (is_null($customer)) {
-                        $this->customer->storeCustomer($line_token);
+                        $customer = $this->customer->storeCustomer($line_token);
                         $message = 'ニックネームが未登録です。ニックネームを入力してください。';
-                        $this->line_service->buildReplyMessage($reply_token, $message);
-                    } elseif ($customer->trashed()) {
-                        $customer->restore();
+                        $this->lineBotService->buildPushMessage($line_token, $message);
                     }
 
                     return;
                 case ($event instanceof TextMessage):
-                    $customer = $this->customer->findCustomer($line_token);
-
                     $text = $event->getText();
-                    if ($customer->step === 1) {
+                    if (preg_match('/checkin/', $text)) {
+                        $checkin = $this->lineBotService->getParamsFromCheckin($text);
+                        $this->customerShopRepository->store($line_token, $checkin);
+
+                        $message = 'チェックインが完了いたしました。ご来店ありがとうございます。';
+                        $this->lineBotService->buildReplyMessage($reply_token, $message);
+                    }
+
+                    $customer = $this->customer->findCustomer($line_token);
+                    if (is_null($customer)) {
+                        $customer = $this->customer->storeCustomer($line_token);
+                        $message = 'ニックネームが未登録です。ニックネームを入力してください。';
+                        $this->lineBotService->buildPushMessage($line_token, $message);
+                    }
+
+                    if (!preg_match('/checkin/', $text) && $customer->step === 1) {
                         $fills = [
                             'name' => $text,
                             'step' => 2
                         ];
 
                         $this->customer->updateCustomer($customer, $fills);
-                        $this->line_service->buildConfirm($event, $reply_token);
+                        $this->lineBotService->buildConfirm($event, $reply_token);
                         return;
                     }
 
@@ -67,12 +75,12 @@ class MessageController extends Controller
                         if ($text === 'はい') {
                             $this->customer->storeStep($customer, 3);
                             $message = "{$customer->name}様、ご登録ありがとうございます。";
-                            $this->line_service->buildReplyMessage($reply_token, $message);
+                            $this->lineBotService->buildReplyMessage($reply_token, $message);
 
                         } elseif ($text === 'いいえ') {
                             $this->customer->deleteName($customer);
                             $message = '他のニックネームをご入力ください。';
-                            $this->line_service->buildReplyMessage($reply_token, $message);
+                            $this->lineBotService->buildReplyMessage($reply_token, $message);
                             return;
                         }
                     }
@@ -81,35 +89,35 @@ class MessageController extends Controller
                         $this->customer->storeStep($customer, 4);
 
                         $question = 'お手数おかけしますが、アンケートのご協力をお願いいたします。';
-                        $this->line_service->buildPushMessage($line_token, $question);
+                        $this->lineBotService->buildPushMessage($line_token, $question);
 
-                        $this->line_service->buildSex($line_token);
+                        $this->lineBotService->buildSex($line_token);
                     }
 
                     $replies = (object) [
-                        'sex' => $this->line_service->getIsReplied('sex', $text),
-                        'generation' => $this->line_service->getIsReplied('generation', $text),
-                        'reason' => $this->line_service->getIsReplied('reason', $text)
+                        'sex' => $this->lineBotService->getIsReplied('sex', $text),
+                        'generation' => $this->lineBotService->getIsReplied('generation', $text),
+                        'reason' => $this->lineBotService->getIsReplied('reason', $text)
                     ];
 
                     if ($replies->sex && is_null($customer->sex)) {
                         $fills = [
-                            'sex' => $this->line_service->getQuestionValue('sex', $text)
+                            'sex' => $this->lineBotService->getQuestionValue('sex', $text)
                         ];
 
                         $this->customer->updateCustomer($customer, $fills);
 
-                        $this->line_service->buildGeneration($line_token);
+                        $this->lineBotService->buildGeneration($line_token);
                     }
 
                     if ($replies->generation && is_null($customer->generation)) {
                         $fills = [
-                            'generation' => $this->line_service->getQuestionValue('generation', $text)
+                            'generation' => $this->lineBotService->getQuestionValue('generation', $text)
                         ];
 
                         $this->customer->updateCustomer($customer, $fills);
 
-                        $this->line_service->buildReason($line_token);
+                        $this->lineBotService->buildReason($line_token);
                     }
 
                     // 来店経路の選択の保存
@@ -123,7 +131,7 @@ class MessageController extends Controller
                         $this->customer->updateCustomer($customer, $fills);
 
                         $question = 'アンケートへのご協力ありがとうございました。';
-                        $this->line_service->buildPushMessage($line_token, $question);
+                        $this->lineBotService->buildPushMessage($line_token, $question);
                     }
 
                 // case ($event instanceof UnfollowEvent):

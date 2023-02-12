@@ -140,6 +140,12 @@ return [
         '属性名' => [
             'ルール名' => 'カスタムメッセージ',
         ],
+        'user.code' => [
+            'regex' => ':attributeには、英数字のみで入力してください。'
+        ],
+        'user.password' => [
+            'regex' => ':attributeには、8文字以上24文字以下の英数字のみで大文字と数字を必ず含めてください。'
+        ]
     ],
 
     /*
@@ -168,5 +174,10 @@ return [
         'bill.amount' => '会計金額',
         'bill.date' => '会計日付',
         'bill.time' => '会計時間',
+        'user.code' => 'ユーザーID',
+        'user.name' => 'ユーザー名',
+        'user.password' => 'パスワード',
+        'user.password_confirm' => 'パスワード（確認用）',
+        'user.email' => 'メールアドレス'
     ],
 ];

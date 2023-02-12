@@ -39,6 +39,12 @@ main {
     top: 0;
     vertical-align: middle;
 }
+.table-wrapper tfoot th {
+    position: sticky;
+    z-index: 1;
+    bottom: 0;
+    vertical-align: middle;
+}
 .table-wrapper td {
     vertical-align: middle;
 }
