@@ -12,6 +12,10 @@
         <link rel="dns-prefetch" href="//fonts.gstatic.com">
         <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
+        <link rel="shortcut icon" type="image/x-icon" href="{{ asset('images/icon.ico') }}">
+        <link rel="apple-touch-icon" href="{{ asset('images/icon.ico') }}">
+        <link rel="icon" type="image/png" href="{{ asset('images/icon.ico') }}">
+
         <!-- Scripts -->
         @vite([
             'resources/sass/app.scss',
