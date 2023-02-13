@@ -52,8 +52,6 @@ Route::as('password.')->prefix('password')->group(function () {
 
 Route::controller(LineLoginController::class)->as('line.')->prefix('line')->group(function () {
     Route::get('/checkin', 'checkin')->name('checkin');
-    // Route::get('/complete', 'complete')->name('complete');
-    // Route::post('/auth', 'auth')->name('auth');
 });
 
 Route::middleware('line.signed')->group(function () {
