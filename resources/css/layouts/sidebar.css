@@ -1,0 +1,16 @@
+.sidebar {
+    width: 300px;
+    height: 100%;
+    position: fixed;
+    left: 0;
+}
+.sidebar .nav-link:not(.active):hover {
+    background-color: #eae9e9 !important;
+}
+.sidebar .nav-link i {
+    width: 2rem;
+    text-align: center;
+}
+.sidebar .nav-link {
+    font-size: 1.2rem;
+}

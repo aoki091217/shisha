@@ -1,0 +1,25 @@
+body {
+    min-height: -webkit-fill-available;
+    font-family: 'Helvetica Neue', 'Helvetica', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Arial', 'Yu Gothic', 'Meiryo', sans-serif;;
+}
+.main-contents {
+    height: 100vh;
+    overflow-y: auto;
+}
+.btn-success {
+    background-color: #06C755 !important;
+    border-color: #06C755 !important;
+}
+.btn-success:hover,
+.btn-success:focus {
+    background-color: #00A342 !important;
+    border-color: #00A342 !important;
+}
+.img-wrapper {
+    display: flex;
+    align-items: center;
+    height: 10rem;
+}
+.img-wrapper img {
+    width: 150px;
+}
