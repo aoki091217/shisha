@@ -26,5 +26,10 @@ return [
     'password_forgot' => 'パスワードを忘れた場合',
     'keeping' => 'ログイン状態を保存する',
     'password_reset' => 'パスワードリセット',
-    'password_reset_send' => 'パスワードリセットメールを送信'
+    'password_reset_send' => 'パスワードリセットメールを送信',
+    'verify_email' => 'メールアドレスの確認',
+    'email_send' => 'あなたのメールアドレスに新しい認証リンクが送信されました。',
+    'before_confirm' => '次に進む前に、確認用リンクが記載された電子メールをご確認ください。',
+    'not_receive' => 'メールが届かなかった場合',
+    'another_request' => '別のリクエストはこちらから'
 ];

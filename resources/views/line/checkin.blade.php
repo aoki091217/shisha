@@ -26,7 +26,9 @@
                 <div class="container rounded-2 p-3 h-100">
                     <div class="d-flex flex-column justify-content-center align-items-center">
                         <div class="col-11 d-flex justify-content-center">
-                            <div class="">画像or文字</div>
+                            <div class="img-wrapper">
+                                <img src="{{ asset('images/logo.png') }}" alt="">
+                            </div>
                         </div>
                         <div class="col-11 border rounded-1 p-3 bg-white">
                             <div>いらっしゃいませ。</div>
