@@ -25,7 +25,7 @@ class LineBotService
         $client = new CurlHTTPClient(config('services.line.access_token'));
         $this->bot = new LINEBot($client, ['channelSecret' => config('services.line.channel_secret')]);
 
-        $this->shop_id = Shop::first()->shop_id;
+        $this->shop_id = optional(Shop::first())->shop_id;
     }
 
     /**
