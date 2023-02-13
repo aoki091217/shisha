@@ -149,7 +149,8 @@ class LineBotService
 
     private function getEncodeMessage($shop_id)
     {
-        if (is_null($shop_id)) {
+        $shop = Shop::find($shop_id);
+        if (is_null($shop_id) || is_null($shop)) {
             $shop_id = $this->shop_id;
         }
         $now = Carbon::now()->format('Y-m-d H:i:s');

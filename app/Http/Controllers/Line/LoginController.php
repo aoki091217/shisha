@@ -14,7 +14,7 @@ class LoginController extends Controller
 
     public function checkin(Request $request)
     {
-        $messages = $this->lineBotService->createUri();
+        $messages = $this->lineBotService->createUri($request->shop_id);
         return view('line.checkin', compact('messages'));
     }
 }
