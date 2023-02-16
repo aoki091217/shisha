@@ -28,13 +28,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::controller(LoginController::class)->group(function () {
-    Route::get('login', 'showLoginForm')->name('form');
+    Route::get('login', 'showLoginForm')->name('loginForm');
     Route::post('login', 'login')->name('login');
     Route::post('logout', 'logout')->name('logout');
 });
 
 Route::controller(RegisterController::class)->group(function () {
-    Route::get('register', 'showRegistrationForm')->name('form');
+    Route::get('register', 'showRegistrationForm')->name('registerForm');
     Route::post('register', 'register')->name('register');
 });
 

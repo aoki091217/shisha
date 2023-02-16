@@ -12,15 +12,15 @@
             <!-- Right Side Of Navbar -->
             <ul class="navbar-nav ms-auto">
                 @guest
-                    @if (Route::has('register'))
+                    @if (Route::has('registerForm'))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">ログイン</a>
+                            <a class="nav-link" href="{{ route('loginForm') }}">ログイン</a>
                         </li>
                     @endif
 
-                    @if (Route::has('login'))
+                    @if (Route::has('loginForm'))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">登録</a>
+                            <a class="nav-link" href="{{ route('registerForm') }}">登録</a>
                         </li>
                     @endif
                 @else
