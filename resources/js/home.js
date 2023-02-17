@@ -23,12 +23,12 @@ function createSalesChart(salesData)
         data: {
             labels: labels,
             datasets: [
-            // {
-            //     label: '前年',
-            //     data: salesData.prev,
-            //     backgroundColor: '#0d6efd',
-            //     borderColor: '#0d6efd'
-            // },
+            {
+                label: '前年',
+                data: salesData.prev,
+                backgroundColor: '#0d6efd',
+                borderColor: '#0d6efd'
+            },
             {
                 label: '今年',
                 data: salesData.this,
