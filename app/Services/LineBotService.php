@@ -40,10 +40,8 @@ class LineBotService
     /**
      * 二者択一形式の応答メッセージ
      */
-    public function buildConfirm($event, $reply_token)
+    public function buildConfirm($message, $reply_token)
     {
-        $message = "ニックネームは「{$event->getText()}」でよろしいですか？";
-
         $positive = new MessageTemplateActionBuilder('はい', 'はい');
         $negative = new MessageTemplateActionBuilder('いいえ', 'いいえ');
         $buttons = [$positive, $negative];
@@ -153,7 +151,7 @@ class LineBotService
         if (is_null($shop_id) || is_null($shop)) {
             $shop_id = $this->shop_id;
         }
-        $now = Carbon::now()->format('Y-m-d H:i:s');
+        $now = Carbon::now()->format('Y-m-d_H:i:s');
         $message = config('line.message');
         $encode = urlencode(sprintf('%s%s%s&%s', $message, 'checkin:', "shop_id={$shop_id}", "datetime={$now}"));
 
@@ -167,7 +165,7 @@ class LineBotService
     {
         $checkin = Str::after($text, 'checkin:');
         $shop_id = Str::between($checkin, 'shop_id=', '&');
-        $datetime = explode('+', Str::after($checkin, 'datetime='));
+        $datetime = explode('_', Str::after($checkin, 'datetime='));
         $visit = Carbon::parse($datetime[0])->setTimeFromTimeString($datetime[1])->format('Y-m-d H:i:s');
 
         return [
