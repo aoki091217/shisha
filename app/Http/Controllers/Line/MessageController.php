@@ -35,29 +35,44 @@ class MessageController extends Controller
 
             switch ($event) {
                 case ($event instanceof FollowEvent):
-                    $customer = $this->customer->findCustomer($line_token);
-                    if (is_null($customer)) {
-                        $customer = $this->customer->storeCustomer($line_token);
-                        $message = 'ニックネームが未登録です。ニックネームを入力してください。';
-                        $this->lineBotService->buildPushMessage($line_token, $message);
-                    }
+                    $message = 'チェックインされますか？';
+                    $this->lineBotService->buildConfirm($message, $reply_token);
 
                     return;
                 case ($event instanceof TextMessage):
                     $text = $event->getText();
+
+                    $customer = $this->customer->findCustomer($line_token);
+
+                    if (is_null($customer) || $customer->step === 5) {
+                        if ($text === 'はい') {
+                            $message = 'チェックインメッセージを送信してください。';
+                            $this->lineBotService->buildPushMessage($line_token, $message);
+                            return;
+                        } elseif ($text === 'いいえ') {
+                            if (is_null($customer)) {
+                                $customer = $this->customer->storeCustomer($line_token);
+                                $message = 'ニックネームが未登録です。ニックネームを入力してください。';
+                                $this->lineBotService->buildPushMessage($line_token, $message);
+                            }
+                            return;
+                        }
+                    }
+
                     if (preg_match('/checkin/', $text)) {
                         $checkin = $this->lineBotService->getParamsFromCheckin($text);
                         $this->customerShopRepository->store($line_token, $checkin);
 
                         $message = 'チェックインが完了いたしました。ご来店ありがとうございます。';
                         $this->lineBotService->buildReplyMessage($reply_token, $message);
-                    }
 
-                    $customer = $this->customer->findCustomer($line_token);
-                    if (is_null($customer)) {
-                        $customer = $this->customer->storeCustomer($line_token);
-                        $message = 'ニックネームが未登録です。ニックネームを入力してください。';
-                        $this->lineBotService->buildPushMessage($line_token, $message);
+                        if (is_null($customer)) {
+                            $customer = $this->customer->storeCustomer($line_token);
+                            $message = 'ニックネームが未登録です。ニックネームを入力してください。';
+                            $this->lineBotService->buildPushMessage($line_token, $message);
+
+                            return;
+                        }
                     }
 
                     if (!preg_match('/checkin/', $text) && $customer->step === 1) {
@@ -67,7 +82,9 @@ class MessageController extends Controller
                         ];
 
                         $this->customer->updateCustomer($customer, $fills);
-                        $this->lineBotService->buildConfirm($event, $reply_token);
+
+                        $message = "ニックネームは「{$event->getText()}」でよろしいですか？";
+                        $this->lineBotService->buildConfirm($message, $reply_token);
                         return;
                     }
 
