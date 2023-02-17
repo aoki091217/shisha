@@ -33,22 +33,22 @@ Route::controller(LoginController::class)->group(function () {
     Route::post('logout', 'logout')->name('logout');
 });
 
-Route::controller(RegisterController::class)->group(function () {
-    Route::get('register', 'showRegistrationForm')->name('registerForm');
-    Route::post('register', 'register')->name('register');
-});
+// Route::controller(RegisterController::class)->group(function () {
+//     Route::get('register', 'showRegistrationForm')->name('registerForm');
+//     Route::post('register', 'register')->name('register');
+// });
 
-Route::as('password.')->prefix('password')->group(function () {
-    Route::controller(ForgotPasswordController::class)->group(function () {
-        Route::get('/reset', 'showLinkRequestForm')->name('request');
-        Route::post('/email', 'sendResetLinkEmail')->name('email');
-    });
+// Route::as('password.')->prefix('password')->group(function () {
+//     Route::controller(ForgotPasswordController::class)->group(function () {
+//         Route::get('/reset', 'showLinkRequestForm')->name('request');
+//         Route::post('/email', 'sendResetLinkEmail')->name('email');
+//     });
 
-    Route::controller(ResetPasswordController::class)->group(function () {
-        Route::get('/reset/{token}', 'showResetForm')->name('reset');
-        Route::post('/update', 'reset')->name('update');
-    });
-});
+//     Route::controller(ResetPasswordController::class)->group(function () {
+//         Route::get('/reset/{token}', 'showResetForm')->name('reset');
+//         Route::post('/update', 'reset')->name('update');
+//     });
+// });
 
 Route::controller(LineLoginController::class)->as('line.')->prefix('line')->group(function () {
     Route::get('/checkin', 'checkin')->name('checkin');
