@@ -213,4 +213,6 @@ return [
         'Log' => \Illuminate\Support\Facades\Log::class
     ])->toArray(),
 
+
+    'os_type' => env('OS_TYPE'),
 ];

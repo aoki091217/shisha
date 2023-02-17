@@ -17,6 +17,7 @@
         <link rel="icon" type="image/png" href="{{ asset('images/icon.ico') }}">
 
         <!-- Scripts -->
+        @if (config('app.os_type') === 'Windows')
         @vite([
             'resources/sass/app.scss',
             'resources/js/app.js',
@@ -25,6 +26,17 @@
             'resources/css/layouts/header.css',
             'resources/css/layouts/sidebar.css'
         ])
+        @elseif('Linux')
+        <script src="https://kit.fontawesome.com/b36b80b928.js" crossorigin="anonymous"></script>
+
+        @vite([
+            'resources/sass/app.scss',
+            'resources/js/app.js',
+            'resources/css/layouts/common.css',
+            'resources/css/layouts/header.css',
+            'resources/css/layouts/sidebar.css'
+        ])
+        @endif
 
         @stack('css')
 
