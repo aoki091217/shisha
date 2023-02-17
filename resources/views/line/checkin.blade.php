@@ -16,7 +16,6 @@
         @vite([
             'resources/sass/app.scss',
             'resources/js/app.js',
-            'resources/css/all.min.css',
             'resources/css/line/checkin.css'
         ])
     </head>
@@ -37,7 +36,7 @@
                             <div>お手数ではございますが、下記のボタンを押してチェックインを行ってください。</div>
                             <a href="{{ $messages->uri }}" class="btn btn-sm btn-success w-100 mt-3">チェックイン</a>
                         </div>
-                        <div class="col-11 border rounded-1 p-3 mt-4">
+                        <div class="col-11 border rounded-1 p-3 mt-4 text-secondary">
                             <div>ボタンを押すとLINEの画面が開きます。</div>
                             <div>友達登録がまだの方は、登録画面が表示されますので、登録をお願いします。</div>
                             <div>完了後、公式アカウントとのトーク画面が開き、チェックイン用のトークンが自動で入力された状態になっています。</div>
