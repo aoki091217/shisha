@@ -20,9 +20,13 @@
         </div>
     </div>
     <div class="col-6 mb-3">
-        <label class="form-label">顧客ニックネーム</label>
+        <label class="form-label">顧客</label>
         <div class="pe-2">
-            <span>{{ $bill->customer->name }}</span>
+            <ul>
+                @foreach ($bill->billCustomers as $billCustomer)
+                    <li>{{ $billCustomer->customer->name }}</li>
+                @endforeach
+            </ul>
         </div>
     </div>
     <div class="col-6 mb-3 d-flex gap-3">
@@ -78,7 +82,7 @@
                 aria-labelledby="tabtabContent{{ $i }}">
                 <ul class="mb-0">
                     @foreach ($orders as $order)
-                        <li>{{ $order->flavor->name }}</li>
+                        <li>{{ $order->mix->name }}</li>
                     @endforeach
                 </ul>
             </div>
@@ -88,12 +92,13 @@
 </div>
 <div class="d-flex align-items-center justify-content-end mt-3 footer-buttons gap-2">
     <a href="{{ route('bill.index') }}" class="btn btn-secondary">戻る</a>
-    <a href="{{ route('bill.edit', $bill->bill_id) }}" class="btn btn-success">編集</a>
-    <form action="{{ route('bill.destroy', $bill->bill_id) }}" method="POST">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-danger">削除</button>
-    </form>
+    <button type="button"
+            class="btn btn-danger"
+            data-route="{{ route('bill.destroy', $bill->bill_id) }}"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteModal">
+            削除
+    </button>
 </div>
 
 @endsection

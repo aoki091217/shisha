@@ -49,8 +49,8 @@
             @if (auth()->check())
             @include('layouts.sidebar')
 
-            <div class="main-contents">
-                <div class="container bg-white rounded-2 p-3 h-100">
+            <div class="main-contents bg-white">
+                <div class="container rounded-2 p-3">
                     @yield('content')
                 </div>
             </div>
@@ -58,6 +58,8 @@
             @yield('auth')
             @endif
         </main>
+
+        @include('layouts.delete_modal')
     </body>
 
     @stack('jquery')

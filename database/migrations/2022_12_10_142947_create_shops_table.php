@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('shops', function (Blueprint $table) {
             $table->increments('shop_id');
+            $table->bigInteger('user_id', false, true)->index();
             $table->string('name', 50);
             $table->timestamps();
             $table->softDeletes();

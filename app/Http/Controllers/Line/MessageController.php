@@ -4,10 +4,15 @@ namespace App\Http\Controllers\Line;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\SendMessage;
+use App\Models\Situation;
+use App\Repositories\CustomerRepository;
 use App\Repositories\CustomerShopRepository;
 use App\Services\LineBotService;
+use App\Services\MessageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use LINE\LINEBot;
 use LINE\LINEBot\Event\FollowEvent;
 use LINE\LINEBot\Event\MessageEvent\TextMessage;
@@ -17,9 +22,10 @@ use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 class MessageController extends Controller
 {
     public function __construct(
-        private Customer $customer,
+        private CustomerRepository $customerRepository,
         private LineBotService $lineBotService,
-        private CustomerShopRepository $customerShopRepository
+        private CustomerShopRepository $customerShopRepository,
+        private MessageService $messageService
     ){}
 
     public function webhook(Request $request)
@@ -33,130 +39,108 @@ class MessageController extends Controller
             $line_token = $event->getUserId();
             $reply_token = $event->getReplyToken();
 
+            $customer = Customer::withTrashed()->where('line_token', $line_token)->first();
+
             switch ($event) {
                 case ($event instanceof FollowEvent):
-                    $message = 'チェックインされますか？';
-                    $this->lineBotService->buildConfirm($message, $reply_token);
+                    $templates = Situation::with('messages.messageActions')->where('event_type', 1)->get()->pluck('messages')->flatten();
+                    foreach ($templates as $template) {
+                        $this->lineBotService->push($line_token, $template);
+                    }
 
+                    $name = $this->lineBotService->getProfileName($line_token);
+
+                    if (is_null($customer)) {
+                        $customer = new Customer();
+                        $customer->fill([
+                            'line_token' => $line_token,
+                            'name' => $name
+                        ])->save();
+                    } else {
+                        $customer->restore();
+                    }
                     return;
                 case ($event instanceof TextMessage):
                     $text = $event->getText();
 
-                    $customer = $this->customer->findCustomer($line_token);
-
-                    if (is_null($customer) || $customer->step === 5) {
-                        if ($text === 'はい') {
-                            $message = 'チェックインメッセージを送信してください。';
-                            $this->lineBotService->buildPushMessage($line_token, $message);
-                            return;
-                        } elseif ($text === 'いいえ') {
-                            if (is_null($customer)) {
-                                $customer = $this->customer->storeCustomer($line_token);
-                                $message = 'ニックネームが未登録です。ニックネームを入力してください。';
-                                $this->lineBotService->buildPushMessage($line_token, $message);
-                            }
-                            return;
-                        }
-                    }
+                    $templates = Situation::with('messages.messageActions')->where('event_type', 2)->get()->pluck('messages')->flatten();
 
                     if (preg_match('/checkin/', $text)) {
                         $checkin = $this->lineBotService->getParamsFromCheckin($text);
-                        $this->customerShopRepository->store($line_token, $checkin);
+                        $this->customerShopRepository->store($customer, $checkin);
 
-                        $message = 'チェックインが完了いたしました。ご来店ありがとうございます。';
-                        $this->lineBotService->buildReplyMessage($reply_token, $message);
-
-                        if (is_null($customer)) {
-                            $customer = $this->customer->storeCustomer($line_token);
-                            $message = 'ニックネームが未登録です。ニックネームを入力してください。';
-                            $this->lineBotService->buildPushMessage($line_token, $message);
-
-                            return;
+                        foreach ($templates->where('keyword', 'checkin') as $template) {
+                            $this->lineBotService->reply($reply_token, $template);
                         }
-                    }
-
-                    if (!preg_match('/checkin/', $text) && $customer->step === 1) {
-                        $fills = [
-                            'name' => $text,
-                            'step' => 2
-                        ];
-
-                        $this->customer->updateCustomer($customer, $fills);
-
-                        $message = "ニックネームは「{$event->getText()}」でよろしいですか？";
-                        $this->lineBotService->buildConfirm($message, $reply_token);
                         return;
                     }
 
-                    if ($customer->step === 2) {
-                        if ($text === 'はい') {
-                            $this->customer->storeStep($customer, 3);
-                            $message = "{$customer->name}様、ご登録ありがとうございます。";
-                            $this->lineBotService->buildReplyMessage($reply_token, $message);
+                    // if (preg_match('/アンケートを開始/', $text)) {
+                    //     $template = $situations->where('event_type', 3)->first()->messages->first();
 
-                        } elseif ($text === 'いいえ') {
-                            $this->customer->deleteName($customer);
-                            $message = '他のニックネームをご入力ください。';
-                            $this->lineBotService->buildReplyMessage($reply_token, $message);
+                    //     $this->lineBotService->saveAnswer($customer->id, $template->id, null, 1);
+                    //     $this->lineBotService->reply($reply_token, $template);
+
+                    //     return;
+                    // }
+                    $send = SendMessage::where('customer_id', $customer->id)->get()->first();
+                    if (!is_null($send)) {
+                        $templateIndex = 1;
+                        foreach ($templates as $index => $template) {
+                            if ($template->id === $send->message_id) {
+                                $templateIndex = $index + 1;
+                                break;
+                            }
+                        }
+
+                        $templates = $templates->slice($templateIndex);
+                    }
+
+                    foreach ($templates as $index => $template) {
+                        // $beforeTemplate = $this->lineBotService->getBeforeTemplate($templates, $index);
+
+                        if (Str::contains($text, $template->keyword)) {
+                            // $this->lineBotService->saveResponse($customer->id, $template->id, $text);
+                            $this->lineBotService->reply($reply_token, $template);
+                            $this->lineBotService->saveSend($customer->id, $template->id);
+
                             return;
+                        }
+
+                        // switch ($template->send_type) {
+                        //     case 1:
+                        //         // push
+                        //         $this->lineBotService->push($line_token, $template);
+                        //         $this->lineBotService->saveSend($customer->id, $template->id);
+
+                        //         return;
+                        //     case 2:
+                        //         // reply
+                        //         // $this->lineBotService->saveResponse($customer->id, $beforeTemplate?->id, $text);
+                        //         $this->lineBotService->reply($reply_token, $template);
+                        //         $this->lineBotService->saveSend($customer->id, $template->id);
+
+                        //         return;
+                        // }
+                    }
+
+                    return;
+                case ($event instanceof UnfollowEvent):
+                    $templates = Situation::with('messages.messageActions')->where('event_type', 3)->get()->pluck('messages')->flatten();
+                    foreach ($templates as $template) {
+                        switch ($template->send_type) {
+                            case 1:
+                                $this->lineBotService->push($line_token, $template);
+                                break;
                         }
                     }
 
-                    if ($customer->step === 3) {
-                        $this->customer->storeStep($customer, 4);
-
-                        $question = 'お手数おかけしますが、アンケートのご協力をお願いいたします。';
-                        $this->lineBotService->buildPushMessage($line_token, $question);
-
-                        $this->lineBotService->buildSex($line_token);
-                    }
-
-                    $replies = (object) [
-                        'sex' => $this->lineBotService->getIsReplied('sex', $text),
-                        'generation' => $this->lineBotService->getIsReplied('generation', $text),
-                        'reason' => $this->lineBotService->getIsReplied('reason', $text)
-                    ];
-
-                    if ($replies->sex && is_null($customer->sex)) {
-                        $fills = [
-                            'sex' => $this->lineBotService->getQuestionValue('sex', $text)
-                        ];
-
-                        $this->customer->updateCustomer($customer, $fills);
-
-                        $this->lineBotService->buildGeneration($line_token);
-                    }
-
-                    if ($replies->generation && is_null($customer->generation)) {
-                        $fills = [
-                            'generation' => $this->lineBotService->getQuestionValue('generation', $text)
-                        ];
-
-                        $this->customer->updateCustomer($customer, $fills);
-
-                        $this->lineBotService->buildReason($line_token);
-                    }
-
-                    // 来店経路の選択の保存
-                    if ($replies->reason && is_null($customer->reason)) {
-                        $fills = [
-                            'reason' => $text
-                        ];
-
-                        $this->customer->storeStep($customer, 5);
-
-                        $this->customer->updateCustomer($customer, $fills);
-
-                        $question = 'アンケートへのご協力ありがとうございました。';
-                        $this->lineBotService->buildPushMessage($line_token, $question);
-                    }
-
-                // case ($event instanceof UnfollowEvent):
-                //     $this->customer->deleteCustomer($line_token);
-                //     return;
+                    $customer = Customer::where('line_token', $line_token)->first();
+                    $customer->delete();
+                    return;
             }
         }
 
-        return '200';
+        return response('OK', 200);
     }
 }

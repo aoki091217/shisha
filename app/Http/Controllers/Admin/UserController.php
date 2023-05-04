@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
+use App\Models\Role;
+use App\Repositories\RoleRepository;
+use App\Repositories\ShopRepository;
 use App\Repositories\UserRepository;
 use App\Services\SessionService;
 use Illuminate\Http\Request;
@@ -12,6 +15,8 @@ class UserController extends Controller
 {
     public function __construct(
         private UserRepository $userRepository,
+        private RoleRepository $roleRepository,
+        private ShopRepository $shopRepository,
         private SessionService $sessionService
     ){}
 
@@ -23,7 +28,9 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('user.create');
+        $roles = $this->roleRepository->get();
+        $shops = $this->shopRepository->get();
+        return view('user.create', compact('roles', 'shops'));
     }
 
     public function store(UserRequest $request)
@@ -36,7 +43,8 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = $this->userRepository->find($id);
-        return view('user.edit', compact('user'));
+        $roles = $this->roleRepository->get();
+        return view('user.edit', compact('user', 'roles'));
     }
 
     public function update(UserRequest $request, $id)

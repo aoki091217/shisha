@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+
+class MixRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, mixed>
+     */
+    public function rules()
+    {
+        return [
+            'mix.name' => 'required|max:50'
+        ];
+    }
+
+    protected function passedValidation()
+    {
+        $presets = [];
+        foreach ($this->mix['presets'] as $preset) {
+            if (is_null($preset['bland_id']) || is_null($preset['flavor_id'])) {
+                $presets['delete'][] = $preset;
+            } else {
+                $presets['regist'][] = $preset;
+            }
+        }
+
+        return $this->merge([
+            'mix' => array_merge($this->mix, ['presets' => $presets])
+        ]);
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $this->merge(['validated', true]);
+        throw new HttpResponseException(
+            redirect($this->getRedirectUrl())
+            ->withErrors($validator)
+            ->withInput($this->input())
+        );
+    }
+}

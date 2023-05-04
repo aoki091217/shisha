@@ -16,11 +16,11 @@ class BillOrder extends Model
     protected $fillable = [
         'bill_order_id',
         'order_id',
-        'flavor_id'
+        'mix_id'
     ];
 
-    public function flavor()
+    public function mix()
     {
-        return $this->belongsTo(Flavor::class, 'flavor_id', 'flavor_id')->withTrashed();
+        return $this->belongsTo(MixPreset::class)->withTrashed();
     }
 }

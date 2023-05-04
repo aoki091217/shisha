@@ -26,11 +26,8 @@ $(window).on('load', function () {
         $('form').attr('action', url).trigger('submit');
     });
 
-    $('.btn-delete').on('click', function () {
-        $('#form').attr('method', 'POST');
-    });
-
-    $('[type=submit]').on('click', function () {
-        $(this).addClass('btn-prevent');
-    });
+    $('#deleteButton, .btn-delete').on('click', function () {
+        let route = $(this).data('route');
+        $('#deleteModal form').attr('action', route);
+    })
 });

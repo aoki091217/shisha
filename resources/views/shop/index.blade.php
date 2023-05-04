@@ -24,7 +24,7 @@
                 <a href="{{ route('shop.index') }}" class="col-6 btn btn-secondary">リセット</a>
             </div>
             <div class="col">
-                <a href="{{ route('shop.create') }}" class="col-10 btn btn-primary">登録</a>
+                <a href="{{ route('shop.create') }}" class="col-12 btn btn-primary">登録</a>
             </div>
         </div>
     </div>
@@ -33,8 +33,9 @@
             <thead>
                 <tr>
                     <th class="bg-light col-2" scope="col">ID</th>
-                    <th class="bg-light col-5" scope="col">店舗</th>
-                    <th class="bg-light col-3" scope="col">登録日</th>
+                    <th class="bg-light col-3" scope="col">店舗</th>
+                    <th class="bg-light col-3" scope="col">ユーザ名</th>
+                    <th class="bg-light col-2" scope="col">登録日</th>
                     <th class="bg-light col"></th>
                     <th class="bg-light col"></th>
                 </tr>
@@ -44,6 +45,7 @@
                 <tr>
                     <td>{{ $shop->shop_id }}</td>
                     <td>{{ $shop->name }}</td>
+                    <td>{{ $shop->user->name }}</td>
                     <td>{{ $shop->created_datetime }}</td>
                     <td>
                         <div class="col-12">
@@ -52,13 +54,9 @@
                     </td>
                     <td>
                         <div class="col-12">
-                            {{ Form::submit(
-                                '削除',
-                                [
-                                    'class' => 'btn btn-sm btn-danger w-100 btn-delete',
-                                    'formaction' => route('shop.destroy', $shop->shop_id)
-                                ]
-                            ) }}
+                            <button type="button" class="btn btn-sm btn-danger w-100 btn-delete" data-route="{{ route('shop.destroy', $shop->shop_id) }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                削除
+                            </button>
                         </div>
                     </td>
                 </tr>

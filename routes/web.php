@@ -3,9 +3,12 @@
 use App\Http\Controllers\Admin\HomeViewController;
 use App\Http\Controllers\Admin\BlandController;
 use App\Http\Controllers\Admin\BillController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\FlavorController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\MemberController;
+use App\Http\Controllers\Admin\MixController;
+use App\Http\Controllers\Admin\SituationController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -13,6 +16,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Line\LoginController as LineLoginController;
 use App\Http\Controllers\Line\MessageController;
+use App\Http\Middleware\RedirectIfNull;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -65,12 +69,20 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('/member', MemberController::class)->except('show')->parameters(['member' => 'id']);
 
+    Route::resource('/mix', MixController::class)->parameters(['mix' => 'id']);
+    Route::post('/mix/flavor', [MixController::class, 'getFlavors'])->name('mix.getFlavors');
+
     Route::resource('/bland', BlandController::class)->except('show')->parameters(['bland' => 'id']);
 
     Route::resource('/flavor', FlavorController::class)->except('show')->parameters(['flavor' => 'id']);
 
     Route::resource('/user', UserController::class)->except('show')->parameters(['user' => 'id']);
 
-    Route::resource('/bill', BillController::class)->parameters(['bill' => 'id']);
+    Route::resource('/bill', BillController::class)->except(['edit', 'update'])->parameters(['bill' => 'id']);
     Route::post('/bill/get_members', [BillController::class, 'getMembers'])->name('bill.getMembers');
+    Route::post('/bill/get_customers', [BillController::class, 'getCustomers'])->name('bill.getCustomers');
+
+    Route::get('/customer', [CustomerController::class, 'index'])->name('customer.index');
+
+    Route::resource('/situation', SituationController::class)->parameters(['situation' => 'id']);
 });

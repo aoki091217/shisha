@@ -14,10 +14,14 @@ export default defineConfig({
                 'resources/css/home/index.css',
                 'resources/css/bill/create.css',
                 'resources/css/line/checkin.css',
+                'resources/css/mix/mix.css',
+                'resources/css/situation.css',
                 'resources/js/common.js',
                 'resources/js/home.js',
                 'resources/js/user.js',
-                'resources/js/bill.js'
+                'resources/js/bill.js',
+                'resources/js/mix.js',
+                'resources/js/situation.js'
             ],
             refresh: true,
         }),

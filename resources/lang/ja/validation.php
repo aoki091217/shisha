@@ -183,6 +183,14 @@ return [
         'name' => 'ユーザー名',
         'password' => 'パスワード',
         'password_confirmation' => 'パスワード（確認用）',
-        'email' => 'メールアドレス'
+        'email' => 'メールアドレス',
+        'mix.name' => 'ミックス名',
+        'situation.name' => 'シチュエーション名',
+        'situation.messages.*.keyword' => '応答キーワード',
+        'situation.messages.*.text' => 'メッセージ内容',
+        'situation.messages.*.alt_text' => '代替テキスト',
+        'situation.messages.*.thumbnail' => 'サムネイル画像',
+        'situation.messages.*.title' => 'タイトル',
+        'situation.messages.*.labels' => 'ラベル',
     ],
 ];

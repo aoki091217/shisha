@@ -1,5 +1,4 @@
 .tab-wrapper {
-    height: 14rem;
     width: 100%;
 }
 .tab-content {
@@ -9,5 +8,20 @@
     padding: 0.5rem 1rem;
 }
 .tab-pane .form-select {
-    width: 23%;
+    width: 19% !important;
+}
+.list-wrapper {
+    overflow-y: auto;
+}
+.table-wrapper,
+.list-wrapper {
+    max-height: 13rem;
+}
+.btn-cancel {
+    width: 5rem;
+}
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

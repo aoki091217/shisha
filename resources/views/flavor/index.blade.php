@@ -35,7 +35,7 @@
                 <a href="{{ route('flavor.index') }}" class="col-6 btn btn-secondary">リセット</a>
             </div>
             <div class="col">
-                <a href="{{ route('flavor.create') }}" class="col-10 btn btn-primary">登録</a>
+                <a href="{{ route('flavor.create') }}" class="col-12 btn btn-primary">登録</a>
             </div>
         </div>
     </div>
@@ -67,13 +67,9 @@
                     </td>
                     <td>
                         <div class="col-12">
-                            {{ Form::submit(
-                                '削除',
-                                [
-                                    'class' => 'btn btn-sm btn-danger w-100 btn-delete',
-                                    'formaction' => route('flavor.destroy', $flavor->flavor_id)
-                                ]
-                            ) }}
+                            <button type="button" class="btn btn-sm btn-danger w-100 btn-delete" data-route="{{ route('flavor.destroy', $flavor->flavor_id) }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                削除
+                            </button>
                         </div>
                     </td>
                 </tr>

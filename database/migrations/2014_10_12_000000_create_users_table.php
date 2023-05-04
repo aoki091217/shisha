@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('email');
             $table->string('password');
             $table->string('name', 20);
+            $table->integer('role_id', false, true)->default(1);
             $table->rememberToken()->nullable();
             $table->timestamps();
             $table->softDeletes();

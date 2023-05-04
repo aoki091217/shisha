@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('bill_orders', function (Blueprint $table) {
-            $table->bigInteger('bill_order_id', false, true);
+            $table->id();
             $table->bigInteger('order_id', false, true);
-            $table->foreignId('flavor_id');
+            $table->foreignId('mix_id');
             $table->timestamps();
         });
     }

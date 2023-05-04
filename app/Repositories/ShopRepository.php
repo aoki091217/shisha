@@ -19,7 +19,7 @@ class ShopRepository
 
     public function relate()
     {
-        return Shop::with('members');
+        return Shop::with('user.role');
     }
 
     public function search($words)

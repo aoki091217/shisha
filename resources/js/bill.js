@@ -29,6 +29,62 @@ $(window).on('load', function () {
         $('#orderTabContents .form-select option:selected[value=null]').prop('disabled', true);
     });
 
+
+    $('.btn-cancel').on('click', function () {
+        $(this).parent().remove();
+    });
+
+    $('.table-wrapper button').on('click', function () {
+        let cloned = $('.list-item-template.d-none').clone();
+        cloned.children('span').text($(this).data('name'));
+        cloned.children('input').attr('name', 'bill[customers][]').val($(this).data('customer-id'));
+        cloned.removeClass('list-item-template d-none');
+        $('.list-wrapper .list-group').append(cloned);
+
+        $('.btn-cancel').on('click', function () {
+            $(this).parent().remove();
+        });
+    });
+
+    $('#searchButton, #reloadButton').on('click', function () {
+        getCustomers().done(function (customerShops) {
+            $('.table-wrapper tbody tr').remove();
+
+            $.each(customerShops, function (index, item) {
+                let selectButton = $('<button>', {
+                    type: 'button',
+                    class: 'btn btn-sm btn-outline-primary w-100',
+                }).text('選択').data('name', item.customer.name).data('customer-id', item.customer_id);
+                let selectElement = $('<td>').append(selectButton);
+
+                let nameElement = $('<td>', {
+                    class: 'name'
+                }).text(item.customer.name);
+                let checkinElement = $('<td>', {
+                    class: 'checkin'
+                }).text(item.visited_at);
+
+                let tr = $('<tr>', {
+                    class: `record_${index}`
+                }).append(nameElement, checkinElement, selectElement);
+
+                $('.table-wrapper tbody').append(tr);
+
+                $(selectButton).on('click', function () {
+                    let cloned = $('.d-none .list-item-template').clone();
+                    cloned.children('span').text(selectButton.data('name'));
+                    cloned.children('input').attr('name', 'bill[customers][]').val(selectButton.data('customer-id'));
+                    cloned.removeClass('list-item-template d-none');
+                    $('.list-wrapper .list-group').append(cloned);
+
+                    $('.btn-cancel').on('click', function () {
+                        $(this).parent().remove();
+                    });
+                });
+            });
+        });
+    });
+
     function getMembers()
     {
         return $.ajax({
@@ -40,6 +96,24 @@ $(window).on('load', function () {
             dataType: 'json',
             data: {
                 shop_id: $('#shopId').val()
+            }
+        })
+    }
+
+    function getCustomers()
+    {
+        return $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: window.getCustomers,
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                search: {
+                    name: $('#searchName').val(),
+                    shop_id: $('#searchShop').val()
+                }
             }
         })
     }

@@ -10,7 +10,7 @@
             <select name="flavor[bland_id]" id="blandName" class="form-select">
                 <option value=""></option>
                 @foreach ($blands as $bland)
-                    <option value="{{ $bland->bland_id }}" {{ old('flavor.bland_id') == $bland->name ? 'selected' : '' }}>
+                    <option value="{{ $bland->bland_id }}" {{ old('flavor.bland_id') == $bland->bland_id ? 'selected' : '' }}>
                         {{ $bland->name }}
                     </option>
                 @endforeach

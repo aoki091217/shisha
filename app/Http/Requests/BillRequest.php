@@ -29,7 +29,7 @@ class BillRequest extends FormRequest
         return [
             'bill.shop_id' => 'required',
             'bill.member_id' => 'required',
-            'bill.customer_id' => 'required',
+            'bill.customers.*' => 'required',
             'bill.top_change' => 'numeric',
             'bill.amount' => 'required',
             'bill.date' => 'required',
