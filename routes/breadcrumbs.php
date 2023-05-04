@@ -88,4 +88,45 @@ Breadcrumbs::for('user.edit', function ($trail, $id) {
     $trail->push('編集', route('user.edit', $id));
 });
 
+
+
+Breadcrumbs::for('customer.index', function ($trail) {
+    $trail->push('一覧', route('customer.index'));
+});
+
+
+
+Breadcrumbs::for('mix.index', function ($trail) {
+    $trail->push('一覧', route('mix.index'));
+});
+Breadcrumbs::for('mix.create', function ($trail) {
+    $trail->parent('mix.index');
+    $trail->push('登録', route('mix.create'));
+});
+Breadcrumbs::for('mix.show', function ($trail, $id) {
+    $trail->parent('mix.index');
+    $trail->push('詳細', route('mix.show', $id));
+});
+Breadcrumbs::for('mix.edit', function ($trail, $id) {
+    $trail->parent('mix.show', $id);
+    $trail->push('編集', route('mix.edit', $id));
+});
+
+
+
+Breadcrumbs::for('situation.index', function ($trail) {
+    $trail->push('一覧', route('situation.index'));
+});
+Breadcrumbs::for('situation.create', function ($trail) {
+    $trail->parent('situation.index');
+    $trail->push('登録', route('situation.create'));
+});
+Breadcrumbs::for('situation.show', function ($trail, $id) {
+    $trail->parent('situation.index');
+    $trail->push('詳細', route('situation.show', $id));
+});
+Breadcrumbs::for('situation.edit', function ($trail, $id) {
+    $trail->parent('situation.show', $id);
+    $trail->push('編集', route('situation.edit', $id));
+});
 ?>

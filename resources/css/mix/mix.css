@@ -1,0 +1,12 @@
+.detail-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1rem;
+}
+.mix-group {
+    display: flex;
+    align-items: center;
+}
+.mix-group span {
+    overflow-wrap: break-word;
+}

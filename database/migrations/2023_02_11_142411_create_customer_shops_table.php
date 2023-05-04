@@ -15,10 +15,11 @@ return new class extends Migration
     {
         Schema::create('customer_shops', function (Blueprint $table) {
             $table->id();
-            $table->string('line_token');
+            $table->bigInteger('customer_id', false, true);
             $table->integer('shop_id', false, true);
-            $table->dateTime('visit');
+            $table->dateTime('visited_at');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -35,7 +35,7 @@
                 <a href="{{ route('user.index') }}" class="col-6 btn btn-secondary">リセット</a>
             </div>
             <div class="col">
-                <a href="{{ route('user.create') }}" class="col-10 btn btn-primary">登録</a>
+                <a href="{{ route('user.create') }}" class="col-12 btn btn-primary">登録</a>
             </div>
         </div>
     </div>
@@ -46,6 +46,7 @@
                     <th class="bg-light" scope="col">ユーザID</th>
                     <th class="bg-light" scope="col">ユーザー名</th>
                     <th class="bg-light" scope="col">E-mail</th>
+                    <th class="bg-light" scope="col">権限</th>
                     <th class="bg-light" scope="col">登録日</th>
                     <th class="bg-light col"></th>
                     <th class="bg-light col"></th>
@@ -57,6 +58,7 @@
                     <td>{{ $user->code }}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
+                    <td>{{ $user->role->name }}</td>
                     <td>{{ $user->created_datetime }}</td>
                     <td>
                         <div class="col-12">
@@ -65,14 +67,14 @@
                     </td>
                     <td>
                         <div class="col-12">
-                            {{ Form::submit(
-                                '削除',
-                                [
-                                    'class' => 'btn btn-sm btn-danger w-100 btn-delete',
-                                    'formaction' => route('user.destroy', $user->id),
-                                    auth()->user()->id != $user->id ? 'disabled' : ''
-                                ]
-                            ) }}
+                            <button type="button"
+                                class="btn btn-sm btn-danger w-100 btn-delete"
+                                data-route="{{ route('user.destroy', $user->id) }}"
+                                {{ auth()->user()->id != $user->id ? 'disabled' : '' }}
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal">
+                                削除
+                            </button>
                         </div>
                     </td>
                 </tr>

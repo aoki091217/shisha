@@ -3,6 +3,7 @@ body {
     min-height: -webkit-fill-available;
     overflow: hidden;
     font-family: 'Helvetica Neue', 'Helvetica', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Arial', 'Yu Gothic', 'Meiryo', sans-serif;;
+    font-weight: 500;
 }
 
 html {
@@ -20,7 +21,6 @@ main {
     height: calc(100vh - 5rem);
     min-height: calc(100vh - 5rem);
     margin-left: 300px;
-    padding: 2rem 0;
 }
 .breadcrumb {
     font-size: 1.3rem;
@@ -62,4 +62,10 @@ main {
 }
 .footer-buttons .btn {
     width: 8rem;
+}
+.modal-footer button {
+    width: 5rem;
+}
+.form-label {
+    font-weight: 700;
 }

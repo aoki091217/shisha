@@ -10,62 +10,30 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Customer extends Model
 {
     use HasFactory;
-
-    protected $primaryKey = 'customer_id';
+    use SoftDeletes;
 
     protected $fillable = [
         'line_token',
-        'name',
-        'sex',
-        'generation',
-        'reason',
-        'customer_date',
-        'step'
+        'name'
     ];
 
-    public function findCustomer($line_token)
+    public function customerShops()
     {
-        return $this->where('line_token', $line_token)->first();
+        return $this->hasMany(CustomerShop::class);
     }
 
-    public function storeCustomer($line_token)
+    public function getFormatCreatedDateAttribute()
     {
-        $this->line_token = $line_token;
-        $this->customer_date = Carbon::today()->toDateString();
-        $this->step = 1;
-        $this->save();
-
-        return $this;
+        return Carbon::parse($this->created_date)->format('Y年m月d日 H時i分');
     }
 
-    public function storeStep($customer, $step)
+    public function scopeSearch($query, $words)
     {
-        $customer->step = $step;
-        $customer->save();
-    }
-
-    public function updateCustomer($customer, $fills)
-    {
-        foreach ($fills as $key => $value) {
-            $customer->{$key} = $value;
+        if (isset($words['name'])) {
+            return $query->where('name', 'LIKE', "%{$words['name']}%");
         }
-
-        $customer->save();
+        if (isset($words['shop_name'])) {
+            return $query->where('shop_name', 'LIKE', "%{$words['shop_name']}%");
+        }
     }
-
-    public function deleteName($customer)
-    {
-        $customer->name = null;
-        $customer->step = 1;
-        $customer->save();
-    }
-
-    // public function deleteCustomer($line_token)
-    // {
-    //     \Log::debug(111111);
-    //     $customer = $this->findCustomer($line_token);
-    //     if (!is_null($customer)) {
-    //         $customer->delete();
-    //     }
-    // }
 }

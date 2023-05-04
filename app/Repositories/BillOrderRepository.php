@@ -18,8 +18,8 @@ class BillOrderRepository
                 $order_count = ++$order_count;
 
                 $insert = [];
-                foreach ($order['flavors'] as $j => $flavor_id) {
-                    $insert = $this->createInsert($j, $bill_order_id, $order_count, $flavor_id);
+                foreach ($order['mixes'] as $mix_id) {
+                    $insert = $this->createInsert($bill_order_id, $order_count, $mix_id);
 
                     $bill_order = new BillOrder();
                     $bill_order->fill($insert)->save();
@@ -42,8 +42,8 @@ class BillOrderRepository
                 $order_count = ++$order_count;
 
                 $insert = [];
-                foreach ($order['flavors'] as $j => $flavor_id) {
-                    $insert = $this->createInsert($j, $bill_order_id, $order_count, $flavor_id);
+                foreach ($order['mixes'] as $mix_id) {
+                    $insert = $this->createInsert($bill_order_id, $order_count, $mix_id);
 
                     $bill_order = new BillOrder();
                     $bill_order->fill($insert)->save();
@@ -54,14 +54,12 @@ class BillOrderRepository
         });
     }
 
-    private function createInsert($j, $bill_order_id, $order_count, $flavor_id)
+    private function createInsert($bill_order_id, $order_count, $mix_id)
     {
-        $flavor_count = $j;
-        $flavor_count = ++$flavor_count;
         return [
             'bill_order_id' => $bill_order_id,
             'order_id' => $order_count,
-            'flavor_id' => intval($flavor_id)
+            'mix_id' => intval($mix_id)
         ];
     }
 }

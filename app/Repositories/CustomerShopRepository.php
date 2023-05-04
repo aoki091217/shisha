@@ -17,6 +17,26 @@ class CustomerShopRepository
         $this->prevYear =  $this->thisYear->copy()->subYear()->year;
     }
 
+    public function get()
+    {
+        return CustomerShop::get();
+    }
+
+    public function paginate()
+    {
+        return CustomerShop::paginate(10);
+    }
+
+    public function relate()
+    {
+        return CustomerShop::with(['shop', 'customer']);
+    }
+
+    public function search($words)
+    {
+        return CustomerShop::search($words);
+    }
+
     public function getSales()
     {
         $sales = [];
@@ -93,17 +113,17 @@ class CustomerShopRepository
         return DB::table('customer_shops')
             ->selectRaw('shops.name, COUNT(*) AS `count`')
             ->leftJoin('shops', 'customer_shops.shop_id', 'shops.shop_id')
-            ->whereRaw("DATE_FORMAT(customer_shops.visit, '{$format}') = '{$target}'")
+            ->whereRaw("DATE_FORMAT(customer_shops.visited_at, '{$format}') = '{$target}'")
             ->groupBy('customer_shops.shop_id')
             ->orderByDesc('count')
             ->get();
     }
 
-    public function store($line_token, $checkin)
+    public function store($customer, $checkin)
     {
         $customer_shop = new CustomerShop();
         $customer_shop->fill(array_merge($checkin, [
-            'line_token' => $line_token
+            'customer_id' => $customer->id
         ]))->save();
     }
 }

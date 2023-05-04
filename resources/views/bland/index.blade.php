@@ -24,7 +24,7 @@
                 <a href="{{ route('bland.index') }}" class="col-6 btn btn-secondary">リセット</a>
             </div>
             <div class="col">
-                <a href="{{ route('bland.create') }}" class="col-10 btn btn-primary">登録</a>
+                <a href="{{ route('bland.create') }}" class="col-12 btn btn-primary">登録</a>
             </div>
         </div>
     </div>
@@ -52,13 +52,9 @@
                     </td>
                     <td>
                         <div class="col-12">
-                            {{ Form::submit(
-                                '削除',
-                                [
-                                    'class' => 'btn btn-sm btn-danger w-100 btn-delete',
-                                    'formaction' => route('bland.destroy', $bland->bland_id)
-                                ]
-                            ) }}
+                            <button type="button" class="btn btn-sm btn-danger w-100 btn-delete" data-route="{{ route('bland.destroy', $bland->bland_id) }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                削除
+                            </button>
                         </div>
                     </td>
                 </tr>

@@ -15,7 +15,6 @@ class Bill extends Model
     protected $primaryKey = 'bill_id';
 
     protected $fillable = [
-        'customer_id',
         'amount',
         'shop_id',
         'member_id',
@@ -30,9 +29,9 @@ class Bill extends Model
         return $this->belongsTo(Shop::class, 'shop_id', 'shop_id')->withTrashed();
     }
 
-    public function customer()
+    public function billCustomers()
     {
-        return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');
+        return $this->hasMany(BillCustomer::class, 'bill_id', 'bill_id');
     }
 
     public function member()

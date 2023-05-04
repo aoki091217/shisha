@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Bill;
+use App\Models\BillCustomer;
 use Carbon\Carbon;
 use DB;
 
@@ -43,6 +44,14 @@ class BillRepository
 
             $bill = new Bill();
             $bill->fill($insert)->save();
+
+            foreach ($request['customers'] as $customer_id) {
+                $billCustomer = new BillCustomer();
+                $billCustomer->fill([
+                    'bill_id' => $bill->bill_id,
+                    'customer_id' => $customer_id
+                ])->save();
+            }
         });
     }
 
@@ -57,6 +66,15 @@ class BillRepository
 
             $bill = $this->find($id);
             $bill->fill($insert)->save();
+
+            $billCustomers = BillCustomer::where('bill_id', $id)->get();
+            foreach ($request['customers'] as $customer_id) {
+                $billCustomer = new BillCustomer();
+                $billCustomer->fill([
+                    'bill_id' => $bill->bill_id,
+                    'customer_id' => $customer_id
+                ])->save();
+            }
         });
     }
 

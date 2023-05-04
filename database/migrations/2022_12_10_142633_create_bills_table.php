@@ -15,11 +15,10 @@ return new class extends Migration
     {
         Schema::create('bills', function (Blueprint $table) {
             $table->bigIncrements('bill_id');
-            $table->bigInteger('customer_id', false, true);
             $table->integer('amount', false, true);
-            $table->integer('shop_id', false, true);
-            $table->bigInteger('member_id', false, true);
-            $table->bigInteger('bill_order_id', false, true);
+            $table->foreignId('shop_id', false, true);
+            $table->foreignId('member_id', false, true);
+            $table->foreignId('bill_order_id', false, true);
             $table->boolean('share');
             $table->tinyInteger('top_change', false, true);
             $table->dateTime('bill_date');

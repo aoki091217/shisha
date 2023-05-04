@@ -2,18 +2,22 @@
 
 namespace App\Services;
 
+use App\Models\Answer;
+use App\Models\SendMessage;
 use App\Models\Shop;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LINE\LINEBot;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
+use LINE\LINEBot\MessageBuilder\ImageMessageBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateBuilder\ButtonTemplateBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateBuilder\ConfirmTemplateBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateMessageBuilder;
 use LINE\LINEBot\MessageBuilder\TextMessageBuilder;
 use LINE\LINEBot\TemplateActionBuilder\MessageTemplateActionBuilder;
 use LINE\LINEBot\TemplateActionBuilder\PostbackTemplateActionBuilder;
+use Storage;
 
 class LineBotService
 {
@@ -73,6 +77,7 @@ class LineBotService
         $confirm = new ButtonTemplateBuilder("アンケートその{$number}", $message, null, $questions);
         $builder = new TemplateMessageBuilder("アンケートその{$number}", $confirm);
 
+
         return $builder;
     }
 
@@ -88,29 +93,114 @@ class LineBotService
         $this->bot->pushMessage($line_token, $builder);
     }
 
-    /**
-     * 年代アンケートのプッシュメッセージ
-     */
-    public function buildGeneration($line_token)
+    public function push($line_token, $template)
     {
-        $message = '年代についてお聞かせください。';
+        switch ($template->type) {
+            case 1:
+                // text
+                $builder = new TextMessageBuilder($template->text);
+                break;
+            case 2:
+                // buttons
+                $actions = [];
+                foreach ($template->messageActions as $action) {
+                    $actions[] = new MessageTemplateActionBuilder($action->label, $action->action);
+                }
 
-        $builder = $this->buildQuestionsTemplate($message, 'generation', 2);
+                $filePath = null;
+                if ($template->thumbnail_image_url) {
+                    $filePath = Storage::disk('public')->url($template->thumbnail_image_url);
+                }
+
+                $buttonBuilder = new ButtonTemplateBuilder($template->title, $template->text, $filePath, $actions);
+                $builder = new TemplateMessageBuilder($template->alt_text, $buttonBuilder);
+                break;
+        }
 
         $this->bot->pushMessage($line_token, $builder);
     }
 
-    /**
-     * どうやって知ったかのアンケートのプッシュメッセージ
-     */
-    public function buildReason($line_token)
+    public function reply($reply_token, $template)
     {
-        $message = '来店経路についてお聞かせください。';
+        switch ($template->type) {
+            case 1:
+                // text
+                $builder = new TextMessageBuilder($template->text);
+                break;
+            case 2:
+                // buttons
+                $actions = [];
+                foreach ($template->messageActions as $action) {
+                    $actions[] = new MessageTemplateActionBuilder($action->label, $action->action);
+                }
 
-        $builder = $this->buildQuestionsTemplate($message, 'reason', 3);
+                $filePath = null;
+                if ($template->thumbnail_image_url) {
+                    $filePath = Storage::disk('public')->url($template->thumbnail_image_url);
+                }
 
-        $this->bot->pushMessage($line_token, $builder);
+                $buttonBuilder = new ButtonTemplateBuilder($template->title, $template->text, $filePath, $actions);
+                $builder = new TemplateMessageBuilder($template->alt_text, $buttonBuilder);
+                break;
+        }
+
+        $this->bot->replyMessage($reply_token, $builder);
     }
+
+
+    public function getProfileName($line_token)
+    {
+        $profile = ['displayName' => ''];
+        $response = $this->bot->getProfile($line_token);
+        if ($response->isSucceeded()) {
+            $profile = $response->getJSONDecodedBody();
+        }
+
+        return $profile['displayName'];
+    }
+
+    public function saveSend($customerId, $messageId)
+    {
+        $sendMessage = SendMessage::where('customer_id', $customerId)->get()->first();
+        if (is_null($sendMessage)) {
+            $sendMessage = new SendMessage();
+        }
+
+        $sendMessage->id = $customerId;
+        $sendMessage->message_id = $messageId;
+        $sendMessage->save();
+    }
+
+    public function saveAnswer($customerId, $messageId = null, $text = null, $is_question)
+    {
+        $response = new Answer();
+        $response->fill([
+            'customer_id' => $customerId,
+            'message_id' => $messageId,
+            'text' => $text,
+            'is_question' => $is_question
+        ])->save();
+    }
+
+    public function saveResponse($customerId, $messageId, $answer)
+    {
+        $response = new Answer();
+        $response->id = $customerId;
+        $response->message_id = $messageId;
+        $response->text = $answer;
+        $response->save();
+    }
+
+    public function getBeforeTemplate($templates, $index)
+    {
+        $before = $index - 1;
+        if (isset($templates[$before])) {
+            return $templates[$before];
+        } else {
+            return null;
+        }
+    }
+
 
     public function getIsReplied($type, $text)
     {
@@ -166,11 +256,11 @@ class LineBotService
         $checkin = Str::after($text, 'checkin:');
         $shop_id = Str::between($checkin, 'shop_id=', '&');
         $datetime = explode('_', Str::after($checkin, 'datetime='));
-        $visit = Carbon::parse($datetime[0])->setTimeFromTimeString($datetime[1])->format('Y-m-d H:i:s');
+        $visited_at = Carbon::parse($datetime[0])->setTimeFromTimeString($datetime[1])->format('Y-m-d H:i:s');
 
         return [
             'shop_id' => $shop_id,
-            'visit' => $visit
+            'visited_at' => $visited_at
         ];
     }
 }

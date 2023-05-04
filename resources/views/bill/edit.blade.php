@@ -13,7 +13,7 @@
     @method('PATCH')
     <input type="hidden" name="bill[bill_order_id]" value="{{ $bill->bill_order_id }}">
     <div class="d-flex flex-wrap">
-        <div class="col-6 mb-3">
+        <div class="col-4 mb-3">
             <label for="shopId" class="form-label">店舗<span class="text-danger">※</span></label>
             <div class="pe-2">
                 <select name="bill[shop_id]" id="shopId" class="form-select">
@@ -27,33 +27,17 @@
                 <span class="text-danger">{{ $errors->first('bill.shop_id') }}</span>
             </div>
         </div>
-        <div class="col-6 mb-3">
-            <label for="memberId" class="form-label ps-2">メイカー<span class="text-danger">※</span></label>
-            <div class="ps-2">
+        <div class="col-4 mb-3 ps-2">
+            <label for="memberId" class="form-label">メイカー<span class="text-danger">※</span></label>
+            <div>
                 <select name="bill[member_id]" id="memberId" class="form-select">
                     <option value=""></option>
                 </select>
                 <span class="text-danger">{{ $errors->first('bill.member_id') }}</span>
             </div>
         </div>
-        <div class="col-6 mb-3">
-            <label for="customerId" class="form-label">顧客ニックネーム<span class="text-danger">※</span></label>
-            <div class="pe-2">
-                <select name="bill[customer_id]" id="customerId" class="form-select">
-                    <option value=""></option>
-                    @foreach ($customers as $customer)
-                        <option
-                            value="{{ $customer->customer_id }}"
-                            {{ old('bill.customer_id', $bill->customer_id) == $customer->customer_id ? 'selected' : '' }}>
-                            {{ $customer->name }}
-                        </option>
-                    @endforeach
-                </select>
-                <span class="text-danger">{{ $errors->first('bill.customer_id') }}</span>
-            </div>
-        </div>
-        <div class="col-6 mb-3 d-flex">
-            <div class="ps-2">
+        <div class="col-4 mb-3 ps-2 d-flex">
+            <div>
                 <label class="form-label">シェア</label>
                 <div class="d-flex">
                     <div class="radio-group">
@@ -98,6 +82,77 @@
                     <span>回</span>
                 </div>
                 <span class="text-danger">{{ $errors->first('bill.top_change') }}</span>
+            </div>
+        </div>
+        <div class="col-8 mb-3">
+            <label for="customerId" class="form-label col-12 pe-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="col-1 text-center">顧客名</span>
+                    <input type="search" class="form-control form-control-sm" id="searchName">
+                    <span class="col-1 text-center">店舗名</span>
+                    <select class="form-select form-select-sm" id="searchShop">
+                        <option value=""></option>
+                        @foreach ($shops as $shop)
+                            <option value="{{ $shop->shop_id }}">
+                                {{ $shop->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <button type="button" class="col-1 btn btn-sm btn-light border" id="reloadButton">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                    <button type="button" class="col-2 btn btn-sm btn-warning" id="searchButton">検索</button>
+                </div>
+            </label>
+            <div class="table-wrapper pe-2">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th class="bg-light col-5" scope="col">名前</th>
+                            <th class="bg-light col-5" scope="col">最終チェックイン日時</th>
+                            <th class="bg-light col-2" scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($customerShops as $customerShop)
+                            <tr>
+                                <td>{{ $customerShop->first()->customer->name }}</td>
+                                <td>{{ $customerShop->first()->visited_at }}</td>
+                                <td>
+                                    <button type="button"
+                                        class="btn btn-sm btn-outline-primary w-100"
+                                        data-name="{{ $customerShop->first()->customer->name }}"
+                                        data-customer-id="{{ $customerShop->first()->customer->id }}">
+                                        選択
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-4 mb-3 d-flex">
+            <div class="col-12 ps-2 mb-3">
+                <span>顧客選択リスト</span>
+                <div class="list-wrapper">
+                    <ul class="list-group">
+                        @foreach ($bill->billCustomers as $billCustomer)
+                        <li class="list-group-item list-item-template">
+                            <span class="text-wrap">{{ $billCustomer->customer->name }}</span>
+                            <input type="hidden" name="bill[customers][]" value="{{ $billCustomer->id }}">
+                            <button type="button" class="btn btn-sm btn-danger btn-cancel">外す</button>
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
+                <div class="d-none">
+                    <li class="list-group-item list-item-template d-none">
+                        <span class="text-wrap"></span>
+                        <input type="hidden" value="">
+                        <button type="button" class="btn btn-sm btn-danger btn-cancel">外す</button>
+                    </li>
+                </div>
             </div>
         </div>
         <div class="col-6 mb-3">
@@ -166,14 +221,14 @@
                     role="tabpanel"
                     aria-labelledby="tabContent{{ $tabPaneCount }}">
                     <div class="d-flex flex-wrap gap-2">
-                        @foreach (range(1, 10) as $j => $flavorCount)
-                            <select name="bill[orders][{{ $i }}][flavors][{{ $j }}]" class="col-3 form-select">
+                        @foreach (range(1, 5) as $j => $mixCount)
+                            <select name="bill[orders][{{ $i }}][mixes][{{ $j }}]" class="col-3 form-select">
                                 <option value="null"></option>
-                                @foreach ($flavors as $flavor)
+                                @foreach ($mixPresets as $preset)
                                     <option
-                                        value="{{ $flavor->flavor_id }}"
-                                        {{ old("bill.orders.{$i}.flavors.{$j}") == $flavor->flavor_id ? 'selected' : '' }}>
-                                        {{ $flavor->name }}
+                                        value="{{ $preset->id }}"
+                                        {{ old("bill.orders.{$i}.mixes.{$j}") == $preset->id ? 'selected' : '' }}>
+                                        {{ $preset->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -192,13 +247,14 @@
 
 @push('jquery')
 <script type="module">
+    window.getCustomers = "{{ route('bill.getCustomers') }}";
     window.getMembers = "{{ route('bill.getMembers') }}";
     window.requests = @json(old('bill'));
     window.member = @json($bill->member);
 
     $.each(@json($grouped_orders), function (i, orders) {
         $.each(orders, function (j, order) {
-            $(`#tabContent${order.order_id} select`).eq(j).children(`[value=${order.flavor_id}]`).prop('selected', true);
+            $(`#tabContent${order.order_id} select`).eq(j).children(`[value=${order.mix_id}]`).prop('selected', true);
         });
     });
 </script>

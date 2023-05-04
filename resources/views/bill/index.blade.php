@@ -5,7 +5,6 @@
 <div class="text-success text-center fw-bold">{{ session('message') }}</div>
 <form action="{{ route('bill.index') }}" method="GET" autocomplete="off" id="form">
     @csrf
-    @method('DELETE')
     <div id="searchForm">
         <div class="col-12 d-flex justify-content-between align-items-end gap-3">
             <div class="col-4">
@@ -60,7 +59,7 @@
                 <a href="{{ route('bill.index') }}" class="col-6 btn btn-secondary">リセット</a>
             </div>
             <div class="col">
-                <a href="{{ route('bill.create') }}" class="col-10 btn btn-primary">登録</a>
+                <a href="{{ route('bill.create') }}" class="col-12 btn btn-primary">登録</a>
             </div>
         </div>
     </div>

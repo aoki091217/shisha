@@ -16,11 +16,17 @@ class Shop extends Model
 
     protected $fillable = [
         'name',
+        'user_id'
     ];
 
     public function members()
     {
         return $this->hasMany(Member::class, 'shop_id', 'shop_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function getCreatedDatetimeAttribute()

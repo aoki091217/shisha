@@ -23,6 +23,11 @@ class BlandRepository
         return Bland::search($words);
     }
 
+    public function relate()
+    {
+        return Bland::with('flavors');
+    }
+
     public function find($id)
     {
         return Bland::find($id);
