@@ -35,6 +35,8 @@ class MessageController extends Controller
 
     public function webhook(Request $request)
     {
+        \Log::debug('----- webhook -----');
+
         $client = new CurlHTTPClient(config('services.line.access_token'));
         $bot = new LINEBot($client, ['channelSecret' => config('services.line.channel_secret')]);
 

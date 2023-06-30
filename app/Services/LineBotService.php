@@ -101,6 +101,8 @@ class LineBotService
 
     public function push($line_token, $message)
     {
+        \Log::debug('----- push -----');
+
         switch ($message->type) {
             case 1:
                 // テキスト
@@ -154,6 +156,8 @@ class LineBotService
 
     public function reply($reply_token, $message, $line_token)
     {
+        \Log::debug('----- reply -----');
+
         switch ($message->type) {
             case 1:
                 // text
