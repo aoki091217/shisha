@@ -121,11 +121,6 @@ class MessageController extends Controller
 
                     return;
                 case ($event instanceof UnfollowEvent):
-                    $situation = Situation::with('messages.carousels.carouselActions')->where('event_type', 4)->first();
-                    foreach ($situation->messages as $message) {
-                        $this->lineBotService->push($line_token, $message);
-                    }
-
                     $customer = Customer::where('line_token', $line_token)->first();
                     $customer->delete();
                     return;
