@@ -130,6 +130,8 @@ class LineBotService
                         );
                     }
 
+                    \Log::debug($actions);
+
                     $filePath = null;
                     if ($carousel->thumbnail_image_url) {
                         $filePath = Storage::disk('public')->url($carousel->thumbnail_image_url);
@@ -145,6 +147,9 @@ class LineBotService
                     );
 
                 }
+
+                \Log::debug($carousels);
+
                 $carouselTemplates = new CarouselTemplateBuilder($carousels);
 
                 $builder = new TemplateMessageBuilder($message->alt_text, $carouselTemplates);
@@ -185,6 +190,8 @@ class LineBotService
                         );
                     }
 
+                    \Log::debug($actions);
+
                     $filePath = null;
                     if ($carousel->thumbnail_image_url) {
                         $filePath = Storage::disk('public')->url($carousel->thumbnail_image_url);
@@ -198,8 +205,10 @@ class LineBotService
                         $filePath,
                         $actions
                     );
-
                 }
+
+                \Log::debug($carousels);
+
                 $carouselTemplates = new CarouselTemplateBuilder($carousels);
 
                 $builder = new TemplateMessageBuilder($message->alt_text, $carouselTemplates);
