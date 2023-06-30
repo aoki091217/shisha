@@ -102,6 +102,8 @@ class MessageController extends Controller
                         $postbacks[$exploded[0]] = $exploded[1];
                     }
 
+                    \Log::debug($postbacks);
+
                     $alreadyAnswer = Answer::where('carousel_id', $postbacks['carousel_id'])
                         ->where('customer_id', $postbacks['customer_id'])
                         ->first();
@@ -114,6 +116,9 @@ class MessageController extends Controller
                     }
 
                     $message = Message::find($postbacks['next_message_id']);
+
+                    \Log::debug($message);
+
                     if (is_null($message)) {
                         break;
                     } else {
