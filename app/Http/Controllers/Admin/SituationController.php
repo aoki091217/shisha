@@ -83,7 +83,7 @@ class SituationController extends Controller
                             $newCarousel = new Carousel();
                             $newCarousel->fill($insert)->save();
 
-                            foreach ($carousel['actions'] as $action) {
+			    foreach ($carousel['actions'] as $action) {				    
                                 $carouselAction = new CarouselAction();
                                 $carouselAction->fill(array_merge($action, ['carousel_id' => $newCarousel->id]))->save();
                             }
