@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Answer;
+use App\Models\Customer;
 use App\Models\SendMessage;
 use App\Models\Shop;
 use Carbon\Carbon;
@@ -10,9 +11,14 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LINE\LINEBot;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
+use LINE\LINEBot\MessageBuilder\Flex\ContainerBuilder\CarouselContainerBuilder;
 use LINE\LINEBot\MessageBuilder\ImageMessageBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateBuilder\ButtonTemplateBuilder;
+use LINE\LINEBot\MessageBuilder\TemplateBuilder\CarouselColumnTemplateBuilder;
+use LINE\LINEBot\MessageBuilder\TemplateBuilder\CarouselTemplateBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateBuilder\ConfirmTemplateBuilder;
+use LINE\LINEBot\MessageBuilder\TemplateBuilder\ImageCarouselColumnTemplateBuilder;
+use LINE\LINEBot\MessageBuilder\TemplateBuilder\ImageCarouselTemplateBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateMessageBuilder;
 use LINE\LINEBot\MessageBuilder\TextMessageBuilder;
 use LINE\LINEBot\TemplateActionBuilder\MessageTemplateActionBuilder;
@@ -93,54 +99,98 @@ class LineBotService
         $this->bot->pushMessage($line_token, $builder);
     }
 
-    public function push($line_token, $template)
+    public function push($line_token, $message)
     {
-        switch ($template->type) {
+        switch ($message->type) {
             case 1:
-                // text
-                $builder = new TextMessageBuilder($template->text);
+                // テキスト
+                $builder = new TextMessageBuilder($message->text);
                 break;
             case 2:
-                // buttons
+                $nextTurn = $message->turn + 1;
+                $nextMessage = $message->load('situation.messages')->situation->messages->where('turn', $nextTurn)->first();
+
+                $customer = Customer::where('line_token', $line_token)->first();
+
+                // カルーセル
                 $actions = [];
-                foreach ($template->messageActions as $action) {
-                    $actions[] = new MessageTemplateActionBuilder($action->label, $action->action);
-                }
+                foreach ($message->carousels as $carousel) {
+                    $actions = [];
+                    foreach ($carousel->carouselActions as $carouselAction) {
+                        $postback = "carousel_id={$carousel->id}&carousel_action_id={$carouselAction->id}&customer_id={$customer->id}&next_message_id={$nextMessage?->id}";
 
-                $filePath = null;
-                if ($template->thumbnail_image_url) {
-                    $filePath = Storage::disk('public')->url($template->thumbnail_image_url);
-                }
+                        $actions[] = new PostbackTemplateActionBuilder(
+                            $carouselAction->action,
+                            $postback,
+                            $carouselAction->action
+                        );
+                    }
 
-                $buttonBuilder = new ButtonTemplateBuilder($template->title, $template->text, $filePath, $actions);
-                $builder = new TemplateMessageBuilder($template->alt_text, $buttonBuilder);
+                    $filePath = null;
+                    if ($carousel->thumbnail_image_url) {
+                        $filePath = Storage::disk('public')->url($carousel->thumbnail_image_url);
+                    }
+
+                    $carousels[] = new CarouselColumnTemplateBuilder(
+                        $carousel->title,
+                        $carousel->text,
+                        $filePath,
+                        $actions
+                    );
+
+                }
+                $carouselTemplates = new CarouselTemplateBuilder($carousels);
+
+                $builder = new TemplateMessageBuilder($message->alt_text, $carouselTemplates);
                 break;
         }
 
         $this->bot->pushMessage($line_token, $builder);
     }
 
-    public function reply($reply_token, $template)
+    public function reply($reply_token, $message, $line_token)
     {
-        switch ($template->type) {
+        switch ($message->type) {
             case 1:
                 // text
-                $builder = new TextMessageBuilder($template->text);
+                $builder = new TextMessageBuilder($message->text);
                 break;
             case 2:
-                // buttons
+                $customer = Customer::where('line_token', $line_token)->first();
+
+                $nextTurn = $message->turn + 1;
+                $nextMessage = $message->load('situation.messages')->situation->messages->where('turn', $nextTurn)->first();
+
+                // カルーセル
                 $actions = [];
-                foreach ($template->messageActions as $action) {
-                    $actions[] = new MessageTemplateActionBuilder($action->label, $action->action);
-                }
+                foreach ($message->carousels as $carousel) {
+                    $actions = [];
+                    foreach ($carousel->carouselActions as $carouselAction) {
+                        $postback = "carousel_id={$carousel->id}&carousel_action_id={$carouselAction->id}&customer_id={$customer->id}&next_message_id={$nextMessage?->id}";
 
-                $filePath = null;
-                if ($template->thumbnail_image_url) {
-                    $filePath = Storage::disk('public')->url($template->thumbnail_image_url);
-                }
+                        $actions[] = new PostbackTemplateActionBuilder(
+                            $carouselAction->action,
+                            $postback,
+                            $carouselAction->action
+                        );
+                    }
 
-                $buttonBuilder = new ButtonTemplateBuilder($template->title, $template->text, $filePath, $actions);
-                $builder = new TemplateMessageBuilder($template->alt_text, $buttonBuilder);
+                    $filePath = null;
+                    if ($carousel->thumbnail_image_url) {
+                        $filePath = Storage::disk('public')->url($carousel->thumbnail_image_url);
+                    }
+
+                    $carousels[] = new CarouselColumnTemplateBuilder(
+                        $carousel->title,
+                        $carousel->text,
+                        $filePath,
+                        $actions
+                    );
+
+                }
+                $carouselTemplates = new CarouselTemplateBuilder($carousels);
+
+                $builder = new TemplateMessageBuilder($message->alt_text, $carouselTemplates);
                 break;
         }
 

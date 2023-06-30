@@ -3,19 +3,24 @@
 namespace App\Http\Controllers\Line;
 
 use App\Http\Controllers\Controller;
+use App\Models\Answer;
 use App\Models\Customer;
+use App\Models\Message;
 use App\Models\SendMessage;
+use App\Models\Shop;
 use App\Models\Situation;
 use App\Repositories\CustomerRepository;
 use App\Repositories\CustomerShopRepository;
 use App\Services\LineBotService;
 use App\Services\MessageService;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LINE\LINEBot;
 use LINE\LINEBot\Event\FollowEvent;
 use LINE\LINEBot\Event\MessageEvent\TextMessage;
+use LINE\LINEBot\Event\PostbackEvent;
 use LINE\LINEBot\Event\UnfollowEvent;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 
@@ -43,13 +48,7 @@ class MessageController extends Controller
 
             switch ($event) {
                 case ($event instanceof FollowEvent):
-                    $templates = Situation::with('messages.messageActions')->where('event_type', 1)->get()->pluck('messages')->flatten();
-                    foreach ($templates as $template) {
-                        $this->lineBotService->push($line_token, $template);
-                    }
-
                     $name = $this->lineBotService->getProfileName($line_token);
-
                     if (is_null($customer)) {
                         $customer = new Customer();
                         $customer->fill([
@@ -59,80 +58,72 @@ class MessageController extends Controller
                     } else {
                         $customer->restore();
                     }
+
+                    $situation = Situation::with('messages.carousels.carouselActions')->where('event_type', 1)->first();
+                    foreach ($situation->messages as $message) {
+                        $this->lineBotService->push($line_token, $message);
+                    }
+
                     return;
                 case ($event instanceof TextMessage):
+                    /** @var TextMessage $event */
                     $text = $event->getText();
 
-                    $templates = Situation::with('messages.messageActions')->where('event_type', 2)->get()->pluck('messages')->flatten();
+                    $replySituation = Situation::with('messages.carousels.carouselActions')->where('event_type', 2)->first();
 
                     if (preg_match('/checkin/', $text)) {
                         $checkin = $this->lineBotService->getParamsFromCheckin($text);
                         $this->customerShopRepository->store($customer, $checkin);
 
-                        foreach ($templates->where('keyword', 'checkin') as $template) {
-                            $this->lineBotService->reply($reply_token, $template);
+                        foreach ($replySituation->messages as $message) {
+                            $this->lineBotService->reply($reply_token, $message, $line_token);
                         }
+
+                        $question = Situation::with('messages.carousels.carouselActions')->where('event_type', 3)->first();
+                        $this->lineBotService->push($line_token, $question->messages->first());
+
                         return;
+                    } else {
+                        foreach ($replySituation->messages->where('keyword', $text) as $message) {
+                            $this->lineBotService->reply($reply_token, $message, $line_token);
+                        }
                     }
 
-                    // if (preg_match('/アンケートを開始/', $text)) {
-                    //     $template = $situations->where('event_type', 3)->first()->messages->first();
+                    break;
+                case ($event instanceof PostbackEvent):
+                    /** @var PostbackEvent $event */
+                    $postback = $event->getPostbackData();
 
-                    //     $this->lineBotService->saveAnswer($customer->id, $template->id, null, 1);
-                    //     $this->lineBotService->reply($reply_token, $template);
-
-                    //     return;
-                    // }
-                    $send = SendMessage::where('customer_id', $customer->id)->get()->first();
-                    if (!is_null($send)) {
-                        $templateIndex = 1;
-                        foreach ($templates as $index => $template) {
-                            if ($template->id === $send->message_id) {
-                                $templateIndex = $index + 1;
-                                break;
-                            }
-                        }
-
-                        $templates = $templates->slice($templateIndex);
+                    $postbacks = [];
+                    foreach (explode('&', $postback) as $value) {
+                        $exploded = explode('=', $value);
+                        $postbacks[$exploded[0]] = $exploded[1];
                     }
 
-                    foreach ($templates as $index => $template) {
-                        // $beforeTemplate = $this->lineBotService->getBeforeTemplate($templates, $index);
+                    $alreadyAnswer = Answer::where('carousel_id', $postbacks['carousel_id'])
+                        ->where('customer_id', $postbacks['customer_id'])
+                        ->first();
 
-                        if (Str::contains($text, $template->keyword)) {
-                            // $this->lineBotService->saveResponse($customer->id, $template->id, $text);
-                            $this->lineBotService->reply($reply_token, $template);
-                            $this->lineBotService->saveSend($customer->id, $template->id);
+                    if (is_null($alreadyAnswer)) {
+                        $answer = new Answer();
+                        $answer->fill($postbacks)->save();
+                    } else {
+                        $this->lineBotService->buildPushMessage($line_token, 'そのメッセージには、すでに回答済みです');
+                    }
 
-                            return;
-                        }
-
-                        // switch ($template->send_type) {
-                        //     case 1:
-                        //         // push
-                        //         $this->lineBotService->push($line_token, $template);
-                        //         $this->lineBotService->saveSend($customer->id, $template->id);
-
-                        //         return;
-                        //     case 2:
-                        //         // reply
-                        //         // $this->lineBotService->saveResponse($customer->id, $beforeTemplate?->id, $text);
-                        //         $this->lineBotService->reply($reply_token, $template);
-                        //         $this->lineBotService->saveSend($customer->id, $template->id);
-
-                        //         return;
-                        // }
+                    $message = Message::find($postbacks['next_message_id']);
+                    if (is_null($message)) {
+                        break;
+                    } else {
+                        $this->lineBotService->push($line_token, $message);
+                        break;
                     }
 
                     return;
                 case ($event instanceof UnfollowEvent):
-                    $templates = Situation::with('messages.messageActions')->where('event_type', 3)->get()->pluck('messages')->flatten();
-                    foreach ($templates as $template) {
-                        switch ($template->send_type) {
-                            case 1:
-                                $this->lineBotService->push($line_token, $template);
-                                break;
-                        }
+                    $situation = Situation::with('messages.carousels.carouselActions')->where('event_type', 4)->first();
+                    foreach ($situation->messages as $message) {
+                        $this->lineBotService->push($line_token, $message);
                     }
 
                     $customer = Customer::where('line_token', $line_token)->first();

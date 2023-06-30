@@ -4,20 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MessageAction extends Model
+class CarouselAction extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
-        'message_id',
-        'type',
-        'label',
+        'carousel_id',
         'action'
     ];
-
-    public function getActionTypeAttribute()
-    {
-        return $this->type == 1 ? 'message' : 'uri';
-    }
 }

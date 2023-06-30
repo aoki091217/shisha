@@ -35,8 +35,9 @@
             <div>
                 <div>
                     <label class="form-label"> 受信イベント</label>
+                    <small class="text-secondary">カスタムした一連のメッセージの送信するタイミングを変更できます。</small>
                 </div>
-                <small class="text-secondary">カスタムした一連のメッセージの送信するタイミングを変更できます。</small>
+                <div class="text-danger font-weight-bold">※メッセージの受信イベントでは、1つのみメッセージを設定できます。</div>
             </div>
             <div class="d-flex">
                 @foreach (config('situation.event_type') as $key => $event_type)
@@ -59,6 +60,7 @@
         <div class="col-12 mb-3">
             <div class="accordion mb-3" id="accordionMessages">
                 <div class="accordion-item">
+                    <input type="hidden" name="situation[messages][0][disabled]" data-name="disabled" value="0">
                     <input type="hidden" name="situation[messages][0][turn]" class="turn" value="1" data-name="turn">
                     <h2 class="accordion-header">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#message_0">
@@ -145,7 +147,7 @@
                                                 <span class="text-danger">{{ $errors->first('situation.messages.0.keyword') }}</span>
                                             </div>
                                         </div>
-                                        <div class="type-text {{ old('situation.messages.0.message_type') == 'buttons' ? 'd-none' : '' }}">
+                                        <div class="type-text {{ old('situation.messages.0.message_type') == 'carousel' ? 'd-none' : '' }}">
                                             <div>
                                                 <div>
                                                     <label class="form-label">メッセージ内容</label>
@@ -171,119 +173,100 @@
                                                     <span class="text-danger">{{ $errors->first('situation.messages.0.alt_text') }}</span>
                                                 </div>
                                             </div>
-                                            {{-- <div class="type-buttons">
-
-                                            </div>
-                                            <div class="type-carousel">
-
-                                            </div> --}}
-                                            {{-- <div class="carousel-column">
-                                                <div>
-                                                    <label class="form-label">カラム数</label>
-                                                    <span class="text-danger">※</span>
-                                                    <span class="text-secondary ms-2">最大：10カラム</span>
-                                                </div>
-                                                <div class="col-6">
-                                                    <select class="carousel-select form-select">
-                                                        @foreach (range(2, 10) as $column)
-                                                            <option value="{{ $column }}">{{ $column }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div> --}}
                                             <div>
                                                 <div>
-                                                    <label class="form-label">サムネイル画像</label>
-                                                    <span class="text-secondary">(任意)</span>
-                                                    <small class="text-secondary ms-2">jpgまたはpng、最大横幅サイズ：1024px、最大ファイルサイズ：10MB</small>
+                                                    <label class="form-label">カルーセル</label>
+                                                    <small class="text-secondary ms-2">最大枚数：5</small>
+                                                    <div class="text-danger">※必ず1枚は設定してください。</div>
+                                                    <div class="text-danger">※画像を設定する場合は、すべてのカルーセルに設定してください。</div>
+                                                    <div class="text-danger">※タイトルを設定する場合は、すべてのカルーセルに設定してください。</div>
                                                 </div>
-                                                <div class="col-6">
-                                                    <input type="file" accept=".jpeg, .jpg, .png" name="situation[messages][0][thumbnail_image_url]" class="form-control" data-name="thumbnail_image_url" value="">
-                                                    <span class="text-danger">{{ $errors->first('situation.messages.0.thumbnail_image_url') }}</span>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div>
-                                                    <label class="form-label">タイトル</label>
-                                                    <span class="text-secondary">(任意)</span>
-                                                    <small class="text-secondary ms-2">最大文字数：40</small>
-                                                </div>
-                                                <div class="col-6">
-                                                    <input type="text" maxlength="40" name="situation[messages][0][title]" class="form-control" data-name="title" value="{{ old('situation.messages.0.title') }}">
-                                                    <span class="text-danger">{{ $errors->first('situation.messages.0.title') }}</span>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div>
-                                                    <label class="form-label">メッセージ内容</label>
-                                                    <span class="text-danger">※</span>
-                                                    <small class="text-secondary ms-2">最大文字数：120、画像またはタイトルを指定する場合の最大文字数：60</small>
-                                                </div>
-                                                <div>
-                                                    <textarea maxlength="120" name="situation[messages][0][text]" class="form-control" data-target-accordion="#" data-name="text">{{ old('situation.messages.0.text') }}</textarea>
-                                                    <span class="text-danger">{{ $errors->first('situation.messages.0.text') }}</span>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div>
-                                                    <label class="form-label">ボタン</label>
-                                                    <span class="text-danger">※</span>
-                                                </div>
-                                                <small class="text-secondary">
-                                                    ラベルに表示したいボタンの名前、アクションに送信させたい文字または、遷移させたいURIを入力ください。<br>
-                                                    メッセージ・・・ユーザがボタンをタップすると、文字が送信されます。<br>
-                                                    リンク・・・ユーザがボタンをタップすると、リンクのページに遷移します。
-                                                </small>
-                                                <ol class="ol-labels d-flex gap-5">
-                                                    @php
-                                                        $count = 0;
-                                                    @endphp
-                                                    @foreach (range(0, 3) as $index)
-                                                    <li>
-                                                        <div class="radio-group d-flex flex-column">
-                                                            @foreach (config('situation.action_type') as $key => $type)
+                                                <div class="carousel-group">
+                                                    @foreach (range(0, 4) as $carouselIndex)
+                                                    <div class="card">
+                                                        <div class="img-remove d-none">×</div>
+                                                        {{ Form::file(
+                                                            "situation[messages][0][carousels][{$carouselIndex}][thumbnail_image_url]",
+                                                            [
+                                                                'class' => 'card-img-top d-none',
+                                                                'accept' => '.jpeg, .jpg, .png',
+                                                                'data-name' => 'thumbnail_image_url',
+                                                                'id' => "thumbnail-image-0-{$carouselIndex}"
+                                                            ]
+                                                        ) }}
+                                                        <label class="card-img-top preview-img d-none" for="thumbnail-image-0-{{ $carouselIndex }}">
+                                                            <img src="" alt="">
+                                                        </label>
+                                                        <label class="card-img-top sample-img" for="thumbnail-image-0-{{ $carouselIndex }}">
+                                                            <span>画像<span class="ms-1">(任意)</span></span>
+                                                            <ul>
+                                                                <li>拡張子：jpg, png</li>
+                                                                <li>最大横幅：1024px</li>
+                                                                <li>最大サイズ：10MB</li>
+                                                            </ul>
+                                                        </label>
+                                                        <div class="card-body">
                                                             <div>
-                                                                {{ Form::radio(
-                                                                    "situation[messages][0][actions][{$index}][type]",
-                                                                    $key,
-                                                                    old("situation.messages.0.actions.{$index}.type") == $key || $loop->first ? 'checked' : '',
-                                                                    [
-                                                                        'class' => 'form-check-input form-check-radio',
-                                                                        'id' => "action_{$key}_{$count}",
-                                                                        'data-name' => 'actions'
-                                                                    ]
-                                                                ) }}
-                                                                <label for="action_{{ $key }}_{{ $count++ }}" class="form-check-label">{{ $type }}</label>
+                                                                <div>
+                                                                    <div>
+                                                                        <label class="form-label">タイトル</label>
+                                                                        <span class="text-secondary">(任意)</span>
+                                                                        <small class="text-secondary ms-2">最大文字数：40</small>
+                                                                    </div>
+                                                                    {{ Form::text(
+                                                                        "situation[messages][0][carousels][{$carouselIndex}][title]",
+                                                                        old("situation.messages.0.carousels.{$carouselIndex}.title"),
+                                                                        [
+                                                                            'class' => 'form-control',
+                                                                            'maxlength' => 40,
+                                                                            'data-name' => 'title'
+                                                                        ]
+                                                                    ) }}
+                                                                </div>
+                                                                <div>
+                                                                    <div>
+                                                                        <label class="form-label mb-0">メッセージ内容</label>
+                                                                        <span class="text-danger">※</span>
+                                                                        <small class="text-secondary ms-2"><br>最大文字数：120、画像またはタイトルを指定する場合の最大文字数：60</small>
+                                                                    </div>
+                                                                    <div>
+                                                                        {{ Form::textarea(
+                                                                            "situation[messages][0][carousels][{$carouselIndex}][text]",
+                                                                            old("situation.messages.0.carousels.{$carouselIndex}.text"),
+                                                                            [
+                                                                                'class' => 'form-control',
+                                                                                'maxlength' => 120,
+                                                                                'data-name' => 'text'
+                                                                            ]
+                                                                        ) }}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="d-flex flex-column justify-content-center">
+                                                                    <div>
+                                                                        <label class="form-label">ボタン</label>
+                                                                        <span class="text-danger">※</span>
+                                                                        <small class="text-secondary ms-2">最大文字数：12</small>
+                                                                    </div>
+                                                                    <div class="d-grid gap-1">
+                                                                        @foreach (range(0, 2) as $buttonIndex)
+                                                                            {{ Form::text(
+                                                                                "situation[messages][0][carousels][{$carouselIndex}][actions][{$buttonIndex}][action]",
+                                                                                old("situation.messages.0.carousels.{$carouselIndex}.actions.{$buttonIndex}.action"),
+                                                                                [
+                                                                                    'class' => 'form-control',
+                                                                                    'maxlength' => 12,
+                                                                                    'data-name' => 'actions',
+                                                                                    'data-action' => 'action'
+                                                                                ]
+                                                                            ) }}
+                                                                        @endforeach
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            @endforeach
                                                         </div>
-                                                        <div>
-                                                            <label>ラベル</label>
-                                                            {{ Form::text(
-                                                                "situation[messages][0][actions][{$index}][label]",
-                                                                old("situation.messages.0.actions.{$index}.label"),
-                                                                [
-                                                                    'class' => 'form-control',
-                                                                    'data-name' => 'actions',
-                                                                    'data-action' => 'label'
-                                                                ]
-                                                            ) }}
-                                                        </div>
-                                                        <div>
-                                                            <label>アクション</label>
-                                                            {{ Form::text(
-                                                                "situation[messages][0][actions][{$index}][trigger]",
-                                                                old("situation.messages.0.actions.{$index}.trigger"),
-                                                                [
-                                                                    'class' => 'form-control',
-                                                                    'data-name' => 'actions',
-                                                                    'data-action' => 'trigger'
-                                                                ]
-                                                            ) }}
-                                                        </div>
-                                                    </li>
+                                                    </div>
                                                     @endforeach
-                                                </ol>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -301,6 +284,7 @@
                                                 <div class="line__left-text">
                                                     <div class="name">テスト太郎</div>
                                                     <div class="text" id="testMessage">これはテストメッセージです。</div>
+                                                    <div class="text d-none" id="inputMessage"></div>
                                                     <div class="card d-none">
                                                         <div class="card-img-top sample-img d-none">
                                                             <span>画像</span>

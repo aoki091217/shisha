@@ -36,6 +36,7 @@ class ShopController extends Controller
         $user = $this->userRepository->find($request->user['code']);
         $this->shopRepository->store(array_merge($request->shop, ['user_id' => $user->id]));
         $this->sessionService->putFlashMessage(config('const.session.flash.stored'));
+
         return redirect()->route('shop.index');
     }
 

@@ -13,15 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::create('carousels', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('situation_id');
-            $table->boolean('type');
-            $table->string('alt_text', 400)->nullable();
-            $table->string('keyword', 50)->nullable();
+            $table->foreignId('message_id');
+            $table->string('thumbnail_image_url', 2000)->nullable();
+            $table->string('title', 40)->nullable();
             $table->string('text', 5000)->nullable();
-            $table->boolean('turn');
-            $table->boolean('send_type');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -34,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('messages');
+        Schema::dropIfExists('carousels');
     }
 };

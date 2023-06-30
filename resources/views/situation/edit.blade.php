@@ -59,15 +59,17 @@
         </div>
         <div class="col-12 mb-3">
             <div class="accordion mb-3" id="accordionMessages">
-                @foreach ($situation->messages as $i => $template)
+                @foreach ($situation->messages as $messageIndex => $message)
                 <div class="accordion-item">
-                    <input type="hidden" name="situation[messages][{{ $i }}][turn]" class="turn" value="{{ $template->turn }}" data-name="turn">
+                    <input type="hidden" name="situation[messages][{{ $messageIndex }}][disabled]" data-name="disabled" value="0">
+                    <input type="hidden" name="situation[messages][{{ $messageIndex }}][id]" class="id" value="{{ $message->id }}" data-name="id">
+                    <input type="hidden" name="situation[messages][{{ $messageIndex }}][turn]" class="turn" value="{{ $message->turn }}" data-name="turn">
                     <h2 class="accordion-header">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#message_{{ $i }}">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#message_{{ $messageIndex }}">
                             メッセージ{{ $loop->iteration }}
                         </button>
                     </h2>
-                    <div id="message_{{ $i }}" class="accordion-collapse collapse show">
+                    <div id="message_{{ $messageIndex }}" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                             <div class="d-flex">
                                 <div class="col-8 d-flex flex-column gap-2 pe-4">
@@ -83,20 +85,20 @@
                                             @foreach (config('situation.message_type') as $key => $message_type)
                                             <div class="radio-group">
                                                 {{ Form::radio(
-                                                    "situation[messages][{$i}][message_type]",
+                                                    "situation[messages][{$messageIndex}][message_type]",
                                                     $key,
-                                                    old("situation.messages.{$i}.message_type", $template->message_type) == $key ? 'checked' : '',
+                                                    old("situation.messages.{$messageIndex}.message_type", $message->message_type) == $key ? 'checked' : '',
                                                     [
                                                         'class' => 'form-check-input form-check-radio',
-                                                        'id' => "message_type_{$key}_{$i}",
+                                                        'id' => "message_type_{$key}_{$messageIndex}",
                                                         'data-name' => 'message_type'
                                                     ]
                                                 ) }}
-                                                <label for="message_type_{{ $key }}_{{ $i }}" class="form-check-label">{{ $message_type }}</label>
+                                                <label for="message_type_{{ $key }}_{{ $messageIndex }}" class="form-check-label">{{ $message_type }}</label>
                                             </div>
                                             @endforeach
                                         </div>
-                                        <span class="text-danger">{{ $errors->first("situation.messages.{$i}.message_type") }}</span>
+                                        <span class="text-danger">{{ $errors->first("situation.messages.{$messageIndex}.message_type") }}</span>
                                     </div>
                                     <div class="type-wrapper">
                                         <div>
@@ -111,16 +113,16 @@
                                                 @foreach (config('situation.send_type') as $key => $send_type)
                                                 <div class="radio-group">
                                                     {{ Form::radio(
-                                                        "situation[messages][{$i}][send_type]",
+                                                        "situation[messages][{$messageIndex}][send_type]",
                                                         $key,
-                                                        old("situation.messages.{$i}.send_type", $template->message_send_type) == $key || $loop->first ? 'checked' : '',
+                                                        old("situation.messages.{$messageIndex}.send_type", $message->message_send_type) == $key || $loop->first ? 'checked' : '',
                                                         [
                                                             'class' => 'form-check-input form-check-radio',
-                                                            'id' => "send_type_{$key}_{$i}",
+                                                            'id' => "send_type_{$key}_{$messageIndex}",
                                                             'data-name' => 'send_type'
                                                         ]
                                                     ) }}
-                                                    <label for="send_type_{{ $key }}_{{ $i }}" class="form-check-label">{{ $send_type }}</label>
+                                                    <label for="send_type_{{ $key }}_{{ $messageIndex }}" class="form-check-label">{{ $send_type }}</label>
                                                 </div>
                                                 @endforeach
                                             </div>
@@ -131,13 +133,11 @@
                                                 <span class="text-danger">※</span>
                                                 <small class="text-secondary ms-2">最大文字数：50</small>
                                             </div>
-                                            <small class="text-secondary">
-                                                キーワードが含まれるメッセージを受信したときにのみ自動で返信します。<br>設定しなければ、前のメッセージに続いて送信されます。<br>
-                                            </small>
+                                            <small class="text-secondary">キーワードが含まれるメッセージを受信したときにのみ自動で返信します。</small>
                                             <div>
                                                 {{ Form::text(
-                                                    "situation[messages][{$i}][keyword]",
-                                                    old("situation.messages.{$i}.keyword", $template->keyword),
+                                                    "situation[messages][{$messageIndex}][keyword]",
+                                                    old("situation.messages.{$messageIndex}.keyword", $message->keyword),
                                                     [
                                                         'class' => 'form-control',
                                                         'maxlength' => 50,
@@ -145,10 +145,10 @@
                                                         old('situation.event_type', $situation->event_type) != 2 ? 'disabled' : ''
                                                     ]
                                                 ) }}
-                                                <span class="text-danger">{{ $errors->first("situation.messages.{$i}.keyword") }}</span>
+                                                <span class="text-danger">{{ $errors->first("situation.messages.{$messageIndex}.keyword") }}</span>
                                             </div>
                                         </div>
-                                        <div class="type-text {{ old("situation.messages.{$i}.message_type", $template->message_type) == 'buttons' ? 'd-none' : '' }}">
+                                        <div class="type-text {{ old("situation.messages.{$messageIndex}.message_type", $message->message_type) == 'carousel' ? 'd-none' : '' }}">
                                             <div>
                                                 <div>
                                                     <label class="form-label">メッセージ内容</label>
@@ -156,12 +156,12 @@
                                                     <small class="text-secondary ms-2">最大文字数：5000</small>
                                                 </div>
                                                 <div>
-                                                    <textarea maxlength="5000" name="situation[messages][{{ $i }}][text]" class="form-control" data-name="text">{{ old("situation.messages.{$i}.text", $template->text) }}</textarea>
-                                                    <span class="text-danger">{{ $errors->first("situation.messages.{$i}.text") }}</span>
+                                                    <textarea maxlength="5000" name="situation[messages][{{ $messageIndex }}][text]" class="form-control" data-name="text">{{ old("situation.messages.{$messageIndex}.text", $message->text) }}</textarea>
+                                                    <span class="text-danger">{{ $errors->first("situation.messages.{$messageIndex}.text") }}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="type-template {{ old("situation.messages.{$i}.message_type", $template->message_type) == 'text' ? 'd-none' : '' }}">
+                                        <div class="type-template {{ old("situation.messages.{$messageIndex}.message_type", $message->message_type) == 'text' ? 'd-none' : '' }}">
                                             <div>
                                                 <div>
                                                     <label class="form-label">代替テキスト</label>
@@ -170,127 +170,118 @@
                                                 </div>
                                                 <small class="text-secondary">相手がメッセージを受信した際に、端末の通知やトークリストでメッセージの代替として表示されます。<br>例）新着メッセージを受信しました。</small>
                                                 <div class="col-6">
-                                                    <input type="text" maxlength="400" name="situation[messages][{{ $i }}][alt_text]" class="form-control" data-name="alt_text" value="{{ old("situation.messages.{$i}.alt_text", $template->alt_text ?? '') }}">
-                                                    <span class="text-danger">{{ $errors->first("situation.messages.{$i}.alt_text") }}</span>
+                                                    <input type="text" maxlength="400" name="situation[messages][{{ $messageIndex }}][alt_text]" class="form-control" data-name="alt_text" value="{{ old("situation.messages.{$messageIndex}.alt_text", $message->alt_text ?? '') }}">
+                                                    <span class="text-danger">{{ $errors->first("situation.messages.{$messageIndex}.alt_text") }}</span>
                                                 </div>
                                             </div>
                                             <div>
                                                 <div>
-                                                    <label class="form-label">サムネイル画像</label>
-                                                    <span class="text-secondary">(任意)</span>
-                                                    <small class="text-secondary ms-2">jpgまたはpng、最大横幅サイズ：1024px、最大ファイルサイズ：10MB</small>
+                                                    <label class="form-label">カルーセル</label>
+                                                    <small class="text-secondary ms-2">最大枚数：5</small>
+                                                    <div class="text-danger">※必ず1枚は設定してください。</div>
+                                                    <div class="text-danger">※画像を設定する場合は、すべてのカルーセルに設定してください。</div>
+                                                    <div class="text-danger">※タイトルを設定する場合は、すべてのカルーセルに設定してください。</div>
                                                 </div>
-                                                <div>
-                                                    @if ($template->thumbnail_image_url)
-                                                    <img src="{{ asset('storage/'.strstr($template->thumbnail_image_url, 'template')) }}" class="img-thumbnail mb-2">
-                                                    @endif
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <div class="col-6">
-                                                            <input type="file" accept=".jpeg, .jpg, .png" name="situation[messages][{{ $i }}][thumbnail_image_url]" class="form-control" data-name="thumbnail_image_url" {{ $template->thumbnail_image_url ? 'disabled' : '' }}>
-                                                        </div>
-                                                        @if ($template->thumbnail_image_url)
-                                                        <input type="hidden" name="situation[messages][{{ $i }}][delete_turns][]" value="{{ $template->turn }}" data-name="delete_turns" disabled>
-                                                        {{ Form::checkbox(
-                                                            '',
-                                                            1,
-                                                            '',
+                                                <div class="carousel-group">
+                                                    @foreach (range(0, 4) as $carouselIndex)
+                                                    @php
+                                                        $carousel = null;
+                                                        if (isset($message->carousels[$carouselIndex])) {
+                                                            $carousel = $message->carousels[$carouselIndex];
+                                                        }
+                                                    @endphp
+                                                    <div class="card">
+                                                        <div class="img-remove {{ is_null($carousel?->thumbnail_image_url) ? 'd-none' : '' }}">×</div>
+                                                        {{ Form::file(
+                                                            "situation[messages][{$messageIndex}][carousels][{$carouselIndex}][thumbnail_image_url]",
                                                             [
-                                                                'id' => "isChange_{$i}",
-                                                                'class' => 'form-checkbox change-img'
+                                                                'class' => 'card-img-top d-none',
+                                                                'accept' => '.jpeg, .jpg, .png',
+                                                                'data-name' => 'thumbnail_image_url',
+                                                                'id' => "thumbnail-image-{$messageIndex}-{$carouselIndex}"
                                                             ]
                                                         ) }}
-                                                        <label for="isChange_{{ $i }}" class="form-check-label">変更する</label>
-                                                        @endif
-                                                    </div>
-                                                    <span class="text-danger">{{ $errors->first("situation.messages.{$i}.thumbnail_image_url") }}</span>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div>
-                                                    <label class="form-label">タイトル</label>
-                                                    <span class="text-secondary">(任意)</span>
-                                                    <small class="text-secondary ms-2">最大文字数：40</small>
-                                                </div>
-                                                <div class="col-6">
-                                                    <input type="text" maxlength="40" name="situation[messages][{{ $i }}][title]" class="form-control" data-name="title" value="{{ old("situation.messages.{$i}.title", $template->title) }}">
-                                                    <span class="text-danger">{{ $errors->first("situation.messages.{$i}.title") }}</span>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div>
-                                                    <label class="form-label">メッセージ内容</label>
-                                                    <span class="text-danger">※</span>
-                                                    <small class="text-secondary ms-2">最大文字数：120、画像またはタイトルを指定する場合の最大文字数：60</small>
-                                                </div>
-                                                <div>
-                                                    <textarea maxlength="120" name="situation[messages][{{ $i }}][text]" class="form-control" data-target-accordion="#" data-name="text">{{ old("situation.messages.{$i}.text", $template->text) }}</textarea>
-                                                    <span class="text-danger">{{ $errors->first("situation.messages.{$i}.text") }}</span>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div>
-                                                    <label class="form-label">ボタン</label>
-                                                    <span class="text-danger">※</span>
-                                                </div>
-                                                <small class="text-secondary">
-                                                    ラベルに表示したいボタンの名前、アクションに送信させたい文字または、遷移させたいURIを入力ください。<br>
-                                                    メッセージ・・・ユーザがボタンをタップすると、文字が送信されます。<br>
-                                                    リンク・・・ユーザがボタンをタップすると、リンクのページに遷移します。
-                                                </small>
-                                                <ol class="ol-labels d-flex gap-5">
-                                                    @php
-                                                        $count = 0;
-                                                    @endphp
-                                                    @foreach (range(0, 3) as $index)
-                                                    <li>
-                                                        <div class="radio-group d-flex flex-column">
-                                                            @foreach (config('situation.action_type') as $key => $type)
-                                                            @php
-                                                                $action = null;
-                                                                if (isset($template->messageActions[$index])) {
-                                                                    $action = $template->messageActions[$index];
-                                                                }
-                                                            @endphp
+                                                        <input type="hidden" name="{{ "situation[messages][{$messageIndex}][carousels][{$carouselIndex}][carousel_id]" }}" value="{{ $carousel?->id }}">
+                                                        <input type="hidden" class="file-path" name="{{ "situation[messages][{$messageIndex}][carousels][{$carouselIndex}][thumbnail_image_url]" }}" value="{{ $carousel?->thumbnail_image_url }}">
+                                                        <label class="card-img-top preview-img {{ !is_null($carousel?->thumbnail_image_url) ? '' : 'd-none' }}" for="{{ "thumbnail-image-{$messageIndex}-{$carouselIndex}" }}">
+                                                            <img src="{{ !is_null($carousel?->thumbnail_image_url) ? asset("storage/{$carousel->thumbnail_image_url}") : '' }}" alt="">
+                                                        </label>
+                                                        <label class="card-img-top sample-img {{ !is_null($carousel?->thumbnail_image_url) ? 'd-none' : '' }}" for="{{ "thumbnail-image-{$messageIndex}-{$carouselIndex}" }}">
+                                                            <span>画像<span class="ms-1">(任意)</span></span>
+                                                            <ul>
+                                                                <li>拡張子：jpg, png</li>
+                                                                <li>最大横幅：1024px</li>
+                                                                <li>最大サイズ：10MB</li>
+                                                            </ul>
+                                                        </label>
+                                                        <div class="card-body">
                                                             <div>
-                                                                {{ Form::radio(
-                                                                    "situation[messages][{$i}][actions][{$index}][type]",
-                                                                    $key,
-                                                                    old("situation.messages.{$i}.actions.{$index}.type", $action?->action_type) == $key || $loop->first ? 'checked' : '',
-                                                                    [
-                                                                        'class' => 'form-check-input form-check-radio',
-                                                                        'id' => "action_{$i}_{$count}",
-                                                                        'data-name' => 'actions'
-                                                                    ]
-                                                                ) }}
-                                                                <label for="action_{{ $i }}_{{ $count++ }}" class="form-check-label">{{ $type }}</label>
+                                                                <div>
+                                                                    <div>
+                                                                        <label class="form-label">タイトル</label>
+                                                                        <span class="text-secondary">(任意)</span>
+                                                                        <small class="text-secondary ms-2">最大文字数：40</small>
+                                                                    </div>
+                                                                    {{ Form::text(
+                                                                        "situation[messages][{$messageIndex}][carousels][{$carouselIndex}][title]",
+                                                                        old("situation.messages.{$messageIndex}.carousels.{$carouselIndex}.title", $carousel?->title),
+                                                                        [
+                                                                            'class' => 'form-control',
+                                                                            'maxlength' => 40,
+                                                                            'data-name' => 'title'
+                                                                        ]
+                                                                    ) }}
+                                                                </div>
+                                                                <div>
+                                                                    <div>
+                                                                        <label class="form-label mb-0">メッセージ内容</label>
+                                                                        <span class="text-danger">※</span>
+                                                                        <small class="text-secondary ms-2"><br>最大文字数：120、画像またはタイトルを指定する場合の最大文字数：60</small>
+                                                                    </div>
+                                                                    <div>
+                                                                        {{ Form::textarea(
+                                                                            "situation[messages][{$messageIndex}][carousels][{$carouselIndex}][text]",
+                                                                            old("situation.messages.{$messageIndex}.carousels.{$carouselIndex}.text", $carousel?->text),
+                                                                            [
+                                                                                'class' => 'form-control',
+                                                                                'maxlength' => 120,
+                                                                                'data-name' => 'text'
+                                                                            ]
+                                                                        ) }}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="d-flex flex-column justify-content-center">
+                                                                    <div>
+                                                                        <label class="form-label">ボタン</label>
+                                                                        <span class="text-danger">※</span>
+                                                                        <small class="text-secondary ms-2">最大文字数：12</small>
+                                                                    </div>
+                                                                    <div class="d-grid gap-1">
+                                                                        @foreach (range(0, 2) as $actionIndex)
+                                                                        @php
+                                                                            $action = null;
+                                                                            if (isset($carousel->carouselActions[$actionIndex])) {
+                                                                                $action = $carousel->carouselActions[$actionIndex];
+                                                                            }
+                                                                        @endphp
+                                                                            {{ Form::text(
+                                                                                "situation[messages][{$messageIndex}][carousels][{$carouselIndex}][actions][{$actionIndex}][action]",
+                                                                                old("situation.messages.{$messageIndex}.carousels.{$carouselIndex}.actions.{$actionIndex}.action", $action?->action),
+                                                                                [
+                                                                                    'class' => 'form-control',
+                                                                                    'maxlength' => 12,
+                                                                                    'data-name' => 'actions',
+                                                                                    'data-action' => 'action'
+                                                                                ]
+                                                                            ) }}
+                                                                        @endforeach
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            @endforeach
                                                         </div>
-                                                        <div>
-                                                            <label>ラベル</label>
-                                                            {{ Form::text(
-                                                                "situation[messages][{$i}][actions][{$index}][label]",
-                                                                old("situation.messages.{$i}.actions.{$index}.label", $action?->label),
-                                                                [
-                                                                    'class' => 'form-control',
-                                                                    'data-name' => 'actions-label'
-                                                                ]
-                                                            ) }}
-                                                        </div>
-                                                        <div>
-                                                            <label>アクション</label>
-                                                            {{ Form::text(
-                                                                "situation[messages][{$i}][actions][{$index}][trigger]",
-                                                                old("situation.messages.{$i}.actions.{$index}.trigger", $action?->action),
-                                                                [
-                                                                    'class' => 'form-control',
-                                                                    'data-name' => 'actions-trigger'
-                                                                ]
-                                                            ) }}
-                                                        </div>
-                                                    </li>
+                                                    </div>
                                                     @endforeach
-                                                </ol>
+                                                </div>
                                             </div>
                                         </div>
                                         <button type="button" class="col-4 btn btn-danger btn-remove" {{ $loop->count == 1 ? 'disabled' : '' }}>このメッセージを削除する</button>

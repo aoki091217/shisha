@@ -16,7 +16,10 @@ class Shop extends Model
 
     protected $fillable = [
         'name',
-        'user_id'
+        'user_id',
+        'account_id',
+        'line_token',
+        'channel_secret'
     ];
 
     public function members()

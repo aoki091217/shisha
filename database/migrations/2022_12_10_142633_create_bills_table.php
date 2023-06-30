@@ -15,15 +15,14 @@ return new class extends Migration
     {
         Schema::create('bills', function (Blueprint $table) {
             $table->bigIncrements('bill_id');
-            $table->integer('amount', false, true);
-            $table->foreignId('shop_id', false, true);
-            $table->foreignId('member_id', false, true);
-            $table->foreignId('bill_order_id', false, true);
-            $table->boolean('share');
-            $table->tinyInteger('top_change', false, true);
-            $table->dateTime('bill_date');
+            $table->integer('amount', false, true)->nullable();
+            $table->foreignId('shop_id', false, true)->nullable();
+            $table->foreignId('member_id', false, true)->nullable();
+            $table->boolean('share')->nullable();
+            $table->boolean('top_change')->nullable();
+            $table->dateTime('bill_date')->nullable();
+            $table->boolean('is_draft')->default(1);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

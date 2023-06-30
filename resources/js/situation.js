@@ -5,48 +5,11 @@ $(window).on('load', function () {
     $('.type-text.d-none, .type-template.d-none').find('input, textarea, select').prop('disabled', true);
 
     $(document).on('focus', '.type-template textarea', function () {
-        if ($('.type-template [type=file]').val().length != 0 || $('.type-template [data-name=title]').val().length) {
+        if ($(this).parents('.card').find('[type=file]').val().length != 0 || $(this).parents('.card').find('[data-name=title]').val().length) {
             $(this).attr('maxlength', 60);
         } else {
             $(this).attr('maxlength', 120);
         }
-    });
-
-    // メッセージ追加
-    $(document).on('click', '#addMessage', function (event) {
-        let clonedMessage = DEFMESSAGE.clone();
-        let messageIndex = $('.accordion .accordion-item').length;
-        let messageCount = messageIndex + 1;
-
-        renameMessage(clonedMessage, messageIndex);
-
-        clonedMessage.find('.turn').val(messageCount);
-
-        renameAccordion(clonedMessage, messageIndex, messageCount);
-
-        if (clonedMessage.find('.btn-remove').length == 0) {
-            let removeButton = $('<button>', {
-                type: 'button',
-                class: 'col-4 btn btn-danger btn-remove'
-            }).text('このメッセージを削除する');
-            clonedMessage.find('.type-wrapper').after(removeButton);
-        }
-
-        clonedMessage.find('.btn-remove').prop('disabled', false);
-        $('.btn-remove').prop('disabled', false);
-
-        renameImage(clonedMessage);
-
-        clonedMessage.find('.type-template.d-none').find('input, textarea, select').prop('disabled', true);
-        if ($('#text').prop('checked')) {
-            clonedMessage.find('[data-name=send_type]').eq(1).prop('disabled', false);
-            clonedMessage.find('[data-name=keyword]').prop('disabled', false);
-        } else {
-            clonedMessage.find('[data-name=send_type]').eq(1).prop('disabled', true);
-            clonedMessage.find('[data-name=keyword]').prop('disabled', true);
-        }
-
-        $('#accordionMessages').append(clonedMessage);
     });
 
     // メッセージタイプ切り替え
@@ -54,7 +17,7 @@ $(window).on('load', function () {
         let type = $(this).val();
 
         switch (type) {
-            case 'buttons':
+            case 'carousel':
                 $(this).parents('.accordion-collapse').find('.type-text').addClass('d-none');
                 $(this).parents('.accordion-collapse').find('.type-template').removeClass('d-none');
 
@@ -85,18 +48,60 @@ $(window).on('load', function () {
         }
     });
 
+    // メッセージ追加
+    $(document).on('click', '#addMessage', function (event) {
+        let clonedMessage = DEFMESSAGE.clone();
+        let messageIndex = $('.accordion .accordion-item').length;
+        let messageCount = messageIndex + 1;
+
+        renameMessage(clonedMessage, messageIndex);
+
+        clonedMessage.find('.turn').val(messageCount);
+
+        renameAccordion(clonedMessage, messageIndex, messageCount);
+
+        renameCarousels(clonedMessage, messageIndex, 1);
+
+        if (clonedMessage.find('.btn-remove').length == 0) {
+            let removeButton = $('<button>', {
+                type: 'button',
+                class: 'col-4 btn btn-danger btn-remove'
+            }).text('このメッセージを削除する');
+            clonedMessage.find('.type-wrapper').after(removeButton);
+        }
+
+        clonedMessage.find('.btn-remove').prop('disabled', false);
+        $('.btn-remove').prop('disabled', false);
+
+        clonedMessage.find('.type-template.d-none').find('input, textarea, select').prop('disabled', true);
+        if ($('#text').prop('checked')) {
+            clonedMessage.find('[data-name=send_type]').eq(0).prop('disabled', true);
+            clonedMessage.find('[data-name=send_type]').eq(1).prop('checked', true).prop('disabled', false);
+            clonedMessage.find('[data-name=keyword]').prop('disabled', false);
+        } else {
+            clonedMessage.find('[data-name=send_type]').eq(0).prop('checked', true);
+            clonedMessage.find('[data-name=send_type]').eq(1).prop('disabled', true);
+            clonedMessage.find('[data-name=keyword]').prop('disabled', true);
+        }
+
+        $('#accordionMessages').append(clonedMessage);
+    });
+
     // 削除ボタン
     $(document).on('click', '.btn-remove', function () {
         $(this).parents('.accordion-item').remove();
 
         $('.accordion .accordion-item').each(function (index, element) {
             let messageCount = index + 1;
+            let messageElement = $(element);
 
-            renameMessage($(element), index);
+            renameMessage(messageElement, index);
 
-            $(element).find('.turn').val(messageCount);
+            messageElement.find('.turn').val(messageCount);
 
-            renameAccordion($(element), index, messageCount);
+            renameAccordion(messageElement, index, messageCount);
+
+            renameCarousels(messageElement, index);
         });
 
         if ($('.accordion-item').length == 1) {
@@ -112,17 +117,44 @@ $(window).on('load', function () {
         })
     });
 
-    $(document).on('click', '#follow, #text, #unfollow', function (clickedEvent) {
+    $(document).on('click', '#follow, #text, #question, #unfollow', function (clickedEvent) {
         $('.accordion-item').each(function (index, accordion) {
             if ($(clickedEvent.target).val() == 2) {
                 $(accordion).find(`#send_type_reply_${index}, [data-name=keyword]`).prop('disabled', false);
                 $(accordion).find(`#send_type_push_${index}`).prop('disabled', true);
                 $(accordion).find(`#send_type_reply_${index}`).prop('checked', true);
+                $('#addMessage').prop('disabled', true);
+                $('.accordion-item:not(:first-of-type)').addClass('d-none').find('[data-name=disabled]').val(1);
             } else {
                 $(accordion).find(`#send_type_reply_${index}, [data-name=keyword]`).prop('disabled', true);
                 $(accordion).find(`#send_type_push_${index}`).prop('checked', true).prop('disabled', false);
+                $('#addMessage').prop('disabled', false);
+                $('.accordion-item:not(:first-of-type)').removeClass('d-none').find('[data-name=disabled]').val(0);
             }
         });
+    });
+
+    $(document).on('click', '.img-remove', function (clickedEvent) {
+        $(clickedEvent.target).siblings('[type=file]').val('');
+        $(clickedEvent.target).siblings('.preview-img').addClass('d-none').children('img').attr('src', '');
+        $(clickedEvent.target).siblings('.sample-img').removeClass('d-none');
+        $(clickedEvent.target).siblings('.file-path').prop('disabled', true);
+        $(clickedEvent.target).addClass('d-none');
+    });
+
+    $(document).on('change', '.card-img-top[type=file]', function (clickedEvent) {
+        $(clickedEvent.target).siblings('.img-remove').removeClass('d-none');
+        $(clickedEvent.target).siblings('.file-path').prop('disabled', true);
+        let preview = $(clickedEvent.target).siblings('.preview-img');
+
+        let reader = new FileReader();
+        reader.onload = function (clickedEvent) {
+            preview.children('img').attr('src', clickedEvent.target.result);
+        }
+        reader.readAsDataURL(clickedEvent.target.files[0]);
+
+        preview.removeClass('d-none');
+        preview.siblings('.sample-img').addClass('d-none');
     });
 
     if ($('#text').prop('checked')) {
@@ -135,6 +167,7 @@ $(window).on('load', function () {
 
     let situation = window.situationOld;
     if (situation != null) {
+        console.log(situation.messages);
         $.each(situation.messages, function (index, message) {
             if (index == 0) return;
             $('#addMessage').trigger('click');
@@ -158,8 +191,8 @@ $(window).on('load', function () {
                         }
                     });
                     break;
-                case 'buttons':
-                    target.find('[data-name=message_type][value=buttons]').trigger('click');
+                case 'carousel':
+                    target.find('[data-name=message_type][value=carousel]').trigger('click');
 
                     $.each(message, function (name, value) {
                         if (value == null) return;
@@ -167,12 +200,22 @@ $(window).on('load', function () {
                             case 'text':
                                 target.find(`[data-name=${name}]:not(:disabled)`).text(value);
                                 break;
-                            case 'labels':
-                                let labelCount = value.length;
-                                target.find('.buttons-select').val(labelCount).trigger('change');
+                            case 'carousels':
+                                $.each(value, function (carouselIndex, carousel) {
+                                    let carouselElement = target.find('.card').eq(carouselIndex);
 
-                                $.each(value, function (j, label) {
-                                    target.find('[data-name=labels]').eq(j).val(label);
+                                    $.each(carousel, function (key, item) {
+                                        switch (key) {
+                                            case 'actions':
+                                                $.each(item, function (j, action) {
+                                                    carouselElement.find('[data-name=actions]').eq(j).val(action.action);
+                                                });
+                                                break;
+                                            default:
+                                                carouselElement.find(`[data-name=${key}]`).val(item);
+                                                break;
+                                        }
+                                    });
                                 });
                                 break;
                             case 'send_type':
@@ -190,7 +233,7 @@ $(window).on('load', function () {
 
     function renameMessage(messageElement, messageIndex)
     {
-        messageElement.find('input, textarea').not('[data-name=actions]').each(function (index, element) {
+        messageElement.find('input, textarea').not('.carousel-group input, .carousel-group textarea').each(function (index, element) {
             let elementName = $(element).data('name');
             let elementValue = $(element).val();
 
@@ -201,22 +244,17 @@ $(window).on('load', function () {
 
             $(element).attr('name', `${DEFNAME}[${messageIndex}][${elementName}]`);
         });
+    }
 
-        messageElement.find('.ol-labels li').each(function (i, element) {
-            $(element).find('[type=radio]').each(function (j, radio) {
-                let rand = Math.random().toString(8).substring(2);
-                let elementName = $(radio).data('name');
-                let elementValue = $(radio).val();
-                $(radio).attr('id', `${elementName}_${elementValue}_${rand}`);
-                $(radio).next().attr('for', `${elementName}_${elementValue}_${rand}`);
-                $(radio).attr('name', `${DEFNAME}[${messageIndex}][${elementName}][${i}][type]`);
-            });
+    function renameCarousels(clonedMessage, messageIndex, isCreate = 0)
+    {
+        clonedMessage.find('.carousel-group .card').each(function (cardIndex, element) {
+            let card = $(element);
 
-            $(element).find('[type=text]').each(function (j, text) {
-                let actionName = $(text).data('action');
-                let elementName = $(text).data('name');
-                $(text).attr('name', `${DEFNAME}[${messageIndex}][${elementName}][${i}][${actionName}]`);
-            });
+            renameImage(card, cardIndex, messageIndex, isCreate);
+            renameTitle(card, cardIndex, messageIndex, isCreate);
+            renameText(card, cardIndex, messageIndex, isCreate);
+            renameButtons(card, cardIndex, messageIndex, isCreate);
         });
     }
 
@@ -226,10 +264,51 @@ $(window).on('load', function () {
         messageElement.find('.accordion-collapse').attr('id', `message_${messageIndex}`);
     }
 
-    function renameImage(messageElement)
+    function renameImage(card, cardIndex, messageIndex, isCreate)
     {
-        messageElement.find('.img-thumbnail').attr('src', '').addClass('d-none');
-        messageElement.find('[data-name=thumbnail_image_url], [data-name="delete_turns"]').prop('disabled', false);
-        messageElement.find('.change-img, .change-img + label').addClass('d-none');
+        const CARD_ID = `thumbnail-image-${messageIndex}-${cardIndex}`;
+        card.find('[type=file]')
+            .attr('id', CARD_ID)
+            .attr('name', `${DEFNAME}[${messageIndex}][carousels][${cardIndex}][thumbnail_image_url]`);
+
+        card.find('.preview-img').attr('for', CARD_ID);
+        card.find('.sample-img').attr('for', CARD_ID);
+
+        if (isCreate == 1) {
+            card.find('[type=file]').val('').addClass('d-none');
+            card.find('.file-path').val('');
+            card.find('.preview-img').addClass('d-none').children('img').attr('src', '');
+            card.find('.sample-img').removeClass('d-none');
+            card.find('.img-remove').addClass('d-none');
+        }
+    }
+
+    function renameTitle(card, cardIndex, messageIndex, isCreate)
+    {
+        card.find('[data-name=title]').attr('name', `${DEFNAME}[${messageIndex}][carousels][${cardIndex}][title]`);
+
+        if (isCreate == 1) {
+            card.find('[data-name=title]').val('');
+        }
+    }
+
+    function renameText(card, cardIndex, messageIndex, isCreate)
+    {
+        card.find('[data-name=text]').attr('name', `${DEFNAME}[${messageIndex}][carousels][${cardIndex}][text]`);
+
+        if (isCreate == 1) {
+            card.find('[data-name=text]').val('');
+        }
+    }
+
+    function renameButtons(card, cardIndex, messageIndex, isCreate)
+    {
+        card.find('[data-name=actions]').each(function (buttonIndex, button) {
+            $(button).attr('name', `${DEFNAME}[${messageIndex}][carousels][${cardIndex}][actions][${buttonIndex}][action]`);
+
+            if (isCreate == 1) {
+                $(button).val('');
+            }
+        });
     }
 });

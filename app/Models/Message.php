@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Message extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'situation_id',
@@ -17,14 +18,22 @@ class Message extends Model
         'alt_text',
         'title',
         'text',
-        'thumbnail_image_url',
         'turn',
         'send_type'
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($article) {
+            $article->carousels()->delete();
+        });
+    }
+
     public function getMessageTypeAttribute()
     {
-        return $this->type == 2 ? 'buttons' : 'text';
+        return $this->type == 2 ? 'carousel' : 'text';
     }
 
     public function getMessageSendTypeAttribute()
@@ -32,8 +41,13 @@ class Message extends Model
         return $this->send_type == 2 ? 'reply' : 'push';
     }
 
-    public function messageActions()
+    public function situation()
     {
-        return $this->hasMany(MessageAction::class);
+        return $this->belongsTo(Situation::class, 'situation_id');
+    }
+
+    public function carousels()
+    {
+        return $this->hasMany(Carousel::class);
     }
 }

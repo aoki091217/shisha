@@ -4,14 +4,12 @@ return [
     'event_type' => [
         'follow' => '友達追加',
         'text' => 'メッセージの受信',
-        // 'question' => 'アンケート',
+        'question' => 'アンケート',
         'unfollow' => 'ブロック'
     ],
     'message_type' => [
         'text' => 'テキストのみ',
-        'buttons' => 'ボタン',
-        // 'carousel' => 'カルーセル',
-        // 'image_carousel' => '画像のみのカルーセル'
+        'carousel' => 'カルーセル'
     ],
     'send_type' => [
         'push' => 'プッシュメッセージ',

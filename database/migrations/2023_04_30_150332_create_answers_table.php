@@ -15,10 +15,11 @@ return new class extends Migration
     {
         Schema::create('answers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('message_id')->nullable();
+            $table->foreignId('carousel_id')->nullable();
+            $table->foreignId('carousel_action_id')->nullable();
             $table->foreignId('customer_id')->nullable();
-            $table->string('text');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

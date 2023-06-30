@@ -93,7 +93,10 @@ Breadcrumbs::for('user.edit', function ($trail, $id) {
 Breadcrumbs::for('customer.index', function ($trail) {
     $trail->push('一覧', route('customer.index'));
 });
-
+Breadcrumbs::for('customer.show', function ($trail, $customer_id) {
+    $trail->parent('customer.index');
+    $trail->push('詳細', route('customer.show', $customer_id));
+});
 
 
 Breadcrumbs::for('mix.index', function ($trail) {

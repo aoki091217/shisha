@@ -67,6 +67,21 @@ class CustomerRepository
         $customer->step = 1;
         $customer->save();
     }
+
+    public function getCustomersByCheckin()
+    {
+        $query = Customer::query();
+        $query->select([
+            'customers.*',
+            'customer_shops.visited_at',
+            'shops.name as shop_name'
+        ])
+            ->join('customer_shops', 'customer_shops.customer_id', 'customers.id')
+            ->join('shops', 'customer_shops.shop_id', 'shops.shop_id')
+            ->orderByDesc('customer_shops.visited_at');
+
+        return $query;
+    }
 }
 
 ?>
