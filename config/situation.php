@@ -4,8 +4,7 @@ return [
     'event_type' => [
         'follow' => '友達追加',
         'text' => 'メッセージの受信',
-        'question' => 'アンケート',
-        'unfollow' => 'ブロック'
+        'question' => 'アンケート'
     ],
     'message_type' => [
         'text' => 'テキストのみ',
