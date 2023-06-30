@@ -75,8 +75,10 @@ class MessageController extends Controller
                         $checkin = $this->lineBotService->getParamsFromCheckin($text);
                         $this->customerShopRepository->store($customer, $checkin);
 
-                        foreach ($replySituation->messages as $message) {
-                            $this->lineBotService->reply($reply_token, $message, $line_token);
+                        if (!is_null($replySituation)) {
+                            foreach ($replySituation->messages as $message) {
+                                $this->lineBotService->reply($reply_token, $message, $line_token);
+                            }
                         }
 
                         $question = Situation::with('messages.carousels.carouselActions')->where('event_type', 3)->first();
