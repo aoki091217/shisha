@@ -117,7 +117,7 @@ $(window).on('load', function () {
         })
     });
 
-    $(document).on('click', '#follow, #text, #question, #unfollow', function (clickedEvent) {
+    $(document).on('click', '#follow, #text, #question', function (clickedEvent) {
         $('.accordion-item').each(function (index, accordion) {
             if ($(clickedEvent.target).val() == 2) {
                 $(accordion).find(`#send_type_reply_${index}, [data-name=keyword]`).prop('disabled', false);
