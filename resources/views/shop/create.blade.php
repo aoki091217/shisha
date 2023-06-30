@@ -17,7 +17,7 @@
             ) }}
             <span class="text-danger">{{ $errors->first('shop.name') }}</span>
         </div>
-        <label for="accountId" class="form-label">ボットベーシックID<span class="text-danger">※</span></label>
+        {{-- <label for="accountId" class="form-label">ボットベーシックID<span class="text-danger">※</span></label>
         <small class="text-secondary ms-3">先頭の"@"マークは削除してください。</small>
         <div class="col-8 mb-3">
             {{ Form::text(
@@ -53,7 +53,7 @@
                 ]
             ) }}
             <span class="text-danger">{{ $errors->first('shop.channel_secret') }}</span>
-        </div>
+        </div> --}}
         <label for="userName" class="form-label">ユーザー名<span class="text-danger">※</span></label>
         <div class="col-8 mb-3">
             {{ Form::text(

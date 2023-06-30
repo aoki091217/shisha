@@ -144,7 +144,11 @@
             </div>
         </div>
         <div class="col-6 mb-3">
-            <label for="amount" class="form-label">会計金額<span class="text-danger">※</span></label>
+            <label for="amount" class="form-label">
+                会計金額
+                <span class="text-danger">※</span>
+                <small class="text-secondary">(下書き保存：任意)</small>
+            </label>
             <div class="input-group pe-2">
                 <span class="input-group-text justify-content-center col-1">¥</span>
                 {{ Form::text(
@@ -159,7 +163,11 @@
             <span class="text-danger">{{ $errors->first('bill.amount') }}</span>
         </div>
         <div class="col-6 mb-3">
-            <label class="form-label ps-2">会計日時<span class="text-danger">※</span></label>
+            <label class="form-label ps-2">
+                会計日時
+                <span class="text-danger">※</span>
+                <small class="text-secondary">(下書き保存：任意)</small>
+            </label>
             <div class="ps-2">
                 <div class="input-group">
                     {{ Form::date(
@@ -184,7 +192,11 @@
             </div>
         </div>
         <div class="col-12 mb-3">
-            <label class="form-label">オーダー<span class="text-danger">※</span></label>
+            <label class="form-label">
+                オーダー
+                <span class="text-danger">※</span>
+                <small class="text-secondary">(下書き保存：任意)</small>
+            </label>
             <div class="col-12 d-flex align-items-center flex-wrap gap-3">
                 @foreach (range(1, 5) as $i => $mixCount)
                     <div class="col-2">

@@ -17,9 +17,9 @@ return new class extends Migration
             $table->increments('shop_id');
             $table->bigInteger('user_id', false, true)->index();
             $table->string('name', 50);
-            $table->string('account_id');
-            $table->string('line_token');
-            $table->string('channel_secret');
+            $table->string('account_id')->nullable();
+            $table->string('line_token')->nullable();
+            $table->string('channel_secret')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
