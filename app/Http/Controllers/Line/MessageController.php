@@ -124,7 +124,7 @@ class MessageController extends Controller
                     if (is_null($message)) {
                         break;
                     } else {
-                        $this->lineBotService->push($line_token, $message);
+                        $this->lineBotService->reply($reply_token, $message, $line_token);
                         break;
                     }
 
