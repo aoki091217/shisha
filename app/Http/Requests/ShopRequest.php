@@ -29,9 +29,9 @@ class ShopRequest extends FormRequest
     {
         $rules = [
             'shop.name' => 'required|max:50',
-            'shop.account_id' => 'required',
-            'shop.line_token' => 'required',
-            'shop.channel_secret' => 'required',
+            'shop.account_id' => 'nullable',
+            'shop.line_token' => 'nullable',
+            'shop.channel_secret' => 'nullable',
             'user.name' => 'required|max:20',
             'user.email' => 'required|email:rfc,dns'
         ];
