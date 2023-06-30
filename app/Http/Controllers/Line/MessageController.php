@@ -84,6 +84,7 @@ class MessageController extends Controller
                         }
 
                         $question = Situation::with('messages.carousels.carouselActions')->where('event_type', 3)->first();
+                        \Log::debug($question->messages->first());
                         $this->lineBotService->push($line_token, $question->messages->first());
 
                         return;
