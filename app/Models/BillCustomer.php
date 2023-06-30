@@ -16,6 +16,11 @@ class BillCustomer extends Model
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function billOrders()
+    {
+        return $this->hasMany(BillOrder::class, 'bill_id');
     }
 }

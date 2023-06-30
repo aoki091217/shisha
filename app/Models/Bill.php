@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Bill extends Model
 {
     use HasFactory;
-    use SoftDeletes;
 
     protected $primaryKey = 'bill_id';
 
@@ -21,7 +20,7 @@ class Bill extends Model
         'share',
         'top_change',
         'bill_date',
-        'bill_order_id'
+        'is_draft'
     ];
 
     public function shop()
@@ -31,7 +30,7 @@ class Bill extends Model
 
     public function billCustomers()
     {
-        return $this->hasMany(BillCustomer::class, 'bill_id', 'bill_id');
+        return $this->hasMany(BillCustomer::class, 'bill_id');
     }
 
     public function member()
@@ -41,7 +40,7 @@ class Bill extends Model
 
     public function billOrders()
     {
-        return $this->hasMany(BillOrder::class, 'bill_order_id', 'bill_order_id');
+        return $this->hasMany(BillOrder::class, 'bill_id');
     }
 
     public function getShareNameAttribute()
@@ -56,7 +55,7 @@ class Bill extends Model
     public function getBillDatetimeAttribute()
     {
         $datetime = Carbon::parse($this->bill_date);
-        return sprintf('%s (%s)', $datetime->format('Y年m月d日 H時i分'), $datetime->dayName);
+        return sprintf('%s (%s)', $datetime->format('Y年m月d日 H時i分'), $datetime->isoFormat('ddd'));
     }
 
     public function getBillDayAttribute()

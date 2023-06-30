@@ -11,7 +11,6 @@
 <form action="{{ route('bill.update', $bill->bill_id) }}" method="POST" autocomplete="off">
     @csrf
     @method('PATCH')
-    <input type="hidden" name="bill[bill_order_id]" value="{{ $bill->bill_order_id }}">
     <div class="d-flex flex-wrap">
         <div class="col-4 mb-3">
             <label for="shopId" class="form-label">店舗<span class="text-danger">※</span></label>
@@ -195,46 +194,28 @@
                 </div>
             </div>
         </div>
-        <div class="tab-wrapper">
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                @foreach (range(1, 10) as $orderTabCount)
-                <li class="nav-item" role="presentation">
-                    <button
-                        class="nav-link @if($orderTabCount == 1) active @endif"
-                        id="tab{{ $orderTabCount }}"
-                        data-bs-toggle="tab"
-                        data-bs-target="#tabContent{{ $orderTabCount }}"
-                        type="button"
-                        role="tab"
-                        aria-controls="tabContent{{ $orderTabCount }}"
-                        aria-selected="true">
-                    {{ "オーダー{$orderTabCount}" }}
-                    </button>
-                </li>
-                @endforeach
-            </ul>
-            <div class="tab-content border border-top-0 rounded-bottom" id="orderTabContents">
-                @foreach (range(1, 10) as $i => $tabPaneCount)
-                <div
-                    class="tab-pane fade show @if($tabPaneCount == 1) active @endif"
-                    id="tabContent{{ $tabPaneCount }}"
-                    role="tabpanel"
-                    aria-labelledby="tabContent{{ $tabPaneCount }}">
-                    <div class="d-flex flex-wrap gap-2">
-                        @foreach (range(1, 5) as $j => $mixCount)
-                            <select name="bill[orders][{{ $i }}][mixes][{{ $j }}]" class="col-3 form-select">
-                                <option value="null"></option>
-                                @foreach ($mixPresets as $preset)
-                                    <option
-                                        value="{{ $preset->id }}"
-                                        {{ old("bill.orders.{$i}.mixes.{$j}") == $preset->id ? 'selected' : '' }}>
-                                        {{ $preset->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        @endforeach
+        <div class="col-12 mb-3">
+            <label class="form-label">オーダー<span class="text-danger">※</span></label>
+            <div class="col-12 d-flex align-items-center flex-wrap gap-3">
+                @foreach (range(1, 5) as $i => $mixCount)
+                    <div class="col-2">
+                        <div class="">ミックス{{ $mixCount }}</div>
+                        <select name="bill[mixes][{{ $i }}][mix_id]" class="form-select">
+                            <option value=""></option>
+                            @foreach ($mixPresets as $preset)
+                                @php
+                                    $billOrder = $bill->billOrders->where('mix_id', $preset->id)->first();
+                                    $mix_id = $billOrder?->mix_id;
+                                @endphp
+                                <option
+                                    value="{{ $preset->id }}"
+                                    {{ old("bill.mixes.{$i}.mix_id", $mix_id) == $preset->id ? 'selected' : '' }}>
+                                    {{ $preset->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="text-danger">{{ $errors->first("bill.mixes.{$i}.mix_id") }}</div>
                     </div>
-                </div>
                 @endforeach
             </div>
         </div>
@@ -251,12 +232,6 @@
     window.getMembers = "{{ route('bill.getMembers') }}";
     window.requests = @json(old('bill'));
     window.member = @json($bill->member);
-
-    $.each(@json($grouped_orders), function (i, orders) {
-        $.each(orders, function (j, order) {
-            $(`#tabContent${order.order_id} select`).eq(j).children(`[value=${order.mix_id}]`).prop('selected', true);
-        });
-    });
 </script>
 @vite('resources/js/bill.js')
 @endpush

@@ -36,21 +36,27 @@ class BillRepository
     public function store($request)
     {
         DB::transaction(function () use ($request) {
-            $bill_order_id = $this->billOrderRepository->store($request);
-
-            $insert = array_merge($request, [
-                'bill_order_id' => $bill_order_id
-            ]);
-
             $bill = new Bill();
-            $bill->fill($insert)->save();
+            $bill->fill($request)->save();
 
-            foreach ($request['customers'] as $customer_id) {
-                $billCustomer = new BillCustomer();
-                $billCustomer->fill([
-                    'bill_id' => $bill->bill_id,
-                    'customer_id' => $customer_id
-                ])->save();
+            $bill->billCustomers()->createMany($request['customers']);
+
+            $bill->billOrders()->createMany($request['mixes']);
+        });
+    }
+
+    public function draft($request)
+    {
+        DB::transaction(function () use ($request) {
+            $bill = new Bill();
+            $bill->fill($request)->save();
+
+            if (isset($request['customers'])) {
+                $bill->billCustomers()->createMany($request['customers']);
+            }
+
+            if (!empty($request['mixes'])) {
+                $bill->billOrders()->createMany($request['mixes']);
             }
         });
     }
@@ -58,22 +64,27 @@ class BillRepository
     public function update($request, $id)
     {
         DB::transaction(function () use ($request, $id) {
-            $bill_order_id = $this->billOrderRepository->update($request);
-
-            $insert = array_merge($request, [
-                'bill_order_id' => $bill_order_id
-            ]);
-
             $bill = $this->find($id);
-            $bill->fill($insert)->save();
+            $bill->fill($request)->save();
 
-            $billCustomers = BillCustomer::where('bill_id', $id)->get();
-            foreach ($request['customers'] as $customer_id) {
-                $billCustomer = new BillCustomer();
-                $billCustomer->fill([
-                    'bill_id' => $bill->bill_id,
-                    'customer_id' => $customer_id
-                ])->save();
+            if (isset($request['customers'])) {
+                if ($bill->billCustomers->isNotEmpty()) {
+                    foreach ($request['customers'] as $customer) {
+                        $bill->billCustomers()->update($customer);
+                    }
+                } else {
+                    $bill->billCustomers()->createMany($request['customers']);
+                }
+            }
+
+            if (!empty($request['mixes'])) {
+                if ($bill->billOrders->isNotEmpty()) {
+                    foreach ($request['mixes'] as $mix) {
+                        $bill->billOrders()->update($mix);
+                    }
+                } else {
+                    $bill->billOrders()->createMany($request['mixes']);
+                }
             }
         });
     }

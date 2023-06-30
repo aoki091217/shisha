@@ -85,14 +85,16 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($customerShops as $customerShop)
+                @foreach ($customers as $customer)
                 <tr>
-                    <td>{{ $customerShop->customer?->name }}</td>
-                    <td class="{{ $customerShop->shop->trashed() ? 'text-danger text-decoration-line-through' : '' }}">
-                        {{ $customerShop->shop->name }}
+                    <td>
+                        <a href="{{ route('customer.show', $customer->id) }}">
+                            {{ $customer->name }}
+                        </a>
                     </td>
-                    <td>{{ $customerShop->checkin_datetime }}</td>
-                    <td>{{ $customerShop->customer?->format_created_date }}</td>
+                    <td>{{ $customer->shop_name }}</td>
+                    <td>{{ $customer->checkin_datetime }}</td>
+                    <td>{{ $customer->format_created_date }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -100,7 +102,7 @@
     </div>
 </form>
 <div class="mt-3" id="footer">
-    {{ $customerShops->links() }}
+    {{ $customers->links() }}
 </div>
 
 @endsection

@@ -6,19 +6,53 @@
     @csrf
     @method('PATCH')
     <input type="hidden" name="user[user_id]" value="{{ $shop->user_id }}">
-    <div>
-        <label for="shopName" class="form-label">店舗</label>
-        <div class="col-8 d-flex justify-content-between align-items-center">
-            {{ Form::text(
-                'shop[name]',
-                old('shop.name', $shop->name),
-                [
-                    'class' => 'form-control',
-                    'id' => 'shopName'
-                ]
-            ) }}
-        </div>
-        <span class="text-danger">{{ $errors->first('shop.name') }}</span>
+    <label for="shopName" class="form-label">店舗</label>
+    <div class="col-8 mb-3">
+        {{ Form::text(
+            'shop[name]',
+            old('shop.name', $shop->name),
+            [
+                'class' => 'form-control',
+                'id' => 'shopName'
+            ]
+        ) }}
+    </div>
+    <span class="text-danger">{{ $errors->first('shop.name') }}</span>
+    <label for="accountId" class="form-label">ボットベーシックID<span class="text-danger">※</span></label>
+    <div class="col-8 mb-3">
+        {{ Form::text(
+            'shop[account_id]',
+            old('shop.account_id', $shop->account_id),
+            [
+                'class' => 'form-control',
+                'id' => 'accountId'
+            ]
+        ) }}
+        <span class="text-danger">{{ $errors->first('shop.account_id') }}</span>
+    </div>
+    <label for="lineToken" class="form-label">アクセストークン<span class="text-danger">※</span></label>
+    <div class="col-8 mb-3">
+        {{ Form::text(
+            'shop[line_token]',
+            old('shop.line_token', $shop->line_token),
+            [
+                'class' => 'form-control',
+                'id' => 'lineToken'
+            ]
+        ) }}
+        <span class="text-danger">{{ $errors->first('shop.line_token') }}</span>
+    </div>
+    <label for="channelSecret" class="form-label">チャネルシークレット<span class="text-danger">※</span></label>
+    <div class="col-8 mb-3">
+        {{ Form::text(
+            'shop[channel_secret]',
+            old('shop.channel_secret', $shop->channel_secret),
+            [
+                'class' => 'form-control',
+                'id' => 'channelSecret'
+            ]
+        ) }}
+        <span class="text-danger">{{ $errors->first('shop.channel_secret') }}</span>
     </div>
     <label for="userName" class="form-label">ユーザー名<span class="text-danger">※</span></label>
         <div class="col-8 mb-3">

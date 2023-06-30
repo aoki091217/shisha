@@ -13,13 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('message_actions', function (Blueprint $table) {
+        Schema::create('carousel_actions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('message_id');
-            $table->boolean('type');
-            $table->string('label', 20);
-            $table->string('action', 1000);
+            $table->foreignId('carousel_id');
+            $table->string('action', 20);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('message_actions');
+        Schema::dropIfExists('carousel_actions');
     }
 };

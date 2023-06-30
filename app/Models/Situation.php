@@ -34,6 +34,8 @@ class Situation extends Model
             case 2:
                 return 'テキストの受信';
             case 3:
+                return 'アンケート';
+            case 4:
                 return 'ブロック';
         }
     }

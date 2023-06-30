@@ -32,12 +32,6 @@ class SituationRequest extends FormRequest
             'situation.messages.*.message_type' => 'required',
             'situation.messages.*.keyword' => 'nullable|max:50',
             'situation.messages.*.alt_text' => 'nullable|max:400',
-            'situation.messages.*.thumbnail_image_url' => 'nullable|mimes:jpg,jpeg,png|dimensions:max_width=1024|max:10000',
-
-            'situation.messages.*.title' => 'nullable|max:40',
-            'situation.messages.*.text' => 'required',
-            'situation.messages.*.actions.*.label' => 'max:12',
-            'situation.messages.*.actions.*.trigger' => 'max:1000'
         ];
 
         return $commonRules;
@@ -46,16 +40,47 @@ class SituationRequest extends FormRequest
     protected function prepareForValidation()
     {
         $situation = $this->situation;
+        $carousels = [];
         $messages = [];
-        $actions = [];
+        foreach ($situation['messages'] as $messageIndex => $message) {
+            if ($message['disabled'] == 1) continue;
 
-        foreach ($situation['messages'] as $message) {
-            if ($message['message_type'] === 'buttons') {
-                $actions = collect($message['actions'])->filter(function ($action) {
-                    return isset($action['label']) && isset($action['trigger']);
+            if ($message['message_type'] === 'carousel') {
+                $carousels = collect($message['carousels'])->reject(function ($item) {
+                    return is_null($item['text']);
                 })->toArray();
 
-                $messages[] = array_merge($message, ['actions' => $actions]);
+                $titleNullCount = 0;
+                $titleFillCount = 0;
+                $imageNullCount = 0;
+                $imageFillCount = 0;
+                foreach ($carousels as $carousel) {
+                    if (is_null($carousel['title'])) {
+                        $titleNullCount++;
+                    } else {
+                        $titleFillCount++;
+                    }
+
+                    if (isset($carousel['thumbnail_image_url'])) {
+                        $imageFillCount++;
+                    } else {
+                        $imageNullCount++;
+                    }
+                }
+
+                if (count($carousels) === $titleNullCount || count($carousels) === $titleFillCount) {
+                    $messages[] = array_merge($message, ['carousels' => $carousels]);
+                } elseif (count($carousels) !== $imageNullCount || count($carousels) !== $imageFillCount) {
+                    $messages[] = array_merge($message, ['carousels' => $carousels]);
+                } else {
+                    $this->merge(['validated', true]);
+
+                    throw new HttpResponseException(
+                        redirect($this->getRedirectUrl())
+                        ->withInput($this->input())
+                        ->with("situation.messages.{$messageIndex}.diff", 'メッセージ内のカルーセルのタイトルまたは画像を一つでも設定する場合は、すべてのカルーセルに設定してください。')
+                    );
+                }
             } else {
                 $messages[] = $message;
             }

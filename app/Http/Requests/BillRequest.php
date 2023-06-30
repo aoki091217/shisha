@@ -3,9 +3,11 @@
 namespace App\Http\Requests;
 
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Route;
 
 class BillRequest extends FormRequest
 {
@@ -26,15 +28,30 @@ class BillRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'bill.shop_id' => 'required',
-            'bill.member_id' => 'required',
-            'bill.customers.*' => 'required',
-            'bill.top_change' => 'numeric',
-            'bill.amount' => 'required',
-            'bill.date' => 'required',
-            'bill.time' => 'required',
-        ];
+        if (Route::is('bill.draft')) {
+            return [
+                'bill.shop_id' => 'required',
+                'bill.member_id' => 'required',
+                'bill.customers' => 'nullable',
+                'bill.mixes.*' => 'nullable',
+                'bill.top_change' => 'numeric',
+                'bill.amount' => 'nullable',
+                'bill.date' => 'nullable',
+                'bill.time' => 'nullable',
+            ];
+        } else {
+            return [
+                'bill.shop_id' => 'required',
+                'bill.member_id' => 'required',
+                'bill.customers' => 'required',
+                'bill.mixes.*' => 'required',
+                'bill.top_change' => 'numeric',
+                'bill.amount' => 'required',
+                'bill.date' => 'required',
+                'bill.time' => 'required',
+            ];
+        }
+
     }
 
     protected function failedValidation(Validator $validator)
@@ -49,9 +66,21 @@ class BillRequest extends FormRequest
 
     protected function passedValidation()
     {
+        $mixes = collect($this->bill['mixes'])->reject(function ($mix) {
+            return is_null($mix['mix_id']);
+        })->toArray();
+
+        if (empty($mixes) && !Route::is('bill.draft')) {
+            throw new HttpResponseException(redirect($this->getRedirectUrl())->withInput($this->input()));
+        }
+
+        $is_draft = Route::is('bill.draft') ? 1 : 0;
+
         $bill = array_merge($this->bill, [
             'amount' => mb_convert_kana($this->bill['amount'], 'n'),
-            'bill_date' => Carbon::parse($this->bill['date'])->setTimeFromTimeString($this->bill['time'])->toDateTimeString()
+            'bill_date' => Carbon::parse($this->bill['date'])->setTimeFromTimeString($this->bill['time'])->toDateTimeString(),
+            'mixes' => $mixes,
+            'is_draft' => $is_draft
         ]);
 
         $this->merge([

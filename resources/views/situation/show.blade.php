@@ -45,46 +45,57 @@
                                     <label class="form-label">メッセージ内容</label>
                                     <div>{{ $message->text }}</div>
                                 </div>
-                                @elseif ($message->message_type == 'buttons')
-                                <div>
-                                    <label class="form-label">代替テキスト</label>
-                                    <div>{{ $message->alt_text }}</div>
-                                </div>
-                                <div>
-                                    <label class="form-label">サムネイル画像</label>
-                                    @if ($message->thumbnail_image_url)
+                                @elseif ($message->message_type == 'carousel')
+                                <div class="type-template">
                                     <div>
-                                        <img src="{{ asset("storage/{$message->thumbnail_image_url}") }}" class="img-thumbnail">
+                                        <label class="form-label">代替テキスト</label>
+                                        <div>{{ $message->alt_text }}</div>
                                     </div>
-                                    @else
-                                    <div>なし</div>
-                                    @endif
-                                </div>
-                                <div>
-                                    <label class="form-label">タイトル</label>
-                                    <div>{{ $message->title ?? 'なし' }}</div>
-                                </div>
-                                <div>
-                                    <label class="form-label">メッセージ内容</label>
-                                    <div>{{ $message->text }}</div>
-                                </div>
-                                <div>
-                                    <label class="form-label">ボタン</label>
-                                    <ol class="ol-labels d-flex gap-5">
-                                        @foreach ($message->messageActions as $action)
-                                            <li style="font-size: 0.8rem;">
-                                                <div>{{ config("situation.action_type.{$action->action_type}") }}</div>
-                                                <div>
-                                                    <strong>ラベル</strong>
-                                                    <div>{{ $action->label }}</div>
+                                    <div>
+                                        <div>
+                                            <label class="form-label">カルーセル</label>
+                                            <div class="carousel-group">
+                                                @foreach ($message->carousels as $carousel)
+                                                <div class="card">
+                                                    @if ($carousel->thumbnail_image_url)
+                                                    <div class="card-img-top preview-img">
+                                                        <img class="" src="{{ asset("storage/{$carousel->thumbnail_image_url}") }}" class="img-thumbnail">
+                                                    </div>
+                                                    @else
+                                                    <label class="card-img-top sample-img">
+                                                        <span>画像<span class="ms-1">(任意)</span></span>
+                                                        <ul>
+                                                            <li>拡張子：jpg, png</li>
+                                                            <li>最大横幅：1024px</li>
+                                                            <li>最大サイズ：10MB</li>
+                                                        </ul>
+                                                    </label>
+                                                    @endif
+                                                    <div class="card-body d-grid gap-2">
+                                                        <div>
+                                                            <label class="form-label mb-0">タイトル</label>
+                                                            <div>{{ $carousel->title ?? 'なし' }}</div>
+                                                        </div>
+                                                        <div>
+                                                            <label class="form-label mb-0">メッセージ内容</label>
+                                                            <div>{{ $carousel->text }}</div>
+                                                        </div>
+                                                        <div>
+                                                            <label class="form-label mb-0">ボタン</label>
+                                                            <ol class="ol-labels d-flex gap-5">
+                                                                @foreach ($carousel->carouselActions as $carouselAction)
+                                                                <li style="font-size: 0.8rem;">
+                                                                    {{ $carouselAction->action }}
+                                                                </li>
+                                                                @endforeach
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <strong>アクション</strong>
-                                                    <div>{{ $action->action }}</div>
-                                                </div>
-                                            </li>
-                                        @endforeach
-                                    </ol>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 @endif
                             </div>

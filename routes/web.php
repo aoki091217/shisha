@@ -76,13 +76,17 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('/flavor', FlavorController::class)->except('show')->parameters(['flavor' => 'id']);
 
-    Route::resource('/user', UserController::class)->except('show')->parameters(['user' => 'id']);
+    Route::prefix('bill')->as('bill.')->group(function () {
+        Route::resource('/', BillController::class)->parameters(['' => 'id']);
+        Route::post('/draft', [BillController::class, 'draft'])->name('draft');
+        Route::post('/get_members', [BillController::class, 'getMembers'])->name('getMembers');
+        Route::post('/get_customers', [BillController::class, 'getCustomers'])->name('getCustomers');
+    });
 
-    Route::resource('/bill', BillController::class)->except(['edit', 'update'])->parameters(['bill' => 'id']);
-    Route::post('/bill/get_members', [BillController::class, 'getMembers'])->name('bill.getMembers');
-    Route::post('/bill/get_customers', [BillController::class, 'getCustomers'])->name('bill.getCustomers');
+    Route::resource('/customer', CustomerController::class)->only(['index', 'show'])->parameters(['customer' => 'id']);
 
-    Route::get('/customer', [CustomerController::class, 'index'])->name('customer.index');
-
-    Route::resource('/situation', SituationController::class)->parameters(['situation' => 'id']);
+    Route::middleware('role')->group(function () {
+        Route::resource('/situation', SituationController::class)->parameters(['situation' => 'id']);
+        Route::resource('/user', UserController::class)->except('show')->parameters(['user' => 'id']);
+    });
 });

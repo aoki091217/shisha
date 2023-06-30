@@ -33,11 +33,6 @@ class UserRepository
         DB::transaction(function () use ($request) {
             $user = new User();
             $user->fill($request)->save();
-
-            // if (!is_null($request['shop_id'])) {
-            //     $shop = new Shop();
-            //     $shop->fill(array_merge($request, ['user_id' => $user->id]))->save();
-            // }
         });
     }
 
@@ -46,11 +41,6 @@ class UserRepository
         DB::transaction(function () use ($request, $id) {
             $user = $this->find($id);
             $user->fill($request)->save();
-
-            // if (!is_null($request['shop_id'])) {
-            //     $shop = Shop::find($request['shop_id']);
-            //     $shop->fill(array_merge($request))->save();
-            // }
         });
     }
 

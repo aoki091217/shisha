@@ -7,6 +7,9 @@
 @section('content')
 {{ Breadcrumbs::render('bill.show', $bill->bill_id) }}
 <div class="d-flex flex-wrap">
+    @if ($bill->is_draft)
+        <div class="col-12 text-center text-danger fw-bold mb-3">この会計情報は下書きです。</div>
+    @endif
     <div class="col-6 mb-3">
         <label class="form-label">店舗</label>
         <div class="pe-2">
@@ -55,43 +58,16 @@
             <span>{{ $bill->bill_datetime }}</span>
         </div>
     </div>
-    <div class="tab-wrapper">
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            @foreach ($bill->billOrders->groupBy('order_id') as $i => $order)
-            <li class="nav-item" role="presentation">
-                <button
-                    class="nav-link @if($i == 1) active @endif"
-                    id="tab{{ $i }}"
-                    data-bs-toggle="tab"
-                    data-bs-target="#tabContent{{ $i }}"
-                    type="button"
-                    role="tab"
-                    aria-controls="tabContent{{ $i }}"
-                    aria-selected="true">
-                オーダー{{ $i }}
-                </button>
-            </li>
-            @endforeach
-        </ul>
-        <div class="tab-content border border-top-0 rounded-bottom" id="orderTabContents">
-            @foreach ($bill->billOrders->groupBy('order_id') as $i => $orders)
-            <div
-                class="tab-pane fade show @if($i == 1) active @endif"
-                id="tabContent{{ $i }}"
-                role="tabpanel"
-                aria-labelledby="tabtabContent{{ $i }}">
-                <ul class="mb-0">
-                    @foreach ($orders as $order)
-                        <li>{{ $order->mix->name }}</li>
-                    @endforeach
-                </ul>
-            </div>
-            @endforeach
-        </div>
+    <div class="col-8 mb-3">
+        <label class="form-label">オーダー</label>
+        @foreach ($bill->billOrders as $billOrder)
+        <div>ミックス{{ $loop->iteration }}：{{ $billOrder->mix->name }}</div>
+        @endforeach
     </div>
 </div>
 <div class="d-flex align-items-center justify-content-end mt-3 footer-buttons gap-2">
     <a href="{{ route('bill.index') }}" class="btn btn-secondary">戻る</a>
+    <a href="{{ route('bill.edit', $bill->bill_id) }}" class="btn btn-success">編集</a>
     <button type="button"
             class="btn btn-danger"
             data-route="{{ route('bill.destroy', $bill->bill_id) }}"

@@ -1,5 +1,5 @@
-<div class="p-3 sidebar shadow">
-    <ul class="nav nav-pills flex-column mb-auto">
+<div class="p-3 sidebar shadow bg-white">
+    <ul class="nav nav-pills flex-column mb-auto gap-1">
         <li>
             <a href="{{ route('home.index') }}" class="nav-link {{ $routeService->getActiveForTab('home.*') }}">
                 <i class="fa-solid fa-house"></i>
@@ -48,6 +48,7 @@
                 会計
             </a>
         </li>
+        @if (auth()->user()->role_id === 1)
         <li>
             <a href="{{ route('user.index') }}" class="nav-link {{ $routeService->getActiveForTab('user.*') }}">
                 <i class="fa-solid fa-users-gear"></i>
@@ -60,5 +61,6 @@
                 メッセージ
             </a>
         </li>
+        @endif
     </ul>
 </div>

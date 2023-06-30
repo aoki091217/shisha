@@ -49,8 +49,8 @@
             @if (auth()->check())
             @include('layouts.sidebar')
 
-            <div class="main-contents bg-white">
-                <div class="container rounded-2 p-3">
+            <div class="main-contents">
+                <div class="container rounded-2 p-3 bg-white">
                     @yield('content')
                 </div>
             </div>

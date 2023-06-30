@@ -22,9 +22,19 @@ class Customer extends Model
         return $this->hasMany(CustomerShop::class);
     }
 
+    public function answers()
+    {
+        return $this->hasMany(Answer::class);
+    }
+
     public function getFormatCreatedDateAttribute()
     {
         return Carbon::parse($this->created_date)->format('Y年m月d日 H時i分');
+    }
+
+    public function getCheckinDatetimeAttribute()
+    {
+        return Carbon::parse($this->visited_at)->format('Y年m月d日 H時i分');
     }
 
     public function scopeSearch($query, $words)

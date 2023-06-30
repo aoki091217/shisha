@@ -73,6 +73,7 @@
                     <th class="bg-light col" scope="col">会計金額</th>
                     <th class="bg-light col" scope="col">会計日時</th>
                     <th class="bg-light col" scope="col">登録日</th>
+                    <th class="bg-light col" scope="col">ステータス</th>
                 </tr>
             </thead>
             <tbody>
@@ -88,6 +89,13 @@
                     <td>¥{{ $bill->amount }}</td>
                     <td>{{ $bill->bill_datetime }}</td>
                     <td>{{ $bill->created_datetime }}</td>
+                    <td>
+                        @if ($bill->is_draft)
+                        <div class="badge rounded-pill bg-danger px-3 py-2">下書き</div>
+                        @else
+                        <div class="badge rounded-pill bg-success px-3 py-2">登録済み</div>
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
             </tbody>

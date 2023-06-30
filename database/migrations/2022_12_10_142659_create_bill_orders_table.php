@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('bill_orders', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('order_id', false, true);
+            $table->bigInteger('bill_id', false, true);
             $table->foreignId('mix_id');
             $table->timestamps();
         });

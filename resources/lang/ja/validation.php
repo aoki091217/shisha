@@ -174,6 +174,7 @@ return [
         'bill.amount' => '会計金額',
         'bill.date' => '会計日付',
         'bill.time' => '会計時間',
+        'bill.mixes.*.mix_id' => 'ミックス',
         'user.code' => 'ユーザーID',
         'user.name' => 'ユーザー名',
         'user.password' => 'パスワード',
