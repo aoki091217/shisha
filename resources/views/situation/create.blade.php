@@ -184,7 +184,7 @@
                                                 <div class="carousel-group">
                                                     @foreach (range(0, 4) as $carouselIndex)
                                                     <div class="card">
-                                                        <div class="img-remove d-none">×</div>
+                                                        {{-- <div class="img-remove d-none">×</div>
                                                         {{ Form::file(
                                                             "situation[messages][0][carousels][{$carouselIndex}][thumbnail_image_url]",
                                                             [
@@ -204,7 +204,7 @@
                                                                 <li>最大横幅：1024px</li>
                                                                 <li>最大サイズ：10MB</li>
                                                             </ul>
-                                                        </label>
+                                                        </label> --}}
                                                         <div class="card-body">
                                                             <div>
                                                                 <div>

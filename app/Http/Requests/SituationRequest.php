@@ -39,12 +39,16 @@ class SituationRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $situation = $this->situation;
         $carousels = [];
         $messages = [];
-        foreach ($situation['messages'] as $messageIndex => $message) {
-            if ($message['disabled'] == 1) continue;
 
+        $requestMessages = collect($this->situation['messages'])->reject(function ($item) {
+            if ($this->method() === 'PATCH') {
+                return !isset($item['id']) || $item['disabled'] == 1;
+            }
+        });
+
+        foreach ($requestMessages as $messageIndex => $message) {
             if ($message['message_type'] === 'carousel') {
                 $carousels = collect($message['carousels'])->reject(function ($item) {
                     return is_null($item['text']);
@@ -86,7 +90,7 @@ class SituationRequest extends FormRequest
             }
         }
 
-        $situation = array_merge($situation, ['messages' => $messages]);
+        $situation = array_merge($this->situation, ['messages' => $messages]);
         $this->merge(['situation' => $situation]);
     }
 

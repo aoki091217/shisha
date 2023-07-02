@@ -35,8 +35,6 @@ class MessageController extends Controller
 
     public function webhook(Request $request)
     {
-        \Log::debug('----- webhook -----');
-
         $client = new CurlHTTPClient(config('services.line.access_token'));
         $bot = new LINEBot($client, ['channelSecret' => config('services.line.channel_secret')]);
 
@@ -84,17 +82,30 @@ class MessageController extends Controller
                         }
 
                         $question = Situation::with('messages.carousels.carouselActions')->where('event_type', 3)->first();
-                        \Log::debug($question->messages->first());
-                        $this->lineBotService->push($line_token, $question->messages->first());
+                        foreach ($question->messages as $index => $message) {
+                            if ($message->type === 1) {
+                                $this->lineBotService->push($line_token, $message);
+
+                                if (isset($question->messages[$index + 1])) {
+                                    $this->lineBotService->push($line_token, $question->messages[$index + 1]);
+                                    return;
+                                }
+                            } else {
+                                $this->lineBotService->reply($reply_token, $message, $line_token);
+                                return;
+                            }
+                        }
 
                         return;
                     } else {
                         foreach ($replySituation->messages->where('keyword', $text) as $message) {
                             $this->lineBotService->reply($reply_token, $message, $line_token);
                         }
+
+                        return;
                     }
 
-                    break;
+                    return;
                 case ($event instanceof PostbackEvent):
                     /** @var PostbackEvent $event */
                     $postback = $event->getPostbackData();
@@ -105,8 +116,6 @@ class MessageController extends Controller
                         $postbacks[$exploded[0]] = $exploded[1];
                     }
 
-                    \Log::debug($postbacks);
-
                     $alreadyAnswer = Answer::where('carousel_id', $postbacks['carousel_id'])
                         ->where('customer_id', $postbacks['customer_id'])
                         ->first();
@@ -116,17 +125,15 @@ class MessageController extends Controller
                         $answer->fill($postbacks)->save();
                     } else {
                         $this->lineBotService->buildPushMessage($line_token, 'そのメッセージには、すでに回答済みです');
+                        return;
                     }
 
                     $message = Message::find($postbacks['next_message_id']);
 
-                    \Log::debug($message);
-
                     if (is_null($message)) {
                         break;
                     } else {
-                        $this->lineBotService->reply($reply_token, $message, $line_token);
-                        break;
+                        $this->lineBotService->push($line_token, $message);
                     }
 
                     return;

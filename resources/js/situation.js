@@ -89,7 +89,8 @@ $(window).on('load', function () {
 
     // 削除ボタン
     $(document).on('click', '.btn-remove', function () {
-        $(this).parents('.accordion-item').remove();
+        const accordion = $(this).parents('.accordion-item');
+        accordion.remove();
 
         $('.accordion .accordion-item').each(function (index, element) {
             let messageCount = index + 1;
