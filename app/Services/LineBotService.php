@@ -101,8 +101,6 @@ class LineBotService
 
     public function push($line_token, $message)
     {
-        \Log::debug('----- push -----');
-
         switch ($message->type) {
             case 1:
                 // テキスト
@@ -121,8 +119,6 @@ class LineBotService
                     foreach ($carousel->carouselActions as $carouselAction) {
                         $postback = "carousel_id={$carousel->id}&carousel_action_id={$carouselAction->id}&customer_id={$customer->id}&next_message_id={$nextMessage?->id}";
 
-                        \Log::debug('post: '. $postback);
-
                         $actions[] = new PostbackTemplateActionBuilder(
                             $carouselAction->action,
                             $postback,
@@ -130,14 +126,10 @@ class LineBotService
                         );
                     }
 
-                    \Log::debug($actions);
-
                     $filePath = null;
                     if ($carousel->thumbnail_image_url) {
                         $filePath = Storage::disk('public')->url($carousel->thumbnail_image_url);
                     }
-
-                    \Log::debug('image: '.$filePath);
 
                     $carousels[] = new CarouselColumnTemplateBuilder(
                         $carousel->title,
@@ -147,8 +139,6 @@ class LineBotService
                     );
 
                 }
-
-                \Log::debug($carousels);
 
                 $carouselTemplates = new CarouselTemplateBuilder($carousels);
 
@@ -161,8 +151,6 @@ class LineBotService
 
     public function reply($reply_token, $message, $line_token)
     {
-        \Log::debug('----- reply -----');
-
         switch ($message->type) {
             case 1:
                 // text
@@ -181,8 +169,6 @@ class LineBotService
                     foreach ($carousel->carouselActions as $carouselAction) {
                         $postback = "carousel_id={$carousel->id}&carousel_action_id={$carouselAction->id}&customer_id={$customer->id}&next_message_id={$nextMessage?->id}";
 
-                        \Log::debug('post: '. $postback);
-
                         $actions[] = new PostbackTemplateActionBuilder(
                             $carouselAction->action,
                             $postback,
@@ -190,14 +176,10 @@ class LineBotService
                         );
                     }
 
-                    \Log::debug($actions);
-
                     $filePath = null;
                     if ($carousel->thumbnail_image_url) {
                         $filePath = Storage::disk('public')->url($carousel->thumbnail_image_url);
                     }
-
-                    \Log::debug('image: '.$filePath);
 
                     $carousels[] = new CarouselColumnTemplateBuilder(
                         $carousel->title,
@@ -206,8 +188,6 @@ class LineBotService
                         $actions
                     );
                 }
-
-                \Log::debug($carousels);
 
                 $carouselTemplates = new CarouselTemplateBuilder($carousels);
 

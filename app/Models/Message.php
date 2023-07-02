@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Storage;
 
 class Message extends Model
 {
@@ -27,6 +28,9 @@ class Message extends Model
         parent::boot();
 
         static::deleting(function ($article) {
+            $dir = "template/{$article->situation_id}/{$article->id}";
+            Storage::disk('public')->deleteDirectory($dir);
+
             $article->carousels()->delete();
         });
     }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Storage;
 
 class Carousel extends Model
 {
@@ -23,6 +24,10 @@ class Carousel extends Model
         parent::boot();
 
         static::deleting(function ($article) {
+            if (!is_null($article->thumbnail_image_url)) {
+                Storage::disk('public')->deleteDirectory($article->thumbnail_image_url);
+            }
+
             $article->carouselActions()->delete();
         });
     }

@@ -10,6 +10,7 @@ use App\Models\Message;
 use App\Models\Situation;
 use App\Services\LineBotService;
 use App\Services\MonitoringService;
+use App\Services\SessionService;
 use DB;
 use Illuminate\Http\Request;
 use Route;
@@ -19,7 +20,8 @@ class SituationController extends Controller
 {
     public function __construct(
         private LineBotService $lineBotService,
-        private MonitoringService $monitoringService
+        private MonitoringService $monitoringService,
+        private SessionService $sessionService
     ){}
 
     public function index(Request $request)
@@ -61,17 +63,19 @@ class SituationController extends Controller
                         $message->fill($insert)->save();
 
                         foreach ($template['carousels'] as $carouselIndex => $carousel) {
+                            $newCarousel = new Carousel();
+
                             $filePath = null;
-                            if ($request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")) {
-                                $dir = "template/{$situation->id}/{$template['turn']}/{$carouselIndex}";
+                            // if ($request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")) {
+                            //     $dir = "template/{$situation->id}/{$message->id}/{$carouselIndex}";
 
-                                $file_name = $request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")->getClientOriginalName();
+                            //     $file_name = $request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")->getClientOriginalName();
 
-                                $request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")->storeAs("public/{$dir}", $file_name);
+                            //     $request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")->storeAs("public/{$dir}", $file_name);
 
-                                $filePath = sprintf('%s/%s', $dir, $file_name);
-                                Storage::disk('public')->url($filePath);
-                            }
+                            //     $filePath = sprintf('%s/%s', $dir, $file_name);
+                            //     Storage::disk('public')->url($filePath);
+                            // }
 
                             $insert = array_merge($insert, [
                                 'message_id' => $message->id,
@@ -80,7 +84,6 @@ class SituationController extends Controller
                                 'text' => $carousel['text']
                             ]);
 
-                            $newCarousel = new Carousel();
                             $newCarousel->fill($insert)->save();
 
                             foreach ($carousel['actions'] as $action) {
@@ -96,6 +99,8 @@ class SituationController extends Controller
                 }
             }
         });
+
+        $this->sessionService->putFlashMessage(config('const.session.flash.stored'));
 
         return redirect()->route('situation.index');
     }
@@ -128,6 +133,14 @@ class SituationController extends Controller
             $situation = Situation::with('messages.carousels.carouselActions')->find($id);
             $situation->fill($request->situation)->save();
 
+            foreach ($situation->messages as $deleteMessage) {
+                foreach ($deleteMessage->carousels as $deleteCarousel) {
+                    $deleteCarousel->carouselActions()->delete();
+                }
+                $deleteMessage->carousels()->delete();
+                $deleteMessage->delete();
+            }
+
             foreach ($request->situation['messages'] as $templateIndex => $template) {
                 if ($template['send_type'] == 'push') {
                     $sendType = 1;
@@ -136,7 +149,6 @@ class SituationController extends Controller
                 }
 
                 $insert = array_merge($template, ['situation_id' => $situation->id], ['send_type' => $sendType]);
-                $storedMessage = $situation->messages->where('turn', $template['turn'])->first();
                 switch ($template['message_type']) {
                     case 'text':
                         $insert = array_merge($insert, ['type' => 1]);
@@ -151,26 +163,17 @@ class SituationController extends Controller
                         $message->fill($insert)->save();
 
                         foreach ($template['carousels'] as $carouselIndex => $carousel) {
-                            if (!is_null($storedMessage?->carousels)) {
-                                $storedCarousels = $storedMessage->carousels;
-                                foreach ($storedCarousels as $storedCarousel) {
-                                    $storedCarousel->delete();
-                                }
-                            }
-
                             $filePath = null;
-                            if ($request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")) {
-                                $dir = "template/{$situation->id}/{$template['turn']}/{$carouselIndex}";
+                            // if ($request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")) {
+                            //     $dir = "template/{$situation->id}/{$message->id}/{$carouselIndex}";
 
-                                $file_name = $request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")->getClientOriginalName();
+                            //     $file_name = $request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")->getClientOriginalName();
 
-                                $request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")->storeAs("public/{$dir}", $file_name);
+                            //     $request->file("situation.messages.{$templateIndex}.carousels.{$carouselIndex}.thumbnail_image_url")->storeAs("public/{$dir}", $file_name);
 
-                                $filePath = sprintf('%s/%s', $dir, $file_name);
-                                Storage::disk('public')->url($filePath);
-                            } elseif (isset($carousel['thumbnail_image_url']) && !is_null($carousel['thumbnail_image_url'])) {
-                                $filePath = $carousel['thumbnail_image_url'];
-                            }
+                            //     $filePath = sprintf('%s/%s', $dir, $file_name);
+                            //     Storage::disk('public')->url($filePath);
+                            // }
 
                             $insert = array_merge($insert, [
                                 'message_id' => $message->id,
@@ -193,24 +196,26 @@ class SituationController extends Controller
                     default:
                         break;
                 }
-
-                if (!is_null($storedMessage)) {
-                    $storedMessage->delete();
-                }
-
-                $situation->messages->where('turn', '<>', $template['turn'])->first()?->delete();
             }
         });
+
+        $this->sessionService->putFlashMessage(config('const.session.flash.updated'));
 
         return redirect()->route('situation.index');
     }
 
     public function destroy($id)
     {
-        $situation = Situation::with('messages')->find($id);
+        $situation = Situation::with('messages.carousels.carouselActions')->find($id);
         if (is_null($situation)) {
             $current = strstr(Route::currentRouteName(), '.', true);
             return redirect()->route("{$current}.index");
+        }
+
+        foreach ($situation->messages as $message) {
+            foreach ($message->carousels as $carousel) {
+                $carousel->delete();
+            }
         }
 
         $situation->delete();

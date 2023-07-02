@@ -57,7 +57,7 @@
                                             <div class="carousel-group">
                                                 @foreach ($message->carousels as $carousel)
                                                 <div class="card">
-                                                    @if ($carousel->thumbnail_image_url)
+                                                    {{-- @if ($carousel->thumbnail_image_url)
                                                     <div class="card-img-top preview-img">
                                                         <img class="" src="{{ asset("storage/{$carousel->thumbnail_image_url}") }}" class="img-thumbnail">
                                                     </div>
@@ -70,7 +70,7 @@
                                                             <li>最大サイズ：10MB</li>
                                                         </ul>
                                                     </label>
-                                                    @endif
+                                                    @endif --}}
                                                     <div class="card-body d-grid gap-2">
                                                         <div>
                                                             <label class="form-label mb-0">タイトル</label>

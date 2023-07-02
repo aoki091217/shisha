@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Storage;
 
 class Situation extends Model
 {
@@ -22,6 +23,9 @@ class Situation extends Model
         parent::boot();
 
         static::deleting(function ($article) {
+            $dir = "template/{$article->id}";
+            Storage::disk('public')->deleteDirectory($dir);
+
             $article->messages()->delete();
         });
     }
