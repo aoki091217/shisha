@@ -53,7 +53,7 @@ class UserRequest extends FormRequest
         unset($user['password_confirmation'], $user['is_change']);
 
         if (!isset($this->user['password'])) {
-            $password = User::where('code', $this->user['code'])->first()->password;
+            $password = User::where('code', $this->user['old_code'])->first()->password;
             $user = array_merge($user, ['password' => $password]);
             $this->merge(['user' => $user]);
         } else {
