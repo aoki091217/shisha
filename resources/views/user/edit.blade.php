@@ -20,6 +20,7 @@
         </div>
         <label for="userCode" class="form-label">ユーザーID<span class="text-danger">※</span></label>
         <div class="col-8 mb-3">
+            <input type="hidden" name="user[old_code]" value="{{ $user->code }}">
             {{ Form::text(
                 'user[code]',
                 old('user.code', $user->code),
