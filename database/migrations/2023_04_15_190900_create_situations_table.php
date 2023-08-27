@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('situations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('shop_id');
             $table->string('name', 50);
             $table->boolean('event_type')->comment('1:友達追加 2:テキストメッセージ 3:アンケート 4:ブロック');
             $table->timestamps();

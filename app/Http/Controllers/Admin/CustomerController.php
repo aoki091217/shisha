@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BillCustomer;
-use App\Models\Customer;
-use App\Models\CustomerShop;
 use App\Repositories\CustomerRepository;
 use App\Repositories\CustomerShopRepository;
 use App\Repositories\ShopRepository;
@@ -17,11 +15,18 @@ class CustomerController extends Controller
         private CustomerShopRepository $customerShopRepository,
         private CustomerRepository $customerRepository,
         private ShopRepository $shopRepository
-    ) {}
+    ) {
+        $this->middleware('role:mid');
+    }
 
     public function index(Request $request)
     {
         $shops = $this->shopRepository->get();
+
+        if (auth()->user()->role_id !== 1) {
+            $shops = $shops->where('shop_id', auth()->user()->member->shop_id);
+        }
+
         $customers = $this->customerRepository->getCustomersByCheckin()->search($request->customer)->paginate();
 
         return view('customer.index', compact('customers', 'shops'));

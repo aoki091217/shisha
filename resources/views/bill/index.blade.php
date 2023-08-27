@@ -1,5 +1,9 @@
 @extends('layouts.parent')
 
+@push('css')
+@vite('resources/css/bill/index.css')
+@endpush
+
 @section('content')
 {{ Breadcrumbs::render('bill.index') }}
 <div class="text-success text-center fw-bold">{{ session('message') }}</div>
@@ -69,21 +73,18 @@
                 <tr>
                     <th class="bg-light col" scope="col">ID</th>
                     <th class="bg-light col-2" scope="col">店舗</th>
-                    <th class="bg-light col" scope="col">メイカー</th>
-                    <th class="bg-light col" scope="col">会計金額</th>
+                    <th class="bg-light col-1" scope="col">メイカー</th>
+                    <th class="bg-light col-1" scope="col">会計金額</th>
                     <th class="bg-light col" scope="col">会計日時</th>
                     <th class="bg-light col" scope="col">登録日</th>
-                    <th class="bg-light col" scope="col">ステータス</th>
+                    <th class="bg-light col-1" scope="col">ステータス</th>
+                    <th class="bg-light col-1" scope="col">削除</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($bills as $bill)
                 <tr>
-                    <td>
-                        <a href="{{ route('bill.show', $bill->bill_id) }}" class="d-block w-100">
-                            {{ $bill->bill_id }}
-                        </a>
-                    </td>
+                    <td>{{ $bill->bill_id }}</td>
                     <td>{{ $bill->shop->name }}</td>
                     <td>{{ $bill->member->name }}</td>
                     <td>¥{{ $bill->amount }}</td>
@@ -91,10 +92,29 @@
                     <td>{{ $bill->created_datetime }}</td>
                     <td>
                         @if ($bill->is_draft)
-                        <div class="badge rounded-pill bg-danger px-3 py-2">下書き</div>
+                        <div class="col-12">
+                            <a href="{{ route('bill.edit', $bill->bill_id) }}" class="btn btn-sm btn-info rounded-pill w-100">
+                                下書き
+                            </a>
+                        </div>
                         @else
-                        <div class="badge rounded-pill bg-success px-3 py-2">登録済み</div>
+                        <div class="col-12">
+                            <a class="btn btn-sm btn-success rounded-pill w-100" style="pointer-events: none">
+                                登録済み
+                            </a>
+                        </div>
                         @endif
+                    </td>
+                    <td>
+                        <div class="col-12">
+                            <button type="button"
+                                class="btn btn-sm btn-danger w-100 btn-delete"
+                                data-route="{{ route('bill.destroy', $bill->bill_id) }}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal">
+                                削除
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 @endforeach

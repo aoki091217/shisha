@@ -22,14 +22,19 @@ class Shop extends Model
         'channel_secret'
     ];
 
+    public function blands()
+    {
+        return $this->hasMany(Bland::class, 'shop_id', 'shop_id');
+    }
+
     public function members()
     {
         return $this->hasMany(Member::class, 'shop_id', 'shop_id');
     }
 
-    public function user()
+    public function mixes()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(Mix::class, 'shop_id', 'shop_id');
     }
 
     public function getCreatedDatetimeAttribute()

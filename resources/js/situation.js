@@ -66,7 +66,7 @@ $(window).on('load', function () {
             let removeButton = $('<button>', {
                 type: 'button',
                 class: 'col-4 btn btn-danger btn-remove'
-            }).text('このメッセージを削除する');
+            }).text('このアンケートを削除する');
             clonedMessage.find('.type-wrapper').after(removeButton);
         }
 
@@ -261,7 +261,7 @@ $(window).on('load', function () {
 
     function renameAccordion(messageElement, messageIndex, messageCount)
     {
-        messageElement.find('.accordion-button').attr('data-bs-target', `#message_${messageIndex}`).text(`メッセージ${messageCount}`);
+        messageElement.find('.accordion-button').attr('data-bs-target', `#message_${messageIndex}`).text(`アンケート${messageCount}`);
         messageElement.find('.accordion-collapse').attr('id', `message_${messageIndex}`);
     }
 

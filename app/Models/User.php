@@ -53,6 +53,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    public function member()
+    {
+        return $this->hasOne(Member::class);
+    }
+
     public function getCreatedDatetimeAttribute()
     {
         return Carbon::parse($this->created_at)->format('Y年m月d日 H時i分');

@@ -10,7 +10,11 @@ class BlandRepository
 {
     public function get()
     {
-        return Bland::get();
+        if (auth()->user()->role_id === 1) {
+            return Bland::get();
+        } else {
+            return Bland::where('shop_id', auth()->user()->member->shop_id)->get();
+        }
     }
 
     public function paginate()
@@ -36,6 +40,10 @@ class BlandRepository
     public function store($request)
     {
         DB::transaction(function () use ($request) {
+            if (auth()->user()->role_id !== 1) {
+                $request = array_merge($request, ['shop_id' => auth()->user()->member->shop_id]);
+            }
+
             $bland = new Bland();
             $bland->fill($request)->save();
         });

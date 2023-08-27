@@ -7,6 +7,7 @@ use App\Http\Requests\BillRequest;
 use App\Repositories\BillRepository;
 use App\Repositories\CustomerRepository;
 use App\Repositories\CustomerShopRepository;
+use App\Repositories\MemberRepository;
 use App\Repositories\MixRepository;
 use App\Repositories\ShopRepository;
 use App\Services\SessionService;
@@ -18,24 +19,34 @@ class BillController extends Controller
         private BillRepository $billRepository,
         private MixRepository $mixRepository,
         private ShopRepository $shopRepository,
+        private MemberRepository $memberRepository,
         private CustomerRepository $customerRepository,
         private CustomerShopRepository $customerShopRepository,
-        private SessionService $sessionService
+        private SessionService $sessionService,
     ) {}
 
     public function index(Request $request)
     {
         $shops = $this->shopRepository->get();
         $bills = $this->billRepository->relate(['shop', 'member'])->search($request->bill)->paginate();
+
         return view('bill.index', compact('bills', 'shops'));
     }
 
     public function create()
     {
         $shops = $this->shopRepository->relate()->get();
-        $customerShops = $this->customerShopRepository->relate()->orderByDesc('visited_at')->get()->groupBy('customer_id');
+        $members = $this->memberRepository->get();
         $mixPresets = $this->mixRepository->relate()->get();
-        return view('bill.create', compact('shops', 'customerShops', 'mixPresets'));
+        $customerShops = $this->customerShopRepository->relate()->orderByDesc('visited_at')->get()->groupBy('customer_id');
+
+        if (auth()->user()->role_id !== 1) {
+            $shops = $shops->where('shop_id', auth()->user()->member->shop_id);
+            $mixPresets = $mixPresets->where('shop_id', auth()->user()->member->shop_id);
+            $customerShops = $customerShops->where('shop_id', auth()->user()->member->shop_id);
+        }
+
+        return view('bill.create', compact('shops', 'members', 'customerShops', 'mixPresets'));
     }
 
     public function store(BillRequest $request)
@@ -45,20 +56,21 @@ class BillController extends Controller
         return redirect()->route('bill.index');
     }
 
-    public function show($id)
-    {
-        $bill = $this->billRepository->relate(['shop', 'member', 'billCustomers.customer', 'billOrders.mix'])->find($id);
-        return view('bill.show', compact('bill'));
-    }
-
     public function edit($id)
     {
         $shops = $this->shopRepository->relate()->get();
+        $members = $this->memberRepository->get();
         $customerShops = $this->customerShopRepository->relate()->orderByDesc('visited_at')->get()->groupBy('customer_id');
         $mixPresets = $this->mixRepository->relate()->get();
         $bill = $this->billRepository->relate(['shop', 'member', 'billCustomers.customer', 'billOrders.mix'])->find($id);
 
-        return view('bill.edit', compact('shops', 'customerShops', 'mixPresets', 'bill'));
+        if (auth()->user()->role_id !== 1) {
+            $shops = $shops->where('shop_id', auth()->user()->member->shop_id);
+            $mixPresets = $mixPresets->where('shop_id', auth()->user()->member->shop_id);
+            $customerShops = $customerShops->where('shop_id', auth()->user()->member->shop_id);
+        }
+
+        return view('bill.edit', compact('shops', 'members', 'customerShops', 'mixPresets', 'bill'));
     }
 
     public function update(BillRequest $request, $id)

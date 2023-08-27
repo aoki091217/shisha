@@ -2,12 +2,19 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\RoleService;
 use Auth;
 use Closure;
 use Illuminate\Http\Request;
 
 class RoleCheckMiddleware
 {
+    public function __construct(
+        private RoleService $roleService
+    ) {
+        $this->roleService = $roleService;
+    }
+
     /**
      * Handle an incoming request.
      *
@@ -15,9 +22,11 @@ class RoleCheckMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, $role)
     {
-        if (Auth::user()->role_id !== 1) {
+        $preset = $this->roleService->findRolePreset($role);
+
+        if (!in_array(Auth::user()->role_id, $preset)) {
             return redirect()->back()->with('validate.role', 'アクセス権限がありません。');
         }
 

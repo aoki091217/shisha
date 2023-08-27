@@ -43,6 +43,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @if (!is_null($billCustomer))
                     @foreach ($billCustomer->billOrders as $billOrder)
                     <tr>
                         <td>{{ $billOrder->mix->name }}</td>
@@ -60,6 +61,7 @@
                         <td>{{ $billOrder->bill->bill_datetime }}</td>
                     </tr>
                     @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>

@@ -10,6 +10,32 @@
     @csrf
     @method('PATCH')
     <div class="d-flex flex-wrap">
+
+        <div class="col-12 mb-3 pe-2">
+            @if (auth()->user()->role_id === 1)
+            <div class="col-6">
+                <div>
+                    <label for="shopName" class="form-label">店舗</label>
+                    <span class="text-danger">※</span>
+                </div>
+                <select name="situation[shop_id]" id="shopName" class="form-select">
+                    <option value=""></option>
+                    @foreach ($shops as $shop)
+                        <option value="{{ $shop->shop_id }}" {{ old('situation.shop_id') == $shop->shop_id ? 'selected' : '' }}>
+                            {{ $shop->name }}
+                        </option>
+                    @endforeach
+                </select>
+                <span class="text-danger">{{ $errors->first('situation.shop_id') }}</span>
+            </div>
+            @else
+            <label for="shopName" class="form-label">店舗</label>
+            <div class="col-6">
+                <span>{{ auth()->user()->member->shop->name }}</span>
+            </div>
+            @endif
+        </div>
+
         <div class="col-6 mb-3 pe-2">
             <div>
                 <div>
@@ -66,7 +92,7 @@
                     <input type="hidden" name="situation[messages][{{ $messageIndex }}][turn]" class="turn" value="{{ $message->turn }}" data-name="turn">
                     <h2 class="accordion-header">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#message_{{ $messageIndex }}">
-                            メッセージ{{ $loop->iteration }}
+                            アンケート{{ $loop->iteration }}
                         </button>
                     </h2>
                     <div id="message_{{ $messageIndex }}" class="accordion-collapse collapse show">

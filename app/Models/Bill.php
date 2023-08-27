@@ -35,7 +35,7 @@ class Bill extends Model
 
     public function member()
     {
-        return $this->belongsTo(Member::class, 'member_id', 'member_id')->withTrashed();
+        return $this->belongsTo(Member::class, 'member_id')->withTrashed();
     }
 
     public function billOrders()
@@ -75,6 +75,10 @@ class Bill extends Model
 
     public function scopeSearch($query, $words)
     {
+        if (auth()->user()->role_id !== 1) {
+            $query->where('shop_id', auth()->user()->member->shop_id);
+        }
+
         if (!empty($words['shop_id'])) {
             $query->where('shop_id', $words['shop_id']);
         }

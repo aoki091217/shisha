@@ -12,6 +12,7 @@ export default defineConfig({
                 'resources/css/layouts/header.css',
                 'resources/css/layouts/sidebar.css',
                 'resources/css/home/index.css',
+                'resources/css/bill/index.css',
                 'resources/css/bill/create.css',
                 'resources/css/line/checkin.css',
                 'resources/css/mix/mix.css',

@@ -8,8 +8,8 @@ use App\Models\Carousel;
 use App\Models\CarouselAction;
 use App\Models\Message;
 use App\Models\Situation;
+use App\Repositories\ShopRepository;
 use App\Services\LineBotService;
-use App\Services\MonitoringService;
 use App\Services\SessionService;
 use DB;
 use Illuminate\Http\Request;
@@ -20,19 +20,26 @@ class SituationController extends Controller
 {
     public function __construct(
         private LineBotService $lineBotService,
-        private MonitoringService $monitoringService,
+        private ShopRepository $shopRepository,
         private SessionService $sessionService
-    ){}
+    ) {}
 
     public function index(Request $request)
     {
-        $situations = Situation::with('messages')->paginate();
+        if (auth()->user()->role_id === 1) {
+            $situations = Situation::with('messages')->paginate();
+        } else {
+            $situations = Situation::with('messages')->where('shop_id', auth()->user()->member->shop_id)->paginate();
+        }
+
         return view('situation.index', compact('situations'));
     }
 
     public function create()
     {
-        return view('situation.create');
+        $shops = $this->shopRepository->get();
+
+        return view('situation.create', compact('shops'));
     }
 
     public function store(SituationRequest $request)
@@ -118,13 +125,15 @@ class SituationController extends Controller
 
     public function edit($id)
     {
+        $shops = $this->shopRepository->get();
+
         $situation = Situation::with('messages.carousels.carouselActions')->find($id);
         if (is_null($situation)) {
             $current = strstr(Route::currentRouteName(), '.', true);
             return redirect()->route("{$current}.index");
         }
 
-        return view('situation.edit', compact('situation'));
+        return view('situation.edit', compact('situation', 'shops'));
     }
 
     public function update(SituationRequest $request, $id)

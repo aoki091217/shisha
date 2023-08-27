@@ -10,7 +10,11 @@ class MixRepository
 {
     public function get()
     {
-        return MixPreset::get();
+        if (auth()->user()->role_id === 1) {
+            return MixPreset::get();
+        } else {
+            return MixPreset::where('shop_id', auth()->user()->member->shop_id)->get();
+        }
     }
 
     public function relate()
@@ -41,6 +45,10 @@ class MixRepository
     public function store($request)
     {
         DB::transaction(function () use ($request) {
+            if (auth()->user()->role_id !== 1) {
+                $request = array_merge($request, ['shop_id' => auth()->user()->member->shop_id]);
+            }
+
             $mixPresets = new MixPreset();
             $mixPresets->fill($request)->save();
 

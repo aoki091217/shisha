@@ -13,6 +13,7 @@ class MixPreset extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'shop_id',
         'name'
     ];
 
@@ -23,6 +24,11 @@ class MixPreset extends Model
         static::deleting(function ($article) {
             $article->mixes()->delete();
         });
+    }
+
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class, 'shop_id');
     }
 
     public function getCreatedDatetimeAttribute()
@@ -37,6 +43,10 @@ class MixPreset extends Model
 
     public function scopeSearch($query, $words)
     {
+        if (auth()->user()->role_id !== 1) {
+            $query->where('shop_id', auth()->user()->member->shop_id);
+        }
+
         if (isset($words['name'])) {
             $query->where('name', 'LIKE', "%{$words['name']}%");
         }

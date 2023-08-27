@@ -17,6 +17,16 @@ class RouteService
             return 'text-dark';
         }
     }
+
+    public function getShopIdFromUrl(): string
+    {
+        $url = url()->current();
+        $parts = parse_url($url);
+        $path = trim($parts['path'], '/');
+        $segments = explode('/', $path);
+
+        return end($segments);
+    }
 }
 
 ?>

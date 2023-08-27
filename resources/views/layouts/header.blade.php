@@ -11,19 +11,6 @@
 
             <!-- Right Side Of Navbar -->
             <ul class="navbar-nav ms-auto">
-                {{-- @guest
-                    @if (Route::has('registerForm'))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('loginForm') }}">ログイン</a>
-                        </li>
-                    @endif
-
-                    @if (Route::has('loginForm'))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('registerForm') }}">登録</a>
-                        </li>
-                    @endif
-                @else --}}
                 @auth
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#userDropdown" aria-controls="userDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>

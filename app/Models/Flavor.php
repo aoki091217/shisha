@@ -16,6 +16,7 @@ class Flavor extends Model
 
     protected $fillable = [
         'bland_id',
+        'shop_id',
         'name'
     ];
 
@@ -24,8 +25,17 @@ class Flavor extends Model
         return $this->belongsTo(Bland::class, 'bland_id', 'bland_id')->withTrashed();
     }
 
+    public function getCreatedDatetimeAttribute()
+    {
+        return Carbon::parse($this->created_at)->format('Y年m月d日 H時i分');
+    }
+
     public function scopeSearch($query, $words)
     {
+        if (auth()->user()->role_id !== 1) {
+            $query->where('shop_id', auth()->user()->member->shop_id);
+        }
+
         if (isset($words['bland_id'])) {
             $query->where('bland_id', $words['bland_id']);
         }

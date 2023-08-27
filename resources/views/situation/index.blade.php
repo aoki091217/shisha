@@ -40,9 +40,10 @@
         <table class="table mb-0">
             <thead>
                 <tr>
-                    <th class="bg-light col-4" scope="col">シチュエーション</th>
-                    <th class="bg-light col-4" scope="col">受信イベント</th>
-                    <th class="bg-light col-4" scope="col">登録日</th>
+                    <th class="bg-light col-3" scope="col">シチュエーション</th>
+                    <th class="bg-light col-3" scope="col">受信イベント</th>
+                    <th class="bg-light col-3" scope="col">店舗</th>
+                    <th class="bg-light col-3" scope="col">登録日</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,6 +55,7 @@
                         </a>
                     </td>
                     <td>{{ $situation->receive_event }}</td>
+                    <td>{{ $situation->shop->name }}</td>
                     <td>{{ $situation->created_datetime }}</td>
                 </tr>
                 @endforeach

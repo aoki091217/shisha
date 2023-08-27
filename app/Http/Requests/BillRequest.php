@@ -30,7 +30,6 @@ class BillRequest extends FormRequest
     {
         if (Route::is('bill.draft')) {
             return [
-                'bill.shop_id' => 'required',
                 'bill.member_id' => 'required',
                 'bill.customers' => 'nullable',
                 'bill.mixes.*' => 'nullable',
@@ -41,7 +40,6 @@ class BillRequest extends FormRequest
             ];
         } else {
             return [
-                'bill.shop_id' => 'required',
                 'bill.member_id' => 'required',
                 'bill.customers' => 'required',
                 'bill.mixes.*' => 'required',

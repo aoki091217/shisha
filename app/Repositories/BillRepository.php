@@ -36,6 +36,10 @@ class BillRepository
     public function store($request)
     {
         DB::transaction(function () use ($request) {
+            if (auth()->user()->role_id !== 1) {
+                $request = array_merge($request, ['shop_id' => auth()->user()->member->shop_id]);
+            }
+
             $bill = new Bill();
             $bill->fill($request)->save();
 
@@ -48,13 +52,23 @@ class BillRepository
     public function draft($request)
     {
         DB::transaction(function () use ($request) {
-            $bill = new Bill();
+            if (auth()->user()->role_id !== 1) {
+                $request = array_merge($request, ['shop_id' => auth()->user()->member->shop_id]);
+            }
+
+            if (isset($request['bill_id'])) {
+                $bill = $this->find($request['bill_id']);
+            } else {
+                $bill = new Bill();
+            }
             $bill->fill($request)->save();
 
+            $bill->billCustomers()->delete();
             if (isset($request['customers'])) {
                 $bill->billCustomers()->createMany($request['customers']);
             }
 
+            $bill->billOrders()->delete();
             if (!empty($request['mixes'])) {
                 $bill->billOrders()->createMany($request['mixes']);
             }
@@ -64,6 +78,10 @@ class BillRepository
     public function update($request, $id)
     {
         DB::transaction(function () use ($request, $id) {
+            if (auth()->user()->role_id !== 1) {
+                $request = array_merge($request, ['shop_id' => auth()->user()->member->shop_id]);
+            }
+
             $bill = $this->find($id);
             $bill->fill($request)->save();
 

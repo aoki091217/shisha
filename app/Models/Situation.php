@@ -14,6 +14,7 @@ class Situation extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'shop_id',
         'name',
         'event_type'
     ];
@@ -28,6 +29,11 @@ class Situation extends Model
 
             $article->messages()->delete();
         });
+    }
+
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class, 'shop_id');
     }
 
     public function getReceiveEventAttribute()

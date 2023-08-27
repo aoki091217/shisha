@@ -33,11 +33,11 @@
             <thead>
                 <tr>
                     <th class="bg-light col-2" scope="col">ID</th>
-                    <th class="bg-light col-3" scope="col">店舗</th>
-                    <th class="bg-light col-3" scope="col">ユーザ名</th>
+                    <th class="bg-light col-4" scope="col">店舗</th>
                     <th class="bg-light col-2" scope="col">登録日</th>
-                    <th class="bg-light col"></th>
-                    <th class="bg-light col"></th>
+                    <th class="bg-light col-1">QR</th>
+                    <th class="bg-light col-1"></th>
+                    <th class="bg-light col-1"></th>
                 </tr>
             </thead>
             <tbody>
@@ -45,8 +45,14 @@
                 <tr>
                     <td>{{ $shop->shop_id }}</td>
                     <td>{{ $shop->name }}</td>
-                    <td>{{ $shop->user->name }}</td>
                     <td>{{ $shop->created_datetime }}</td>
+                    <td>
+                        <div class="col-12">
+                            <a href="{{ route('shop.download', ['shop_id' => $shop->shop_id]) }}" class="btn btn-sm btn-info w-100">
+                                <i class="fa-solid fa-download"></i>
+                            </a>
+                        </div>
+                    </td>
                     <td>
                         <div class="col-12">
                             <a href="{{ route('shop.edit', $shop->shop_id) }}" class="btn btn-sm btn-success w-100">編集</a>

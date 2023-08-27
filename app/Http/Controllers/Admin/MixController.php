@@ -8,6 +8,7 @@ use App\Models\Bland;
 use App\Repositories\BlandRepository;
 use App\Repositories\FlavorRepository;
 use App\Repositories\MixRepository;
+use App\Repositories\ShopRepository;
 use App\Services\SessionService;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,7 @@ class MixController extends Controller
     public function __construct(
         private MixRepository $mixRepository,
         private BlandRepository $blandRepository,
+        private ShopRepository $shopRepository,
         private FlavorRepository $flavorRepository,
         private SessionService $sessionService
     ) {}
@@ -25,13 +27,20 @@ class MixController extends Controller
         $blands = $this->blandRepository->get();
         $flavors = $this->flavorRepository->get();
         $mixPresets = $this->mixRepository->relate()->search($request->mix)->paginate();
+
         return view('mix.index', compact('mixPresets', 'blands', 'flavors'));
     }
 
     public function create(Request $request)
     {
+        $shops = $this->shopRepository->get();
         $blands = $this->blandRepository->relate()->get();
-        return view('mix.create', compact('blands'));
+
+        if (auth()->user()->role_id !== 1) {
+            $blands = $blands->where('shop_id', auth()->user()->member->shop_id);
+        }
+
+        return view('mix.create', compact('blands', 'shops'));
     }
 
     public function store(MixRequest $request)

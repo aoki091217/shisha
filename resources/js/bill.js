@@ -11,6 +11,10 @@ $(window).on('load', function () {
         }
     });
 
+    $('#draftButton').on('click', function () {
+        $('[name=_method]').prop('disabled', true);
+    });
+
     if ($('#shopId option').first().val() != $('#shopId option:selected').val()) {
         getMembers().done(function (response) {
             createMemberOptions(response);

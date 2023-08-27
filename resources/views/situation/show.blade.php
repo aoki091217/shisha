@@ -7,11 +7,15 @@
 @section('content')
 {{ Breadcrumbs::render('situation.show', $situation->id) }}
 <div class="d-flex flex-wrap">
-    <div class="col-6 mb-3 pe-2">
+    <div class="col-4 mb-3 pe-2">
+        <label class="form-label">店舗</label>
+        <div>{{ $situation->shop->name }}</div>
+    </div>
+    <div class="col-4 mb-3 pe-2">
         <label class="form-label">シチュエーション名</label>
         <div>{{ $situation->name }}</div>
     </div>
-    <div class="col-6 mb-3 ps-2">
+    <div class="col-4 mb-3 ps-2">
         <label class="form-label"> 受信イベント</label>
         <div>{{ $situation->receive_event }}</div>
     </div>
@@ -21,7 +25,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#message_{{ $i }}">
-                        メッセージ{{ $loop->iteration }}
+                        アンケート{{ $loop->iteration }}
                     </button>
                 </h2>
                 <div id="message_{{ $i }}" class="accordion-collapse collapse show">
