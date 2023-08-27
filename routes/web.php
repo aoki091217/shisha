@@ -58,14 +58,13 @@ Route::controller(LineLoginController::class)->as('line.')->prefix('line')->grou
     Route::get('/checkin', 'checkin')->name('checkin');
 });
 
-Route::middleware('line.signed')->group(function () {
-    Route::post('/line/webhook', [MessageController::class, 'webhook'])->name('line.webhook');
-});
-
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeViewController::class, 'index'])->name('home.index');
 
-    Route::resource('/shop', ShopController::class)->except('show')->parameters(['shop' => 'id']);
+    Route::prefix('shop')->as('shop.')->middleware('role:high')->group(function () {
+        Route::resource('/', ShopController::class)->except('show')->parameters(['' => 'id']);
+        Route::get('/download', [ShopController::class, 'download'])->name('download');
+    });
 
     Route::resource('/member', MemberController::class)->except('show')->parameters(['member' => 'id']);
 
@@ -85,8 +84,6 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('/customer', CustomerController::class)->only(['index', 'show'])->parameters(['customer' => 'id']);
 
-    Route::middleware('role')->group(function () {
-        Route::resource('/situation', SituationController::class)->parameters(['situation' => 'id']);
-        Route::resource('/user', UserController::class)->except('show')->parameters(['user' => 'id']);
-    });
+    Route::resource('/user', UserController::class)->middleware('role:high')->except('show')->parameters(['user' => 'id']);
+    Route::resource('/situation', SituationController::class)->middleware('role:mid')->parameters(['situation' => 'id']);
 });

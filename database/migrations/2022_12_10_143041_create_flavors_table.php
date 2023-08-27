@@ -15,7 +15,8 @@ return new class extends Migration
     {
         Schema::create('flavors', function (Blueprint $table) {
             $table->bigIncrements('flavor_id');
-            $table->bigInteger('bland_id');
+            $table->foreignId('bland_id');
+            $table->foreignId('shop_id');
             $table->string('name', 50);
             $table->timestamps();
             $table->softDeletes();

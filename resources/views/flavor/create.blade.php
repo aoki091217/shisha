@@ -5,6 +5,25 @@
 <form action="{{ route('flavor.store') }}" method="POST" autocomplete="off">
     @csrf
     <div>
+        @if (auth()->user()->role_id === 1)
+        <label for="shopName" class="form-label">店舗<span class="text-danger">※</span></label>
+        <div class="col-8 mb-3">
+            <select name="flavor[shop_id]" id="shopName" class="form-select">
+                <option value=""></option>
+                @foreach ($shops as $shop)
+                    <option value="{{ $shop->shop_id }}" {{ old('flavor.shop_id') == $shop->shop_id ? 'selected' : '' }}>
+                        {{ $shop->name }}
+                    </option>
+                @endforeach
+            </select>
+            <span class="text-danger">{{ $errors->first('flavor.shop_id') }}</span>
+        </div>
+        @else
+        <label for="shopName" class="form-label">店舗</label>
+        <div class="col-8 mb-3">
+            <span>{{ auth()->user()->member->shop->name }}</span>
+        </div>
+        @endif
         <label for="blandName" class="form-label">ブランド名<span class="text-danger">※</span></label>
         <div class="col-8 mb-3">
             <select name="flavor[bland_id]" id="blandName" class="form-select">

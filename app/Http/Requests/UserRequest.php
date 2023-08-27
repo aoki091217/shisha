@@ -35,13 +35,13 @@ class UserRequest extends FormRequest
         if(request()->method() === 'PATCH') {
             return array_merge($rules, [
                 'user.code' => 'required|regex:/^[a-zA-Z0-9]+$/|max:20',
-                'user.password' => 'sometimes|required|regex:/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z\-]{8,24}$/',
+                'user.password' => 'sometimes|required|min:8',
                 'user.password_confirmation' => 'sometimes|required|same:user.password',
             ]);
         } else {
             return array_merge($rules, [
                 'user.code' => 'required|unique:users,code|regex:/^[a-zA-Z0-9]+$/|max:20',
-                'user.password' => 'required|regex:/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z\-]{8,24}$/',
+                'user.password' => 'required|min:8',
                 'user.password_confirmation' => 'required|same:user.password',
             ]);
         }

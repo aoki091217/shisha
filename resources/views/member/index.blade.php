@@ -8,6 +8,7 @@
     @method('DELETE')
     <div id="searchForm">
         <div class="col-12 d-flex justify-content-between align-items-end gap-3">
+            @if (auth()->user()->role_id === 1)
             <div class="col-4">
                 <label for="shopName" class="form-label">店舗</label>
                 <select name="member[shop_id]" id="shopName" class="form-select">
@@ -19,7 +20,8 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-4">
+            @endif
+            <div class="col-4 @if (auth()->user()->role_id !== 1) col-6 @endif">
                 <label for="memberName" class="form-label">スタッフ</label>
                 {{ Form::text(
                     'member[name]',
@@ -54,7 +56,7 @@
             <tbody>
                 @foreach ($members as $member)
                 <tr>
-                    <td>{{ $member->member_id }}</td>
+                    <td>{{ $member->id }}</td>
                     <td class="{{ $member->shop->trashed() ? 'text-danger text-decoration-line-through' : '' }}">
                         {{ $member->shop->name }}
                     </td>
@@ -62,12 +64,12 @@
                     <td>{{ $member->created_datetime }}</td>
                     <td>
                         <div class="col-12">
-                            <a href="{{ route('member.edit', $member->member_id) }}" class="btn btn-sm btn-success w-100">編集</a>
+                            <a href="{{ route('member.edit', $member->id) }}" class="btn btn-sm btn-success w-100">編集</a>
                         </div>
                     </td>
                     <td>
                         <div class="col-12">
-                            <button type="button" class="btn btn-sm btn-danger w-100 btn-delete" data-route="{{ route('member.destroy', $member->member_id) }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <button type="button" class="btn btn-sm btn-danger w-100 btn-delete" data-route="{{ route('member.destroy', $member->id) }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                 削除
                             </button>
                         </div>

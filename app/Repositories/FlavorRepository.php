@@ -9,7 +9,11 @@ class FlavorRepository
 {
     public function get()
     {
-        return Flavor::get();
+        if (auth()->user()->role_id === 1) {
+            return Flavor::get();
+        } else {
+            return Flavor::where('shop_id', auth()->user()->member->shop_id)->get();
+        }
     }
 
     public function relate()
@@ -39,9 +43,14 @@ class FlavorRepository
                 return is_null($name);
             });
 
+            if (auth()->user()->role_id !== 1) {
+                $request = array_merge($request, ['shop_id' => auth()->user()->member->shop_id]);
+            }
+
             foreach ($names as $name) {
                 $flavor = new Flavor();
                 $flavor->fill([
+                    'shop_id' => $request['shop_id'],
                     'bland_id' => $request['bland_id'],
                     'name' => $name
                 ])->save();

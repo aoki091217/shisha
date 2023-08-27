@@ -60,15 +60,6 @@
             </select>
             <span class="text-danger">{{ $errors->first('user.role_id') }}</span>
         </div>
-        {{-- <label for="userShop" class="form-label">店舗</label>
-        <div class="col-8 mb-3">
-            <select name="user[shop_id]" id="userShop" class="form-select">
-                <option value=""></option>
-                @foreach ($shops as $shop)
-                    <option value="{{ $shop->shop_id }}" {{ old('user.shop_id') == $shop->shop_id ? 'selected' : '' }}>{{ $shop->name }}</option>
-                @endforeach
-            </select>
-        </div> --}}
         <label for="userEmail" class="form-label">メールアドレス<span class="text-danger">※</span></label>
         <div class="col-8 mb-3">
             {{ Form::text(

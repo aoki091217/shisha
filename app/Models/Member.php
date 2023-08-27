@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,12 +13,25 @@ class Member extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $primaryKey = 'member_id';
-
     protected $fillable = [
         'shop_id',
+        'user_id',
         'name'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($article) {
+            $article->user()->delete();
+        });
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function shop()
     {
@@ -36,6 +50,10 @@ class Member extends Model
 
     public function scopeSearch($query, $words)
     {
+        if (auth()->user()->role_id !== 1) {
+            $query->where('shop_id', auth()->user()->member->shop_id);
+        }
+
         if (isset($words['shop_id'])) {
             $query->where('shop_id', $words['shop_id']);
         }

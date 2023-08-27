@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('mixes', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('preset_id', false, true);
-            $table->bigInteger('bland_id', false, true);
-            $table->bigInteger('flavor_id', false, true);
+            $table->foreignId('preset_id');
+            $table->foreignId('bland_id');
+            $table->foreignId('flavor_id');
             $table->timestamps();
             $table->softDeletes();
         });

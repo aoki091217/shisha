@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('mix_presets', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('shop_id');
             $table->string('name', 50);
             $table->timestamps();
             $table->softDeletes();

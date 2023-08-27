@@ -10,9 +10,10 @@
     @csrf
     <div class="d-flex flex-wrap">
         <div class="col-4 mb-3">
-            <label for="shopId" class="form-label">店舗<span class="text-danger">※</span></label>
+            @if (auth()->user()->role_id === 1)
+            <label for="shopName" class="form-label">店舗<span class="text-danger">※</span></label>
             <div>
-                <select name="bill[shop_id]" id="shopId" class="form-select">
+                <select name="bill[shop_id]" id="shopName" class="form-select">
                     <option value=""></option>
                     @foreach ($shops as $shop)
                         <option value="{{ $shop->shop_id }}" {{ old('bill.shop_id') == $shop->shop_id ? 'selected' : '' }}>
@@ -22,12 +23,23 @@
                 </select>
                 <span class="text-danger">{{ $errors->first('bill.shop_id') }}</span>
             </div>
+            @else
+            <label for="shopName" class="form-label">店舗</label>
+            <div>
+                <span>{{ auth()->user()->member->shop->name }}</span>
+            </div>
+            @endif
         </div>
         <div class="col-4 mb-3 ps-2">
             <label for="memberId" class="form-label">メイカー<span class="text-danger">※</span></label>
             <div>
                 <select name="bill[member_id]" id="memberId" class="form-select">
                     <option value=""></option>
+                    @foreach ($members as $member)
+                        <option value="{{ $member->id }}" {{ old('bill.member_id') == $member->id ? 'selected' : '' }}>
+                            {{ $member->name }}
+                        </option>
+                    @endforeach
                 </select>
                 <span class="text-danger">{{ $errors->first('bill.member_id') }}</span>
             </div>
@@ -131,6 +143,8 @@
         <div class="col-4 mb-3 d-flex">
             <div class="col-12 ps-2 mb-3">
                 <span>顧客選択リスト</span>
+                <span class="text-danger">※</span>
+                <small class="text-secondary">(一時保存：任意)</small>
                 <div class="list-wrapper">
                     <ul class="list-group"></ul>
                 </div>
@@ -147,7 +161,7 @@
             <label for="amount" class="form-label">
                 会計金額
                 <span class="text-danger">※</span>
-                <small class="text-secondary">(下書き保存：任意)</small>
+                <small class="text-secondary">(一時保存：任意)</small>
             </label>
             <div class="input-group pe-2">
                 <span class="input-group-text justify-content-center col-1">¥</span>
@@ -166,7 +180,7 @@
             <label class="form-label ps-2">
                 会計日時
                 <span class="text-danger">※</span>
-                <small class="text-secondary">(下書き保存：任意)</small>
+                <small class="text-secondary">(一時保存：任意)</small>
             </label>
             <div class="ps-2">
                 <div class="input-group">
@@ -195,19 +209,19 @@
             <label class="form-label">
                 オーダー
                 <span class="text-danger">※</span>
-                <small class="text-secondary">(下書き保存：任意)</small>
+                <small class="text-secondary">(一時保存：任意)</small>
             </label>
             <div class="col-12 d-flex align-items-center flex-wrap gap-3">
                 @foreach (range(1, 5) as $i => $mixCount)
                     <div class="col-2">
-                        <div class="">ミックス{{ $mixCount }}</div>
+                        <div>ミックス{{ $mixCount }}</div>
                         <select name="bill[mixes][{{ $i }}][mix_id]" class="form-select">
                             <option value=""></option>
                             @foreach ($mixPresets as $preset)
                                 <option
                                     value="{{ $preset->id }}"
                                     {{ old("bill.mixes.{$i}.mix_id") == $preset->id ? 'selected' : '' }}>
-                                    {{ $preset->name }}
+                                    {{ auth()->user()->role_id === 1 ? $preset->shop->name.'：'.$preset->name : $preset->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -219,8 +233,8 @@
     </div>
     <div class="d-flex align-items-center justify-content-end mt-3 footer-buttons gap-2">
         <a href="{{ route('bill.index') }}" class="btn btn-secondary">戻る</a>
-        <button formaction="{{ route('bill.draft') }}" class="btn btn-info">下書き保存</button>
-        <button type="submit" class="btn btn-primary">追加</button>
+        <button formaction="{{ route('bill.draft') }}" class="btn btn-info" id="draftButton">一時保存</button>
+        <button type="submit" class="btn btn-primary">確定</button>
     </div>
 </form>
 

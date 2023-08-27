@@ -9,6 +9,7 @@ use App\Repositories\ShopRepository;
 use App\Repositories\UserRepository;
 use App\Services\SessionService;
 use Illuminate\Http\Request;
+use Storage;
 
 class ShopController extends Controller
 {
@@ -32,9 +33,7 @@ class ShopController extends Controller
 
     public function store(ShopRequest $request)
     {
-        $this->userRepository->store($request->user);
-        $user = $this->userRepository->find($request->user['code']);
-        $this->shopRepository->store(array_merge($request->shop, ['user_id' => $user->id]));
+        $this->shopRepository->store($request);
         $this->sessionService->putFlashMessage(config('const.session.flash.stored'));
 
         return redirect()->route('shop.index');
@@ -48,7 +47,6 @@ class ShopController extends Controller
 
     public function update(ShopRequest $request, $id)
     {
-        $this->userRepository->update($request->user, $request->user['user_id']);
         $this->shopRepository->update($request->shop, $id);
         $this->sessionService->putFlashMessage(config('const.session.flash.updated'));
         return redirect()->route('shop.index');
@@ -56,8 +54,28 @@ class ShopController extends Controller
 
     public function destroy($id)
     {
+        if (is_null($this->shopRepository->find($id))) {
+            return redirect()->back();
+        }
+
         $this->shopRepository->delete($id);
         $this->sessionService->putFlashMessage(config('const.session.flash.deleted'));
         return redirect()->route('shop.index');
+    }
+
+    public function download(Request $request)
+    {
+        $shopId = $request->shop_id;
+        $shop = $this->shopRepository->find($shopId);
+        if (is_null($shop)) {
+            return;
+        }
+
+        $fileName = 'qr.png';
+        $filePath = "{$shop->shop_id}/{$fileName}";
+        $mimeType = Storage::disk('public')->mimeType($filePath);
+        $headers = [["Content-type: {$mimeType}"]];
+
+        return Storage::disk('public')->download($filePath, $fileName, $headers);
     }
 }

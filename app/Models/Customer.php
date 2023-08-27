@@ -39,6 +39,12 @@ class Customer extends Model
 
     public function scopeSearch($query, $words)
     {
+        if (auth()->user()->role_id !== 1) {
+            $query->whereHas('customerShops', function ($query) {
+                return $query->where('shop_id', auth()->user()->member->shop_id);
+            });
+        }
+
         if (isset($words['name'])) {
             return $query->where('name', 'LIKE', "%{$words['name']}%");
         }

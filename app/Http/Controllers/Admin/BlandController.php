@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BlandRequest;
 use App\Repositories\BlandRepository;
+use App\Repositories\ShopRepository;
 use App\Services\SessionService;
 use Illuminate\Http\Request;
 
 class BlandController extends Controller
 {
     public function __construct(
+        private ShopRepository $shopRepository,
         private BlandRepository $blandRepository,
         private SessionService $sessionService
     ) {}
@@ -23,7 +25,8 @@ class BlandController extends Controller
 
     public function create()
     {
-        return view('bland.create');
+        $shops = $this->shopRepository->get();
+        return view('bland.create', compact('shops'));
     }
 
     public function store(BlandRequest $request)
@@ -35,8 +38,9 @@ class BlandController extends Controller
 
     public function edit($id)
     {
+        $shops = $this->shopRepository->get();
         $bland = $this->blandRepository->find($id);
-        return view('bland.edit', compact('bland'));
+        return view('bland.edit', compact('bland', 'shops'));
     }
 
     public function update(BlandRequest $request, $id)

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\FlavorRequest;
 use App\Repositories\BlandRepository;
 use App\Repositories\FlavorRepository;
+use App\Repositories\ShopRepository;
 use App\Services\SessionService;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,7 @@ class FlavorController extends Controller
 {
     public function __construct(
         private BlandRepository $blandRepository,
+        private ShopRepository $shopRepository,
         private FlavorRepository $flavorRepository,
         private SessionService $sessionService
     ) {}
@@ -21,13 +23,15 @@ class FlavorController extends Controller
     {
         $blands = $this->blandRepository->get();
         $flavors = $this->flavorRepository->relate()->search($request->flavor)->paginate();
+
         return view('flavor.index', compact('blands', 'flavors'));
     }
 
     public function create()
     {
+        $shops = $this->shopRepository->get();
         $blands = $this->blandRepository->get();
-        return view('flavor.create', compact('blands'));
+        return view('flavor.create', compact('blands', 'shops'));
     }
 
     public function store(FlavorRequest $request)
@@ -39,9 +43,10 @@ class FlavorController extends Controller
 
     public function edit($id)
     {
+        $shops = $this->shopRepository->get();
         $blands = $this->blandRepository->get();
         $flavor = $this->flavorRepository->relate()->find($id);
-        return view('flavor.edit', compact('blands', 'flavor'));
+        return view('flavor.edit', compact('blands', 'flavor', 'shops'));
     }
 
     public function update(FlavorRequest $request, $id)

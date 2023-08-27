@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
-use App\Models\Role;
 use App\Repositories\RoleRepository;
 use App\Repositories\ShopRepository;
 use App\Repositories\UserRepository;
@@ -18,7 +17,7 @@ class UserController extends Controller
         private RoleRepository $roleRepository,
         private ShopRepository $shopRepository,
         private SessionService $sessionService
-    ){}
+    ) {}
 
     public function index(Request $request)
     {

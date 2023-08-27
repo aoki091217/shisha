@@ -15,8 +15,14 @@ class Bland extends Model
     protected $primaryKey = 'bland_id';
 
     protected $fillable = [
+        'shop_id',
         'name'
     ];
+
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class, 'shop_id', 'shop_id');
+    }
 
     public function flavors()
     {
@@ -30,6 +36,10 @@ class Bland extends Model
 
     public function scopeSearch($query, $words)
     {
+        if (auth()->user()->role_id !== 1) {
+            $query->where('shop_id', auth()->user()->member->shop_id);
+        }
+
         if (isset($words['name'])) {
             return $query->where('name', 'LIKE', "%{$words['name']}%");
         }

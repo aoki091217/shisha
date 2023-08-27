@@ -7,13 +7,13 @@
     "require": {
         "php": "^8.0.2",
         "diglactic/laravel-breadcrumbs": "^8.0",
+        "endroid/qr-code": "^4.8",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "laravelcollective/html": "^6.3",
-        "linecorp/line-bot-sdk": "^3.6",
-        "simplesoftwareio/simple-qrcode": "^0.0.4@beta"
+        "linecorp/line-bot-sdk": "^3.6"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12",

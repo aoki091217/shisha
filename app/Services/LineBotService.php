@@ -6,7 +6,11 @@ use App\Models\Answer;
 use App\Models\Customer;
 use App\Models\SendMessage;
 use App\Models\Shop;
+use App\Repositories\CustomerRepository;
+use App\Repositories\CustomerShopRepository;
+use App\Repositories\ShopRepository;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LINE\LINEBot;
@@ -29,13 +33,23 @@ class LineBotService
 {
     protected $bot;
     private $shop_id;
+    private CustomerRepository $customerRepository;
+    private CustomerShopRepository $customerShopRepository;
+    private ShopRepository $shopRepository;
 
-    public function __construct()
-    {
+    public function __construct(
+        CustomerRepository $customerRepository,
+        CustomerShopRepository $customerShopRepository,
+        ShopRepository $shopRepository
+    ) {
         $client = new CurlHTTPClient(config('services.line.access_token'));
         $this->bot = new LINEBot($client, ['channelSecret' => config('services.line.channel_secret')]);
 
         $this->shop_id = optional(Shop::first())->shop_id;
+
+        $this->customerRepository = $customerRepository;
+        $this->customerShopRepository = $customerShopRepository;
+        $this->shopRepository = $shopRepository;
     }
 
     /**
@@ -67,35 +81,6 @@ class LineBotService
     public function buildPushMessage($line_token, $message)
     {
         $builder = new TextMessageBuilder($message);
-        $this->bot->pushMessage($line_token, $builder);
-    }
-
-    /**
-     * 選択肢テンプレートメッセージの生成
-     */
-    public function buildQuestionsTemplate($message, $type, $number)
-    {
-        $questions = [];
-        foreach (config("line.questions.{$type}") as $item) {
-            $questions[] = new MessageTemplateActionBuilder($item['string'], $item['string']);
-        }
-
-        $confirm = new ButtonTemplateBuilder("アンケートその{$number}", $message, null, $questions);
-        $builder = new TemplateMessageBuilder("アンケートその{$number}", $confirm);
-
-
-        return $builder;
-    }
-
-    /**
-     * 性別アンケートのプッシュメッセージ
-     */
-    public function buildSex($line_token)
-    {
-        $message = '性別についてお聞かせください。';
-
-        $builder = $this->buildQuestionsTemplate($message, 'sex', 1);
-
         $this->bot->pushMessage($line_token, $builder);
     }
 
@@ -210,75 +195,11 @@ class LineBotService
         return $profile['displayName'];
     }
 
-    public function saveSend($customerId, $messageId)
-    {
-        $sendMessage = SendMessage::where('customer_id', $customerId)->get()->first();
-        if (is_null($sendMessage)) {
-            $sendMessage = new SendMessage();
-        }
-
-        $sendMessage->id = $customerId;
-        $sendMessage->message_id = $messageId;
-        $sendMessage->save();
-    }
-
-    public function saveAnswer($customerId, $messageId = null, $text = null, $is_question)
-    {
-        $response = new Answer();
-        $response->fill([
-            'customer_id' => $customerId,
-            'message_id' => $messageId,
-            'text' => $text,
-            'is_question' => $is_question
-        ])->save();
-    }
-
-    public function saveResponse($customerId, $messageId, $answer)
-    {
-        $response = new Answer();
-        $response->id = $customerId;
-        $response->message_id = $messageId;
-        $response->text = $answer;
-        $response->save();
-    }
-
-    public function getBeforeTemplate($templates, $index)
-    {
-        $before = $index - 1;
-        if (isset($templates[$before])) {
-            return $templates[$before];
-        } else {
-            return null;
-        }
-    }
-
-
-    public function getIsReplied($type, $text)
-    {
-        return collect(config("line.questions.{$type}"))->contains(function ($item) use ($text) {
-            return $item['string'] === $text;
-        });
-    }
-
-    public function getQuestionValue($type, $text)
-    {
-        $item = $this->firstQuestions($type, $text);
-
-        return $item['value'];
-    }
-
-    public function firstQuestions($type, $text)
-    {
-        return collect(config("line.questions.{$type}"))->filter(function ($item) use ($text) {
-            return $item['string'] === $text;
-        })->first();
-    }
-
     public function createUri($shop_id = null)
     {
-        $line_id = urlencode(config('services.line.account_id'));
+        $shop = $this->shopRepository->find($shop_id);
         $message = $this->getEncodeMessage($shop_id);
-        $uri = "https://line.me/R/oaMessage/@{$line_id}/?{$message->encode}";
+        $uri = "https://line.me/R/oaMessage/{$shop->account_id}/?{$message->encode}";
 
         return (object) [
             'uri' => $uri,
@@ -313,6 +234,25 @@ class LineBotService
             'shop_id' => $shop_id,
             'visited_at' => $visited_at
         ];
+    }
+
+    public function findLineAccount(Request $request)
+    {
+        \Log::debug($request->all());
+        // \Log::debug($request->events[0]);
+        if (isset($request->events[0])) {
+            // $event = $request->events[0];
+            // $customer = Customer::where('line_token', $event['source']['userId'])->firstOrNew([
+            //     'line_token' => $event['source']['userId']
+            // ])->save();
+            // \Log::debug($customer->id);
+            // $shop_id = $customerShops->sortByDesc('visited_at')->first()->shop_id;
+            // $latestShop = $this->shopRepository->find($shop_id);
+
+            // return $latestShop;
+        }
+
+        return null;
     }
 }
 

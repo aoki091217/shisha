@@ -6,17 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Customer;
 use App\Models\Message;
-use App\Models\SendMessage;
-use App\Models\Shop;
 use App\Models\Situation;
 use App\Repositories\CustomerRepository;
 use App\Repositories\CustomerShopRepository;
+use App\Repositories\ShopRepository;
 use App\Services\LineBotService;
 use App\Services\MessageService;
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use LINE\LINEBot;
 use LINE\LINEBot\Event\FollowEvent;
 use LINE\LINEBot\Event\MessageEvent\TextMessage;
@@ -27,16 +23,19 @@ use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 class MessageController extends Controller
 {
     public function __construct(
+        private ShopRepository $shopRepository,
         private CustomerRepository $customerRepository,
         private LineBotService $lineBotService,
         private CustomerShopRepository $customerShopRepository,
         private MessageService $messageService
-    ){}
+    ) {}
 
-    public function webhook(Request $request)
+    public function webhook(Request $request, $id)
     {
-        $client = new CurlHTTPClient(config('services.line.access_token'));
-        $bot = new LINEBot($client, ['channelSecret' => config('services.line.channel_secret')]);
+        $shop = $this->shopRepository->find($id);
+
+        $client = new CurlHTTPClient($shop->access_token);
+        $bot = new LINEBot($client, ['channelSecret' => $shop->channel_secret]);
 
         $events = $bot->parseEventRequest($request->getContent(), $request->header('x-line-signature'));
 
@@ -59,7 +58,7 @@ class MessageController extends Controller
                         $customer->restore();
                     }
 
-                    $situation = Situation::with('messages.carousels.carouselActions')->where('event_type', 1)->first();
+                    $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
                     foreach ($situation->messages as $message) {
                         $this->lineBotService->push($line_token, $message);
                     }
@@ -69,7 +68,9 @@ class MessageController extends Controller
                     /** @var TextMessage $event */
                     $text = $event->getText();
 
-                    $replySituation = Situation::with('messages.carousels.carouselActions')->where('event_type', 2)->first();
+                    \Log::debug($line_token);
+                    \Log::debug($this->lineBotService->getProfileName($line_token));
+                    $replySituation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 2)->first();
 
                     if (preg_match('/checkin/', $text)) {
                         $checkin = $this->lineBotService->getParamsFromCheckin($text);
@@ -81,7 +82,7 @@ class MessageController extends Controller
                             }
                         }
 
-                        $question = Situation::with('messages.carousels.carouselActions')->where('event_type', 3)->first();
+                        $question = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 3)->first();
                         foreach ($question->messages as $index => $message) {
                             if ($message->type === 1) {
                                 $this->lineBotService->push($line_token, $message);

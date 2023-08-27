@@ -11,11 +11,13 @@
 <form action="{{ route('bill.update', $bill->bill_id) }}" method="POST" autocomplete="off">
     @csrf
     @method('PATCH')
+    <input type="hidden" name="bill[bill_id]" value="{{ $bill->bill_id }}">
     <div class="d-flex flex-wrap">
         <div class="col-4 mb-3">
-            <label for="shopId" class="form-label">店舗<span class="text-danger">※</span></label>
-            <div class="pe-2">
-                <select name="bill[shop_id]" id="shopId" class="form-select">
+            @if (auth()->user()->role_id === 1)
+            <label for="shopName" class="form-label">店舗<span class="text-danger">※</span></label>
+            <div>
+                <select name="bill[shop_id]" id="shopName" class="form-select">
                     <option value=""></option>
                     @foreach ($shops as $shop)
                         <option value="{{ $shop->shop_id }}" {{ old('bill.shop_id', $bill->shop_id) == $shop->shop_id ? 'selected' : '' }}>
@@ -25,12 +27,23 @@
                 </select>
                 <span class="text-danger">{{ $errors->first('bill.shop_id') }}</span>
             </div>
+            @else
+            <label for="shopName" class="form-label">店舗</label>
+            <div>
+                <span>{{ auth()->user()->member->shop->name }}</span>
+            </div>
+            @endif
         </div>
         <div class="col-4 mb-3 ps-2">
             <label for="memberId" class="form-label">メイカー<span class="text-danger">※</span></label>
             <div>
                 <select name="bill[member_id]" id="memberId" class="form-select">
                     <option value=""></option>
+                    @foreach ($members as $member)
+                        <option value="{{ $member->id }}" {{ old('bill.member_id', $bill->member_id) == $member->id ? 'selected' : '' }}>
+                            {{ $member->name }}
+                        </option>
+                    @endforeach
                 </select>
                 <span class="text-danger">{{ $errors->first('bill.member_id') }}</span>
             </div>
@@ -204,13 +217,16 @@
                             <option value=""></option>
                             @foreach ($mixPresets as $preset)
                                 @php
-                                    $billOrder = $bill->billOrders->where('mix_id', $preset->id)->first();
-                                    $mix_id = $billOrder?->mix_id;
+                                    $mix_id = null;
+                                    if (isset($bill->billOrders[$i])) {
+                                        $billOrder = $bill->billOrders[$i];
+                                        $mix_id = $billOrder?->mix_id;
+                                    }
                                 @endphp
                                 <option
                                     value="{{ $preset->id }}"
                                     {{ old("bill.mixes.{$i}.mix_id", $mix_id) == $preset->id ? 'selected' : '' }}>
-                                    {{ $preset->name }}
+                                    {{ auth()->user()->role_id === 1 ? $preset->shop->name.'：'.$preset->name : $preset->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -221,8 +237,9 @@
         </div>
     </div>
     <div class="d-flex align-items-center justify-content-end mt-3 footer-buttons gap-2">
-        <a href="{{ route('bill.show', $bill->bill_id) }}" class="btn btn-secondary">戻る</a>
-        <button type="submit" class="btn btn-primary">更新</button>
+        <a href="{{ route('bill.index') }}" class="btn btn-secondary">戻る</a>
+        <button formaction="{{ route('bill.draft') }}" class="btn btn-info" id="draftButton">一時保存</button>
+        <button type="submit" class="btn btn-primary">確定</button>
     </div>
 </form>
 

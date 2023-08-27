@@ -14,8 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('members', function (Blueprint $table) {
-            $table->bigIncrements('member_id');
-            $table->integer('shop_id', false, true);
+            $table->id();
+            $table->foreignId('shop_id');
+            $table->foreignId('user_id');
             $table->string('name', 50);
             $table->timestamps();
             $table->softDeletes();

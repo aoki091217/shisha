@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('bills', function (Blueprint $table) {
             $table->bigIncrements('bill_id');
+            $table->foreignId('shop_id')->nullable();
+            $table->foreignId('member_id')->nullable();
             $table->integer('amount', false, true)->nullable();
-            $table->foreignId('shop_id', false, true)->nullable();
-            $table->foreignId('member_id', false, true)->nullable();
             $table->boolean('share')->nullable();
             $table->boolean('top_change')->nullable();
             $table->dateTime('bill_date')->nullable();
