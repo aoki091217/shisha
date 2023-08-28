@@ -65,7 +65,7 @@ class ShopRepository
                 ->build();
 
             Storage::disk('public')->makeDirectory($shop->shop_id);
-            $qrCode->saveToFile(storage_path("app/public/{$shop->shop_id}/qr.png"));
+            $qrCode->saveToFile(storage_path("app/public/{$shop->shop_id}/qr_{$shop->name}.png"));
         });
     }
 
