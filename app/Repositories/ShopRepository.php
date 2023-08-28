@@ -74,6 +74,18 @@ class ShopRepository
         DB::transaction(function () use ($request, $id) {
             $shop = $this->find($id);
             $shop->fill($request)->save();
+
+            Storage::disk('public')->deleteDirectory($shop->shop_id);
+
+            $uri = route('line.checkin', ['shop_id' => $shop->shop_id]);
+            $qrCode = Builder::create()
+                ->writer(new PngWriter)
+                ->data($uri)
+                ->encoding(new Encoding('UTF-8'))
+                ->build();
+
+            Storage::disk('public')->makeDirectory($shop->shop_id);
+            $qrCode->saveToFile(storage_path("app/public/{$shop->shop_id}/qr_{$shop->name}.png"));
         });
     }
 
