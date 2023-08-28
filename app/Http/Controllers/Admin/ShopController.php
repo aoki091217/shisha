@@ -71,7 +71,7 @@ class ShopController extends Controller
             return;
         }
 
-        $fileName = 'qr.png';
+        $fileName = "qr_{$shop->name}.png";
         $filePath = "{$shop->shop_id}/{$fileName}";
         $mimeType = Storage::disk('public')->mimeType($filePath);
         $headers = [["Content-type: {$mimeType}"]];
