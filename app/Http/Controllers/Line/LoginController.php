@@ -8,13 +8,11 @@ use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
-    public function __construct(
-        private LineBotService $lineBotService
-    ){}
-
     public function checkin(Request $request)
     {
-        $messages = $this->lineBotService->createUri($request->shop_id);
+        $lineBotService = new LineBotService((int) $request->shop_id);
+
+        $messages = $lineBotService->createUri($request->shop_id);
 
         return view('line.checkin', compact('messages'));
     }
