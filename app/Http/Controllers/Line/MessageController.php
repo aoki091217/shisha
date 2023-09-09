@@ -34,7 +34,7 @@ class MessageController extends Controller
     {
         $shop = $this->shopRepository->find($id);
 
-        $client = new CurlHTTPClient($shop->access_token);
+        $client = new CurlHTTPClient($shop->line_token);
         $bot = new LINEBot($client, ['channelSecret' => $shop->channel_secret]);
 
         $events = $bot->parseEventRequest($request->getContent(), $request->header('x-line-signature'));
@@ -47,20 +47,15 @@ class MessageController extends Controller
 
             switch ($event) {
                 case ($event instanceof FollowEvent):
-                    $name = $this->lineBotService->getProfileName($line_token);
-                    if (is_null($customer)) {
-                        $customer = new Customer();
-                        $customer->fill([
-                            'line_token' => $line_token,
-                            'name' => $name
-                        ])->save();
-                    } else {
-                        $customer->restore();
-                    }
 
-                    $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
-                    foreach ($situation->messages as $message) {
-                        $this->lineBotService->push($line_token, $message);
+                    if (is_null($customer)) {
+                        $customer = $this->customerRepository->store($line_token);
+                        $this->lineBotService->buildPushMessage($line_token, 'ニックネームが未登録です。ニックネームを入力してください。');
+                    } else {
+                        $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
+                        foreach ($situation->messages as $message) {
+                            $this->lineBotService->push($line_token, $message);
+                        }
                     }
 
                     return;
@@ -68,8 +63,6 @@ class MessageController extends Controller
                     /** @var TextMessage $event */
                     $text = $event->getText();
 
-                    \Log::debug($line_token);
-                    \Log::debug($this->lineBotService->getProfileName($line_token));
                     $replySituation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 2)->first();
 
                     if (preg_match('/checkin/', $text)) {
@@ -99,8 +92,31 @@ class MessageController extends Controller
 
                         return;
                     } else {
-                        foreach ($replySituation->messages->where('keyword', $text) as $message) {
-                            $this->lineBotService->reply($reply_token, $message, $line_token);
+                        if ($customer->step === 1) {
+                            $fills = [
+                                'name' => $text,
+                                'step' => 2
+                            ];
+
+                            $this->customerRepository->update($customer, $fills);
+                            $this->lineBotService->buildConfirm("ニックネームは「{$event->getText()}」でよろしいですか？", $reply_token);
+
+                            return;
+                        } elseif ($customer->step === 2) {
+                            if ($text === 'はい') {
+                                $this->customerRepository->storeStep($customer, 3);
+                                $this->lineBotService->buildReplyMessage($reply_token, "{$customer->name}様、ご登録ありがとうございます。");
+                            } elseif ($text === 'いいえ') {
+                                $this->customerRepository->deleteName($customer);
+                                $this->lineBotService->buildReplyMessage($reply_token, '他のニックネームをご入力ください。');
+                                return;
+                            }
+                        }
+
+                        if (!is_null($replySituation)) {
+                            foreach ($replySituation->messages->where('keyword', $text) as $message) {
+                                $this->lineBotService->reply($reply_token, $message, $line_token);
+                            }
                         }
 
                         return;
@@ -140,7 +156,10 @@ class MessageController extends Controller
                     return;
                 case ($event instanceof UnfollowEvent):
                     $customer = Customer::where('line_token', $line_token)->first();
-                    $customer->delete();
+                    if (!is_null($customer)) {
+                        $customer->delete();
+                    }
+
                     return;
             }
         }

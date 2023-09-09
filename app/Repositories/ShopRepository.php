@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Models\Shop;
-use App\Models\User;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\Writer\PngWriter;
@@ -36,7 +35,7 @@ class ShopRepository
         return Shop::search($words);
     }
 
-    public function find($id)
+    public function find($id): Shop
     {
         return Shop::find($id);
     }

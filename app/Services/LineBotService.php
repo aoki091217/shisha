@@ -2,27 +2,16 @@
 
 namespace App\Services;
 
-use App\Models\Answer;
 use App\Models\Customer;
-use App\Models\SendMessage;
 use App\Models\Shop;
-use App\Repositories\CustomerRepository;
-use App\Repositories\CustomerShopRepository;
 use App\Repositories\ShopRepository;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LINE\LINEBot;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
-use LINE\LINEBot\MessageBuilder\Flex\ContainerBuilder\CarouselContainerBuilder;
-use LINE\LINEBot\MessageBuilder\ImageMessageBuilder;
-use LINE\LINEBot\MessageBuilder\TemplateBuilder\ButtonTemplateBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateBuilder\CarouselColumnTemplateBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateBuilder\CarouselTemplateBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateBuilder\ConfirmTemplateBuilder;
-use LINE\LINEBot\MessageBuilder\TemplateBuilder\ImageCarouselColumnTemplateBuilder;
-use LINE\LINEBot\MessageBuilder\TemplateBuilder\ImageCarouselTemplateBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateMessageBuilder;
 use LINE\LINEBot\MessageBuilder\TextMessageBuilder;
 use LINE\LINEBot\TemplateActionBuilder\MessageTemplateActionBuilder;
@@ -33,13 +22,9 @@ class LineBotService
 {
     protected $bot;
     private $shop_id;
-    private CustomerRepository $customerRepository;
-    private CustomerShopRepository $customerShopRepository;
     private ShopRepository $shopRepository;
 
     public function __construct(
-        CustomerRepository $customerRepository,
-        CustomerShopRepository $customerShopRepository,
         ShopRepository $shopRepository
     ) {
         $client = new CurlHTTPClient(config('services.line.access_token'));
@@ -47,8 +32,6 @@ class LineBotService
 
         $this->shop_id = optional(Shop::first())->shop_id;
 
-        $this->customerRepository = $customerRepository;
-        $this->customerShopRepository = $customerShopRepository;
         $this->shopRepository = $shopRepository;
     }
 
@@ -197,9 +180,14 @@ class LineBotService
 
     public function createUri($shop_id = null)
     {
-        $shop = $this->shopRepository->find($shop_id);
+        if (is_null($shop_id)) {
+            $shop = Shop::first();
+        } else {
+            $shop = $this->shopRepository->find($shop_id);
+        }
+        $accountId = urlencode($shop->account_id);
         $message = $this->getEncodeMessage($shop_id);
-        $uri = "https://line.me/R/oaMessage/{$shop->account_id}/?{$message->encode}";
+        $uri = "https://line.me/R/oaMessage/{$accountId}/?{$message->encode}";
 
         return (object) [
             'uri' => $uri,
@@ -234,25 +222,6 @@ class LineBotService
             'shop_id' => $shop_id,
             'visited_at' => $visited_at
         ];
-    }
-
-    public function findLineAccount(Request $request)
-    {
-        \Log::debug($request->all());
-        // \Log::debug($request->events[0]);
-        if (isset($request->events[0])) {
-            // $event = $request->events[0];
-            // $customer = Customer::where('line_token', $event['source']['userId'])->firstOrNew([
-            //     'line_token' => $event['source']['userId']
-            // ])->save();
-            // \Log::debug($customer->id);
-            // $shop_id = $customerShops->sortByDesc('visited_at')->first()->shop_id;
-            // $latestShop = $this->shopRepository->find($shop_id);
-
-            // return $latestShop;
-        }
-
-        return null;
     }
 }
 

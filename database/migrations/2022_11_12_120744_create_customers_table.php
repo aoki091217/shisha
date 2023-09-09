@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('line_token')->nullable();
             $table->string('name')->nullable();
+            $table->tinyInteger('step');
             $table->timestamps();
             $table->softDeletes();
         });

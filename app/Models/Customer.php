@@ -14,7 +14,8 @@ class Customer extends Model
 
     protected $fillable = [
         'line_token',
-        'name'
+        'name',
+        'step'
     ];
 
     public function customerShops()

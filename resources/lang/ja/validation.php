@@ -186,6 +186,7 @@ return [
         'password_confirmation' => 'パスワード（確認用）',
         'email' => 'メールアドレス',
         'mix.name' => 'ミックス名',
+        'situation.shop_id' => '店舗',
         'situation.name' => 'シチュエーション名',
         'situation.messages.*.keyword' => '応答キーワード',
         'situation.messages.*.text' => 'メッセージ内容',

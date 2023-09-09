@@ -27,6 +27,7 @@ class SituationRequest extends FormRequest
     public function rules()
     {
         $commonRules = [
+            'situation.shop_id' => 'required',
             'situation.name' => 'required|max:50',
             'situation.event_type' => 'required',
             'situation.messages.*.message_type' => 'required',
