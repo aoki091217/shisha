@@ -34,8 +34,8 @@ return [
     'line' => [
         // 'account_id' => env('LINE_ACCOUNT_ID'),
         // 'channel_id' => env('LINE_CHANNEL_ID'),
-        // 'channel_secret' => env('LINE_CHANNEL_SECRET'),
-        // 'access_token' => env('LINE_ACCESS_TOKEN'),
+        'channel_secret' => env('LINE_CHANNEL_SECRET'),
+        'access_token' => env('LINE_ACCESS_TOKEN'),
         'ngrok' => env('APP_NGROK')
         // 'login_channel_id' => env('LINE_LOGIN_CHANNEL_ID'),
         // 'login_channel_secret' => env('LINE_LOGIN_CHANNEL_SECRET'),

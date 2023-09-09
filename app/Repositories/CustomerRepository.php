@@ -38,7 +38,6 @@ class CustomerRepository
         return DB::transaction(function () use ($line_token) {
             $customer = new Customer();
             $customer->line_token = $line_token;
-            $customer->customer_date = Carbon::today()->toDateString();
             $customer->step = 1;
             $customer->save();
 
