@@ -9,17 +9,14 @@ use App\Models\CarouselAction;
 use App\Models\Message;
 use App\Models\Situation;
 use App\Repositories\ShopRepository;
-use App\Services\LineBotService;
 use App\Services\SessionService;
 use DB;
 use Illuminate\Http\Request;
 use Route;
-use Storage;
 
 class SituationController extends Controller
 {
     public function __construct(
-        private LineBotService $lineBotService,
         private ShopRepository $shopRepository,
         private SessionService $sessionService
     ) {}

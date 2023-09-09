@@ -25,13 +25,14 @@ class MessageController extends Controller
     public function __construct(
         private ShopRepository $shopRepository,
         private CustomerRepository $customerRepository,
-        private LineBotService $lineBotService,
         private CustomerShopRepository $customerShopRepository,
         private MessageService $messageService
     ) {}
 
     public function webhook(Request $request, $id)
     {
+        $lineBotService = new LineBotService($id);
+
         $shop = $this->shopRepository->find($id);
 
         $client = new CurlHTTPClient($shop->line_token);
@@ -50,11 +51,11 @@ class MessageController extends Controller
 
                     if (is_null($customer)) {
                         $customer = $this->customerRepository->store($line_token);
-                        $this->lineBotService->buildPushMessage($line_token, 'ニックネームが未登録です。ニックネームを入力してください。');
+                        $lineBotService->buildPushMessage($line_token, 'ニックネームが未登録です。ニックネームを入力してください。');
                     } else {
                         $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
                         foreach ($situation->messages as $message) {
-                            $this->lineBotService->push($line_token, $message);
+                            $lineBotService->push($line_token, $message);
                         }
                     }
 
@@ -66,26 +67,26 @@ class MessageController extends Controller
                     $replySituation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 2)->first();
 
                     if (preg_match('/checkin/', $text)) {
-                        $checkin = $this->lineBotService->getParamsFromCheckin($text);
+                        $checkin = $lineBotService->getParamsFromCheckin($text);
                         $this->customerShopRepository->store($customer, $checkin);
 
                         if (!is_null($replySituation)) {
                             foreach ($replySituation->messages as $message) {
-                                $this->lineBotService->reply($reply_token, $message, $line_token);
+                                $lineBotService->reply($reply_token, $message, $line_token);
                             }
                         }
 
                         $question = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 3)->first();
                         foreach ($question->messages as $index => $message) {
                             if ($message->type === 1) {
-                                $this->lineBotService->push($line_token, $message);
+                                $lineBotService->push($line_token, $message);
 
                                 if (isset($question->messages[$index + 1])) {
-                                    $this->lineBotService->push($line_token, $question->messages[$index + 1]);
+                                    $lineBotService->push($line_token, $question->messages[$index + 1]);
                                     return;
                                 }
                             } else {
-                                $this->lineBotService->reply($reply_token, $message, $line_token);
+                                $lineBotService->reply($reply_token, $message, $line_token);
                                 return;
                             }
                         }
@@ -99,23 +100,23 @@ class MessageController extends Controller
                             ];
 
                             $this->customerRepository->update($customer, $fills);
-                            $this->lineBotService->buildConfirm("ニックネームは「{$event->getText()}」でよろしいですか？", $reply_token);
+                            $lineBotService->buildConfirm("ニックネームは「{$event->getText()}」でよろしいですか？", $reply_token);
 
                             return;
                         } elseif ($customer->step === 2) {
                             if ($text === 'はい') {
                                 $this->customerRepository->storeStep($customer, 3);
-                                $this->lineBotService->buildReplyMessage($reply_token, "{$customer->name}様、ご登録ありがとうございます。");
+                                $lineBotService->buildReplyMessage($reply_token, "{$customer->name}様、ご登録ありがとうございます。");
                             } elseif ($text === 'いいえ') {
                                 $this->customerRepository->deleteName($customer);
-                                $this->lineBotService->buildReplyMessage($reply_token, '他のニックネームをご入力ください。');
+                                $lineBotService->buildReplyMessage($reply_token, '他のニックネームをご入力ください。');
                                 return;
                             }
                         }
 
                         if (!is_null($replySituation)) {
                             foreach ($replySituation->messages->where('keyword', $text) as $message) {
-                                $this->lineBotService->reply($reply_token, $message, $line_token);
+                                $lineBotService->reply($reply_token, $message, $line_token);
                             }
                         }
 
@@ -141,7 +142,7 @@ class MessageController extends Controller
                         $answer = new Answer();
                         $answer->fill($postbacks)->save();
                     } else {
-                        $this->lineBotService->buildPushMessage($line_token, 'そのメッセージには、すでに回答済みです');
+                        $lineBotService->buildPushMessage($line_token, 'そのメッセージには、すでに回答済みです');
                         return;
                     }
 
@@ -150,7 +151,7 @@ class MessageController extends Controller
                     if (is_null($message)) {
                         break;
                     } else {
-                        $this->lineBotService->push($line_token, $message);
+                        $lineBotService->push($line_token, $message);
                     }
 
                     return;

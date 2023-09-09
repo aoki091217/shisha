@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Customer;
 use App\Models\Shop;
-use App\Repositories\ShopRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use LINE\LINEBot;
@@ -22,17 +21,15 @@ class LineBotService
 {
     protected $bot;
     private $shop_id;
-    private ShopRepository $shopRepository;
 
-    public function __construct(
-        ShopRepository $shopRepository
-    ) {
-        $client = new CurlHTTPClient(config('services.line.access_token'));
-        $this->bot = new LINEBot($client, ['channelSecret' => config('services.line.channel_secret')]);
+    public function __construct(int $id)
+    {
+        $shop = Shop::find($id);
 
-        $this->shop_id = optional(Shop::first())->shop_id;
+        $client = new CurlHTTPClient($shop->line_token);
+        $this->bot = new LINEBot($client, ['channelSecret' => $shop->channel_secret]);
 
-        $this->shopRepository = $shopRepository;
+        $this->shop_id = $shop->shop_id;
     }
 
     /**
@@ -166,24 +163,12 @@ class LineBotService
         $this->bot->replyMessage($reply_token, $builder);
     }
 
-
-    public function getProfileName($line_token)
-    {
-        $profile = ['displayName' => ''];
-        $response = $this->bot->getProfile($line_token);
-        if ($response->isSucceeded()) {
-            $profile = $response->getJSONDecodedBody();
-        }
-
-        return $profile['displayName'];
-    }
-
     public function createUri($shop_id = null)
     {
         if (is_null($shop_id)) {
             $shop = Shop::first();
         } else {
-            $shop = $this->shopRepository->find($shop_id);
+            $shop = Shop::find($shop_id);
         }
         $accountId = urlencode($shop->account_id);
         $message = $this->getEncodeMessage($shop_id);
