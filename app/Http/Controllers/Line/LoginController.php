@@ -10,8 +10,7 @@ class LoginController extends Controller
 {
     public function checkin(Request $request)
     {
-        $lineBotService = new LineBotService((int) $request->shop_id);
-
+        $lineBotService = new LineBotService($request->shop_id);
         $messages = $lineBotService->createUri($request->shop_id);
 
         return view('line.checkin', compact('messages'));
