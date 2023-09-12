@@ -22,9 +22,13 @@ class LineBotService
     protected $bot;
     private $shop_id;
 
-    public function __construct(int $id)
+    public function __construct($id)
     {
-        $shop = Shop::find($id);
+        if (is_null($id)) {
+            $shop = Shop::first();
+        } else {
+            $shop = Shop::find($id);
+        }
 
         $client = new CurlHTTPClient($shop->line_token);
         $this->bot = new LINEBot($client, ['channelSecret' => $shop->channel_secret]);
@@ -163,15 +167,15 @@ class LineBotService
         $this->bot->replyMessage($reply_token, $builder);
     }
 
-    public function createUri($shop_id = null)
+    public function createUri($shopId = null)
     {
-        if (is_null($shop_id)) {
+        if (is_null($shopId)) {
             $shop = Shop::first();
         } else {
-            $shop = Shop::find($shop_id);
+            $shop = Shop::find($shopId);
         }
         $accountId = urlencode($shop->account_id);
-        $message = $this->getEncodeMessage($shop_id);
+        $message = $this->getEncodeMessage($shopId);
         $uri = "https://line.me/R/oaMessage/{$accountId}/?{$message->encode}";
 
         return (object) [
