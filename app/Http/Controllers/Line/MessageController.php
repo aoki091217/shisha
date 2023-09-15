@@ -44,7 +44,7 @@ class MessageController extends Controller
             $line_token = $event->getUserId();
             $reply_token = $event->getReplyToken();
 
-            $customer = Customer::withTrashed()->where('line_token', $line_token)->first();
+            $customer = Customer::where('line_token', $line_token)->first();
 
             switch ($event) {
                 case ($event instanceof FollowEvent):
