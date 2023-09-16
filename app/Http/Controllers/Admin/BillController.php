@@ -46,6 +46,10 @@ class BillController extends Controller
             $customerShops = $customerShops->where('shop_id', auth()->user()->member->shop_id);
         }
 
+        $customerShops = $customerShops->reject(function ($item) {
+            return is_null($item->first()->customer);
+        });
+
         return view('bill.create', compact('shops', 'members', 'customerShops', 'mixPresets'));
     }
 
@@ -54,6 +58,12 @@ class BillController extends Controller
         $this->billRepository->store($request->bill);
         $this->sessionService->putFlashMessage(config('const.session.flash.stored'));
         return redirect()->route('bill.index');
+    }
+
+    public function show($id)
+    {
+        $bill = $this->billRepository->relate(['shop', 'member', 'billCustomers.customer', 'billOrders.mix'])->find($id);
+        return view('bill.show', compact('bill'));
     }
 
     public function edit($id)
@@ -69,6 +79,10 @@ class BillController extends Controller
             $mixPresets = $mixPresets->where('shop_id', auth()->user()->member->shop_id);
             $customerShops = $customerShops->where('shop_id', auth()->user()->member->shop_id);
         }
+
+        $customerShops = $customerShops->reject(function ($item) {
+            return is_null($item->first()->customer);
+        });
 
         return view('bill.edit', compact('shops', 'members', 'customerShops', 'mixPresets', 'bill'));
     }

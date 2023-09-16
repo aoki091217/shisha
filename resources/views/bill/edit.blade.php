@@ -152,7 +152,7 @@
                         @foreach ($bill->billCustomers as $billCustomer)
                         <li class="list-group-item list-item-template">
                             <span class="text-wrap">{{ $billCustomer->customer->name }}</span>
-                            <input type="hidden" name="bill[customers][]" value="{{ $billCustomer->id }}">
+                            <input type="hidden" name="bill[customers][]" value="{{ $billCustomer->customer->id }}">
                             <button type="button" class="btn btn-sm btn-danger btn-cancel">外す</button>
                         </li>
                         @endforeach

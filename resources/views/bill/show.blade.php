@@ -67,7 +67,6 @@
 </div>
 <div class="d-flex align-items-center justify-content-end mt-3 footer-buttons gap-2">
     <a href="{{ route('bill.index') }}" class="btn btn-secondary">戻る</a>
-    <a href="{{ route('bill.edit', $bill->bill_id) }}" class="btn btn-success">編集</a>
     <button type="button"
             class="btn btn-danger"
             data-route="{{ route('bill.destroy', $bill->bill_id) }}"
