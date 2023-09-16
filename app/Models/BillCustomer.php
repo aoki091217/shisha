@@ -21,6 +21,6 @@ class BillCustomer extends Model
 
     public function billOrders()
     {
-        return $this->hasMany(BillOrder::class, 'bill_id');
+        return $this->hasMany(BillOrder::class, 'bill_id', 'bill_id');
     }
 }

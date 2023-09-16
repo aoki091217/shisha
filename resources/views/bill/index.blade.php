@@ -84,7 +84,11 @@
             <tbody>
                 @foreach ($bills as $bill)
                 <tr>
-                    <td>{{ $bill->bill_id }}</td>
+                    <td>
+                        <a href="{{ route('bill.show', $bill->bill_id) }}" class="d-block w-100">
+                            {{ $bill->bill_id }}
+                        </a>
+                    </td>
                     <td>{{ $bill->shop->name }}</td>
                     <td>{{ $bill->member->name }}</td>
                     <td>¥{{ $bill->amount }}</td>

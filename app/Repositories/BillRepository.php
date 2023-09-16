@@ -82,6 +82,7 @@ class BillRepository
                 $request = array_merge($request, ['shop_id' => auth()->user()->member->shop_id]);
             }
 
+            /** @var Bill $bill */
             $bill = $this->find($id);
             $bill->fill($request)->save();
 
