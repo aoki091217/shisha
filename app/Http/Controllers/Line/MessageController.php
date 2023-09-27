@@ -45,22 +45,20 @@ class MessageController extends Controller
             $reply_token = $event->getReplyToken();
 
             $customer = Customer::where('line_token', $line_token)->first();
-
+            \Log::debug($customer);
             switch ($event) {
                 case ($event instanceof FollowEvent):
-
-                    if (is_null($customer)) {
-                        $customer = $this->customerRepository->store($line_token);
-                        $lineBotService->buildPushMessage($line_token, 'ニックネームが未登録です。ニックネームを入力してください。');
-                    } else {
-                        $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
-                        foreach ($situation->messages as $message) {
-                            $lineBotService->push($line_token, $message);
-                        }
+                    $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
+                    foreach ($situation->messages as $message) {
+                        $lineBotService->push($line_token, $message);
                     }
 
                     return;
                 case ($event instanceof TextMessage):
+                    if (is_null($customer)) {
+                        $customer = $this->customerRepository->store($line_token);
+                    }
+
                     /** @var TextMessage $event */
                     $text = $event->getText();
 
@@ -76,20 +74,22 @@ class MessageController extends Controller
                             }
                         }
 
-                        $question = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 3)->first();
+                        if (Answer::where('customer_id', $customer->id)->count() === 0) {
+                            $question = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 3)->first();
 
-                        if (!is_null($question)) {
-                            foreach ($question->messages as $index => $message) {
-                                if ($message->type === 1) {
-                                    $lineBotService->push($line_token, $message);
+                            if (!is_null($question)) {
+                                foreach ($question->messages as $index => $message) {
+                                    if ($message->type === 1) {
+                                        $lineBotService->push($line_token, $message);
 
-                                    if (isset($question->messages[$index + 1])) {
-                                        $lineBotService->push($line_token, $question->messages[$index + 1]);
+                                        if (isset($question->messages[$index + 1])) {
+                                            $lineBotService->push($line_token, $question->messages[$index + 1]);
+                                            return;
+                                        }
+                                    } else {
+                                        $lineBotService->reply($reply_token, $message, $line_token);
                                         return;
                                     }
-                                } else {
-                                    $lineBotService->reply($reply_token, $message, $line_token);
-                                    return;
                                 }
                             }
                         }
@@ -159,9 +159,13 @@ class MessageController extends Controller
                     $message = Message::find($postbacks['next_message_id']);
 
                     if (is_null($message)) {
-                        break;
+                        $customer = Customer::where('line_token', $line_token)->first();
+                        if (is_null($customer->name)) {
+                            $lineBotService->buildPushMessage($line_token, 'ニックネームが未登録です。ニックネームを入力してください。');
+                        }
                     } else {
                         $lineBotService->push($line_token, $message);
+                        return;
                     }
 
                     return;
