@@ -111,12 +111,12 @@ class MessageController extends Controller
                                 $this->customerRepository->storeStep($customer, 3);
                                 $lineBotService->buildReplyMessage($reply_token, "{$customer->name}様、ご登録ありがとうございます。");
 
-                                $greeting = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
-                                if (!is_null($greeting)) {
-                                    foreach ($greeting->messages as $message) {
-                                        $lineBotService->push($line_token, $message);
-                                    }
-                                }
+                                // $greeting = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
+                                // if (!is_null($greeting)) {
+                                //     foreach ($greeting->messages as $message) {
+                                //         $lineBotService->push($line_token, $message);
+                                //     }
+                                // }
                             } elseif ($text === 'いいえ') {
                                 $this->customerRepository->deleteName($customer);
                                 $lineBotService->buildReplyMessage($reply_token, '他のニックネームをご入力ください。');
