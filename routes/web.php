@@ -84,6 +84,6 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('/customer', CustomerController::class)->only(['index', 'show'])->parameters(['customer' => 'id']);
 
-    Route::resource('/user', UserController::class)->middleware('role:high')->except('show')->parameters(['user' => 'id']);
+    Route::resource('/user', UserController::class)->middleware('role:mid')->except('show')->parameters(['user' => 'id']);
     Route::resource('/situation', SituationController::class)->middleware('role:mid')->parameters(['situation' => 'id']);
 });

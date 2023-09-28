@@ -221,7 +221,7 @@
                                 <option
                                     value="{{ $preset->id }}"
                                     {{ old("bill.mixes.{$i}.mix_id") == $preset->id ? 'selected' : '' }}>
-                                    {{ auth()->user()->role_id === 1 ? $preset->shop->name.'：'.$preset->name : $preset->name }}
+                                    {{ $preset->name }}
                                 </option>
                             @endforeach
                         </select>
