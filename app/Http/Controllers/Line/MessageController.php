@@ -45,7 +45,7 @@ class MessageController extends Controller
             $reply_token = $event->getReplyToken();
 
             $customer = Customer::where('line_token', $line_token)->first();
-            \Log::debug($customer);
+
             switch ($event) {
                 case ($event instanceof FollowEvent):
                     $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();

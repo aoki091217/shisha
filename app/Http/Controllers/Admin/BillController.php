@@ -12,6 +12,7 @@ use App\Repositories\MixRepository;
 use App\Repositories\ShopRepository;
 use App\Services\SessionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class BillController extends Controller
 {
@@ -38,16 +39,21 @@ class BillController extends Controller
         $shops = $this->shopRepository->relate()->get();
         $members = $this->memberRepository->get();
         $mixPresets = $this->mixRepository->relate()->get();
-        $customerShops = $this->customerShopRepository->relate()->orderByDesc('visited_at')->get()->groupBy('customer_id');
+        $customerShops = $this->customerShopRepository->relate()->orderByDesc('visited_at')->get();
+
+        $latests = new Collection();
+        foreach ($customerShops->groupBy('customer_id') as $i => $customerShop) {
+            $latests = $latests->put($i, $customerShop->first());
+        }
 
         if (auth()->user()->role_id !== 1) {
             $shops = $shops->where('shop_id', auth()->user()->member->shop_id);
             $mixPresets = $mixPresets->where('shop_id', auth()->user()->member->shop_id);
-            $customerShops = $customerShops->where('shop_id', auth()->user()->member->shop_id);
+            $customerShops = $latests->where('shop_id', auth()->user()->member->shop_id);
         }
 
-        $customerShops = $customerShops->reject(function ($item) {
-            return is_null($item->first()->customer);
+        $customerShops = $latests->reject(function ($item) {
+            return is_null($item->customer);
         });
 
         return view('bill.create', compact('shops', 'members', 'customerShops', 'mixPresets'));
@@ -70,18 +76,23 @@ class BillController extends Controller
     {
         $shops = $this->shopRepository->relate()->get();
         $members = $this->memberRepository->get();
-        $customerShops = $this->customerShopRepository->relate()->orderByDesc('visited_at')->get()->groupBy('customer_id');
+        $customerShops = $this->customerShopRepository->relate()->orderByDesc('visited_at')->get();
         $mixPresets = $this->mixRepository->relate()->get();
         $bill = $this->billRepository->relate(['shop', 'member', 'billCustomers.customer', 'billOrders.mix'])->find($id);
+
+        $latests = new Collection();
+        foreach ($customerShops->groupBy('customer_id') as $i => $customerShop) {
+            $latests = $latests->put($i, $customerShop->first());
+        }
 
         if (auth()->user()->role_id !== 1) {
             $shops = $shops->where('shop_id', auth()->user()->member->shop_id);
             $mixPresets = $mixPresets->where('shop_id', auth()->user()->member->shop_id);
-            $customerShops = $customerShops->where('shop_id', auth()->user()->member->shop_id);
+            $customerShops = $latests->where('shop_id', auth()->user()->member->shop_id);
         }
 
-        $customerShops = $customerShops->reject(function ($item) {
-            return is_null($item->first()->customer);
+        $customerShops = $latests->reject(function ($item) {
+            return is_null($item->customer);
         });
 
         return view('bill.edit', compact('shops', 'members', 'customerShops', 'mixPresets', 'bill'));
