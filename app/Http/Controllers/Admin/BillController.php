@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BillRequest;
+use App\Models\Situation;
 use App\Repositories\BillRepository;
 use App\Repositories\CustomerRepository;
 use App\Repositories\CustomerShopRepository;
 use App\Repositories\MemberRepository;
 use App\Repositories\MixRepository;
 use App\Repositories\ShopRepository;
+use App\Services\LineBotService;
 use App\Services\SessionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -23,7 +25,7 @@ class BillController extends Controller
         private MemberRepository $memberRepository,
         private CustomerRepository $customerRepository,
         private CustomerShopRepository $customerShopRepository,
-        private SessionService $sessionService,
+        private SessionService $sessionService
     ) {}
 
     public function index(Request $request)
@@ -63,6 +65,21 @@ class BillController extends Controller
     {
         $this->billRepository->store($request->bill);
         $this->sessionService->putFlashMessage(config('const.session.flash.stored'));
+
+        $shopId = !is_null(auth()->user()->member) ? auth()->user()->member->shop_id : (int) $request['bill']['shop_id'];
+
+        $service = new LineBotService($shopId);
+        $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shopId)->where('event_type', 4)->first();
+
+        $customers = $request['bill']['customers'];
+        foreach ($customers as $customer) {
+            $customer = $this->customerRepository->findById((int) $customer['customer_id']);
+
+            foreach ($situation->messages as $message) {
+                $service->buildPushMessage($customer->line_token, $message->text);
+            }
+        }
+
         return redirect()->route('bill.index');
     }
 
@@ -102,6 +119,21 @@ class BillController extends Controller
     {
         $this->billRepository->update($request->bill, $id);
         $this->sessionService->putFlashMessage(config('const.session.flash.updated'));
+
+        $shopId = !is_null(auth()->user()->member) ? auth()->user()->member->shop_id : (int) $request['bill']['shop_id'];
+
+        $service = new LineBotService($shopId);
+        $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shopId)->where('event_type', 4)->first();
+
+        $customers = $request['bill']['customers'];
+        foreach ($customers as $customer) {
+            $customer = $this->customerRepository->findById((int) $customer['customer_id']);
+
+            foreach ($situation->messages as $message) {
+                $service->buildPushMessage($customer->line_token, $message->text);
+            }
+        }
+
         return redirect()->route('bill.index');
     }
 

@@ -118,7 +118,7 @@ $(window).on('load', function () {
         })
     });
 
-    $(document).on('click', '#follow, #text, #question', function (clickedEvent) {
+    $(document).on('click', '#follow, #text, #question, #bill', function (clickedEvent) {
         $('.accordion-item').each(function (index, accordion) {
             if ($(clickedEvent.target).val() == 2) {
                 $(accordion).find(`#send_type_reply_${index}, [data-name=keyword]`).prop('disabled', false);
@@ -168,7 +168,6 @@ $(window).on('load', function () {
 
     let situation = window.situationOld;
     if (situation != null) {
-        console.log(situation.messages);
         $.each(situation.messages, function (index, message) {
             if (index == 0) return;
             $('#addMessage').trigger('click');

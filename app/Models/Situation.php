@@ -46,7 +46,7 @@ class Situation extends Model
             case 3:
                 return 'アンケート';
             case 4:
-                return 'ブロック';
+                return '会計確定';
         }
     }
 
