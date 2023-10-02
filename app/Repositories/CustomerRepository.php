@@ -8,6 +8,11 @@ use DB;
 
 class CustomerRepository
 {
+    public function findById(int $id): Customer
+    {
+        return Customer::find($id);
+    }
+
     public function get()
     {
         return Customer::get();

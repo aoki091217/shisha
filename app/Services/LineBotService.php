@@ -212,6 +212,20 @@ class LineBotService
             'visited_at' => $visited_at
         ];
     }
+
+    public function checkDuplicate(string $text, Customer $customer): bool
+    {
+        $checkin = Str::after($text, 'checkin:');
+        $shopId = Str::between($checkin, 'shop_id=', '&');
+        $datetime = explode('_', Str::after($checkin, 'datetime='));
+
+        $latestCustomerShop = $customer->customerShops->where('shop_id', $shopId)->sortByDesc('visited_at')->first();
+        if (!is_null($latestCustomerShop) && Carbon::parse(join($datetime))->diffInHours(Carbon::parse($latestCustomerShop->visited_at)) < 12) {
+            return true;
+        }
+
+        return false;
+    }
 }
 
 ?>
