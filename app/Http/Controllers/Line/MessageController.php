@@ -66,7 +66,7 @@ class MessageController extends Controller
 
                     if (preg_match('/checkin/', $text)) {
 
-                        if (!$lineBotService->checkDuplicate($text, $customer)) {
+                        if ($lineBotService->checkDuplicate($text, $customer)) {
                             $checkin = $lineBotService->getParamsFromCheckin($text);
                             $this->customerShopRepository->store($customer, $checkin);
                         }
