@@ -217,14 +217,10 @@ class LineBotService
     {
         $checkin = Str::after($text, 'checkin:');
         $shopId = Str::between($checkin, 'shop_id=', '&');
-        $datetime = explode('_', Str::after($checkin, 'datetime='));
+        $checkinDatetime = Carbon::parse(join(explode('_', Str::after($checkin, 'datetime='))));
+        $latestCustomerShop = $customer->customerShops->where('shop_id', $shopId)->where('visited_at', '>', $checkinDatetime->copy()->subHour())->sortByDesc('visited_at')->first();
 
-        $latestCustomerShop = $customer->customerShops->where('shop_id', $shopId)->sortByDesc('visited_at')->first();
-        if (!is_null($latestCustomerShop) && Carbon::parse(join($datetime))->diffInHours(Carbon::parse($latestCustomerShop->visited_at)) < 12) {
-            return true;
-        }
-
-        return false;
+        return is_null($latestCustomerShop);
     }
 }
 
