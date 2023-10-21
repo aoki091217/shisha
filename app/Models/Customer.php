@@ -30,7 +30,7 @@ class Customer extends Model
 
     public function getFormatCreatedDateAttribute()
     {
-        return Carbon::parse($this->created_date)->format('Y年m月d日 H時i分');
+        return Carbon::parse($this->created_at)->format('Y年m月d日 H時i分');
     }
 
     public function getCheckinDatetimeAttribute()
