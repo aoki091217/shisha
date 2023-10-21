@@ -85,7 +85,13 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($customers as $customer)
+                @php
+                    $customersForView = $customers->groupBy('id')->map(function ($items) {
+                        return $items->first();
+                    });
+                @endphp
+
+                @foreach ($customersForView as $customer)
                 <tr>
                     <td>
                         <a href="{{ route('customer.show', $customer->id) }}">
