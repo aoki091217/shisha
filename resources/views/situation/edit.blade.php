@@ -21,7 +21,7 @@
                 <select name="situation[shop_id]" id="shopName" class="form-select">
                     <option value=""></option>
                     @foreach ($shops as $shop)
-                        <option value="{{ $shop->shop_id }}" {{ old('situation.shop_id') == $shop->shop_id ? 'selected' : '' }}>
+                        <option value="{{ $shop->shop_id }}" {{ old('situation.shop_id', $situation->shop_id) == $shop->shop_id ? 'selected' : '' }}>
                             {{ $shop->name }}
                         </option>
                     @endforeach
