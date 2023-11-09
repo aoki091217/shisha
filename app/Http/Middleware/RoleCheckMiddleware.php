@@ -23,8 +23,8 @@ class RoleCheckMiddleware
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next, $role)
-    {
-        $preset = $this->roleService->findRolePreset($role);
+    {    
+	$preset = $this->roleService->findRolePreset($role);
 
         if (!in_array(Auth::user()->role_id, $preset)) {
             return redirect()->back()->with('validate.role', 'アクセス権限がありません。');
