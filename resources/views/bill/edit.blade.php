@@ -128,13 +128,13 @@
                     <tbody>
                         @foreach ($customerShops as $customerShop)
                             <tr>
-                                <td>{{ $customerShop->first()->customer->name }}</td>
-                                <td>{{ $customerShop->first()->visited_at }}</td>
+                                <td>{{ $customerShop->customer->name }}</td>
+                                <td>{{ $customerShop->checkin_datetime }}</td>
                                 <td>
                                     <button type="button"
                                         class="btn btn-sm btn-outline-primary w-100"
-                                        data-name="{{ $customerShop->first()->customer->name }}"
-                                        data-customer-id="{{ $customerShop->first()->customer->id }}">
+                                        data-name="{{ $customerShop->customer->name }}"
+                                        data-customer-id="{{ $customerShop->customer->id }}">
                                         選択
                                     </button>
                                 </td>
