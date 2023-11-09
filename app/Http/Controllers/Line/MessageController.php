@@ -49,9 +49,12 @@ class MessageController extends Controller
             switch ($event) {
                 case ($event instanceof FollowEvent):
                     $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
-		    foreach ($situation->messages as $message) {
-                        $lineBotService->push($line_token, $message);
-                    }
+
+		    if (!is_null($situation)) {
+		    	foreach ($situation->messages as $message) {
+                            $lineBotService->push($line_token, $message);
+                    	}
+		    }
 
                     return;
                 case ($event instanceof TextMessage):
