@@ -59,4 +59,14 @@ class Situation extends Model
     {
         return $this->hasMany(Message::class);
     }
+
+    public function scopeSearch($query, $words)
+    {
+        if (!empty($words['name'])) {
+            $query->where('name', 'LIKE', "%{$words['name']}%");
+        }
+        if (!empty($words['event_type'])) {
+            $query->where('event_type', $words['event_type']);
+        }
+    }
 }

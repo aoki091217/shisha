@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -38,7 +39,7 @@ class Customer extends Model
         return Carbon::parse($this->visited_at)->format('Y年m月d日 H時i分');
     }
 
-    public function scopeSearch($query, $words)
+    public function scopeSearch(Builder $query, $words)
     {
         if (auth()->user()->role_id !== 1) {
             $query->whereHas('customerShops', function ($query) {
@@ -46,11 +47,14 @@ class Customer extends Model
             });
         }
 
-        if (isset($words['name'])) {
-            return $query->where('name', 'LIKE', "%{$words['name']}%");
+        if (!empty($words['name'])) {
+            $query->where('customers.name', 'LIKE', "%{$words['name']}%");
         }
-        if (isset($words['shop_name'])) {
-            return $query->where('shop_name', 'LIKE', "%{$words['shop_name']}%");
+        if (!empty($words['shop_id'])) {
+            $query->where('shops.shop_id', (int) $words['shop_id']);
+        }
+        if (!empty($words['visited_date'])) {
+            $query->whereRaw("DATE_FORMAT(visited_at, '%Y-%m-%d') = '{$words['visited_date']}'");
         }
     }
 }

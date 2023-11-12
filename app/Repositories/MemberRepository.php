@@ -61,9 +61,11 @@ class MemberRepository
 
     public function update($request, $id)
     {
-        DB::transaction(function () use ($request, $id) {
+        return DB::transaction(function () use ($request, $id) {
             $member = $this->find($id);
             $member->fill($request)->save();
+
+            return $member;
         });
     }
 

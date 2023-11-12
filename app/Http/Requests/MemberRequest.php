@@ -59,10 +59,10 @@ class MemberRequest extends FormRequest
 
         if (!isset($this->user['password'])) {
             $password = User::where('code', $this->user['code'])->first()->password;
-            $user = array_merge($user, ['password' => $password, 'role_id' => 2]);
+            $user = array_merge($user, ['password' => $password]);
             $this->merge(['user' => $user]);
         } else {
-            $user = array_merge($user, ['password' => Hash::make($this->user['password']), 'role_id' => 2]);
+            $user = array_merge($user, ['password' => Hash::make($this->user['password'])]);
             $this->merge(['user' => $user]);
         }
     }

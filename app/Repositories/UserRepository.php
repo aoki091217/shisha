@@ -25,7 +25,6 @@ class UserRepository
         } else {
             return User::where('code', $id)->first();
         }
-
     }
 
     public function store($request)
