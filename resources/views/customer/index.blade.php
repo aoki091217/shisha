@@ -8,7 +8,7 @@
     @method('DELETE')
     <div id="searchForm">
         <div class="col-12 d-flex justify-content-between align-items-end gap-3">
-            <div class="col-2">
+            <div class="col-3">
                 <label for="customerName" class="form-label">顧客名</label>
                 {{ Form::text(
                     'customer[name]',
@@ -19,7 +19,7 @@
                     ]
                 ) }}
             </div>
-            <div class="col-2">
+            <div class="col-3">
                 <label for="shopName" class="form-label">店舗</label>
                 <select name="customer[shop_id]" id="shopName" class="form-select">
                     <option value=""></option>
@@ -30,7 +30,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-2">
+            <div class="col-3">
                 <label for="visitedDate" class="form-label">チェックイン：日付</label>
                 {{ Form::date(
                     'customer[visited_date]',
@@ -40,33 +40,6 @@
                         'id' => 'visitedDate'
                     ]
                 ) }}
-            </div>
-            <div class="col-2">
-                <label for="visitedHour" class="form-label">チェックイン：時間</label>
-                <div class="d-flex align-items-center gap-2">
-                    <select name="customer[visited_hour]" id="visitedHour" class="form-select">
-                        <option value=""></option>
-                        @foreach (range(0, 23) as $hour)
-                            <option
-                                value="{{ $hour }}"
-                                {{ !is_null(request('customer.visited_hour')) && request('customer.visited_hour') == $hour ? 'selected' : '' }}>
-                                {{ $hour }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <span>時</span>
-                    <select name="customer[visited_minute]" class="form-select">
-                        <option value=""></option>
-                        @foreach (range(0, 59) as $minute)
-                            <option
-                                value="{{ $minute }}"
-                                {{ !is_null(request('customer.visited_minute')) && request('customer.visited_minute') == $minute ? 'selected' : '' }}>
-                                {{ $minute }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <span>分</span>
-                </div>
             </div>
             <div class="col btn-group">
                 <button type="submit" class="col-6 btn btn-warning">検索</button>

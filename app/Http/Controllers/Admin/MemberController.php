@@ -45,27 +45,27 @@ class MemberController extends Controller
         return redirect()->route('member.index');
     }
 
-    public function edit($id)
+    public function edit($member_id)
     {
         $roles = $this->roleRepository->get();
         $shops = $this->shopRepository->get();
-        $member = $this->memberRepository->relate()->find($id);
+        $member = $this->memberRepository->relate()->find($member_id);
 
         return view('member.edit', compact('shops', 'roles', 'member'));
     }
 
-    public function update(MemberRequest $request, $id)
+    public function update(MemberRequest $request, $member_id)
     {
-        $this->userRepository->update($request->user, $request->user['user_id']);
-        $this->memberRepository->update($request->member, $id);
+        $member = $this->memberRepository->update($request->member, $member_id);
+        $this->userRepository->update($request->user, $member->user_id);
         $this->sessionService->putFlashMessage(config('const.session.flash.updated'));
 
         return redirect()->route('member.index');
     }
 
-    public function destroy($id)
+    public function destroy($member_id)
     {
-        $this->memberRepository->delete($id);
+        $this->memberRepository->delete($member_id);
         $this->sessionService->putFlashMessage(config('const.session.flash.deleted'));
 
         return redirect()->route('member.index');

@@ -24,9 +24,12 @@ class SituationController extends Controller
     public function index(Request $request)
     {
         if (auth()->user()->role_id === 1) {
-            $situations = Situation::with('messages')->paginate();
+            $situations = Situation::with('messages')->search($request->situation)->paginate();
         } else {
-            $situations = Situation::with('messages')->where('shop_id', auth()->user()->member->shop_id)->paginate();
+            $situations = Situation::with('messages')
+                ->where('shop_id', auth()->user()->member->shop_id)
+                ->search($request->situation)
+                ->paginate();
         }
 
         return view('situation.index', compact('situations'));

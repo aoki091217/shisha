@@ -78,6 +78,7 @@ class CustomerRepository
         $query->select([
             'customers.*',
             'customer_shops.visited_at',
+            'shops.shop_id as shop_id',
             'shops.name as shop_name'
         ])
             ->join('customer_shops', 'customer_shops.customer_id', 'customers.id')
