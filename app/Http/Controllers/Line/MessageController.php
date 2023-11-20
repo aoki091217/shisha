@@ -68,9 +68,10 @@ class MessageController extends Controller
                     $replySituation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 2)->first();
 
                     if (preg_match('/checkin/', $text)) {
+                        $params = $lineBotService->getQueryParams($text);
 
-                        if ($lineBotService->checkDuplicate($text, $customer)) {
-                            $checkin = $lineBotService->getParamsFromCheckin($text);
+                        if ($lineBotService->checkDuplicate($params, $customer)) {
+                            $checkin = $lineBotService->getParamsFromCheckin($params);
                             $this->customerShopRepository->store($customer, $checkin);
                         }
 

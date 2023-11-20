@@ -49,13 +49,8 @@ class SituationController extends Controller
             $situation->fill($request->situation)->save();
 
             foreach ($request->situation['messages'] as $templateIndex => $template) {
-                if ($template['send_type'] == 'push') {
-                    $sendType = 1;
-                } else {
-                    $sendType = 2;
-                }
 
-                $insert = array_merge($template, ['situation_id' => $situation->id], ['send_type' => $sendType]);
+                $insert = array_merge($template, ['situation_id' => $situation->id], ['send_type' => 2]);
                 switch ($template['message_type']) {
                     case 'text':
                         $insert = array_merge($insert, ['type' => 1]);
@@ -151,13 +146,8 @@ class SituationController extends Controller
             }
 
             foreach ($request->situation['messages'] as $templateIndex => $template) {
-                if ($template['send_type'] == 'push') {
-                    $sendType = 1;
-                } else {
-                    $sendType = 2;
-                }
 
-                $insert = array_merge($template, ['situation_id' => $situation->id], ['send_type' => $sendType]);
+                $insert = array_merge($template, ['situation_id' => $situation->id], ['send_type' => 2]);
                 switch ($template['message_type']) {
                     case 'text':
                         $insert = array_merge($insert, ['type' => 1]);

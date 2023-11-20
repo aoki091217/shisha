@@ -127,7 +127,7 @@
                                         <span class="text-danger">{{ $errors->first("situation.messages.{$messageIndex}.message_type") }}</span>
                                     </div>
                                     <div class="type-wrapper">
-                                        <div>
+                                        {{-- <div>
                                             <div>
                                                 <div>
                                                     <label class="form-label">送信タイプ</label>
@@ -152,7 +152,7 @@
                                                 </div>
                                                 @endforeach
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         <div>
                                             <div>
                                                 <label class="form-label">応答キーワード</label>
@@ -205,8 +205,8 @@
                                                     <label class="form-label">カルーセル</label>
                                                     <small class="text-secondary ms-2">最大枚数：5</small>
                                                     <div class="text-danger">※必ず1枚は設定してください。</div>
-                                                    <div class="text-danger">※画像を設定する場合は、すべてのカルーセルに設定してください。</div>
                                                     <div class="text-danger">※タイトルを設定する場合は、すべてのカルーセルに設定してください。</div>
+                                                    <div class="text-danger">※複数枚カルーセルを使用する場合、ボタンの数は揃えてください。</div>
                                                 </div>
                                                 <div class="carousel-group">
                                                     @foreach (range(0, 4) as $carouselIndex)
