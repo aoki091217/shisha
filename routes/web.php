@@ -10,14 +10,8 @@ use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\MixController;
 use App\Http\Controllers\Admin\SituationController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Line\LoginController as LineLoginController;
-use App\Http\Controllers\Line\MessageController;
-use App\Http\Middleware\RedirectIfNull;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -56,6 +50,7 @@ Route::controller(LoginController::class)->group(function () {
 
 Route::controller(LineLoginController::class)->as('line.')->prefix('line')->group(function () {
     Route::get('/checkin', 'checkin')->name('checkin');
+    Route::get('/liff', 'liff')->name('liff');
 });
 
 Route::middleware('auth')->group(function () {

@@ -167,7 +167,7 @@ class LineBotService
         $this->bot->replyMessage($reply_token, $builder);
     }
 
-    public function createUri($shopId = null)
+    public function getLineUrl($shopId = null)
     {
         if (is_null($shopId)) {
             $shop = Shop::first();
@@ -175,7 +175,7 @@ class LineBotService
             $shop = Shop::find($shopId);
         }
         $accountId = urlencode($shop->account_id);
-        $message = $this->getEncodeMessage($shopId);
+        $message = $this->getEncodeParam($shopId);
         $uri = "https://line.me/R/oaMessage/{$accountId}/?{$message->encode}";
 
         return (object) [
@@ -184,7 +184,15 @@ class LineBotService
         ];
     }
 
-    private function getEncodeMessage($shop_id)
+    public function getLiffUrl($shopId = null): string
+    {
+        $parameter = $this->getEncodeParam($shopId);
+        $liffUrl = 'https://liff.line.me/' . config('services.line.liff_id') . "?{$parameter->native}";
+
+        return $liffUrl;
+    }
+
+    private function getEncodeParam($shop_id)
     {
         $shop = Shop::find($shop_id);
         if (is_null($shop_id) || is_null($shop)) {
@@ -192,35 +200,42 @@ class LineBotService
         }
         $now = Carbon::now()->format('Y-m-d_H:i:s');
         $message = config('line.message');
-        $encode = urlencode(sprintf('%s%s%s&%s', $message, 'checkin:', "shop_id={$shop_id}", "datetime={$now}"));
+        $encode = urlencode($message . join('&', ['action=checkin', "shop_id={$shop_id}", "datetime={$now}"]));
 
         return (object) [
-            'native' => sprintf('%s%s&%s', 'checkin:', "shop_id={$shop_id}", "datetime={$now}"),
+            'native' => join('&', ['action=checkin', "shop_id={$shop_id}", "datetime={$now}"]),
             'encode' => $encode
         ];
     }
 
-    public function getParamsFromCheckin($text)
+    public function getParamsFromCheckin(array $params)
     {
-        $checkin = Str::after($text, 'checkin:');
-        $shop_id = Str::between($checkin, 'shop_id=', '&');
-        $datetime = explode('_', Str::after($checkin, 'datetime='));
+        $datetime = explode('_', $params['datetime']);
         $visited_at = Carbon::parse($datetime[0])->setTimeFromTimeString($datetime[1])->format('Y-m-d H:i:s');
 
         return [
-            'shop_id' => $shop_id,
+            'shop_id' => $params['shop_id'],
             'visited_at' => $visited_at
         ];
     }
 
-    public function checkDuplicate(string $text, Customer $customer): bool
+    public function checkDuplicate(array $params, Customer $customer): bool
     {
-        $checkin = Str::after($text, 'checkin:');
-        $shopId = Str::between($checkin, 'shop_id=', '&');
-        $checkinDatetime = Carbon::parse(join(explode('_', Str::after($checkin, 'datetime='))));
-        $latestCustomerShop = $customer->customerShops->where('shop_id', $shopId)->where('visited_at', '>', $checkinDatetime->copy()->subHour())->sortByDesc('visited_at')->first();
+        $checkinDatetime = Carbon::parse(join(explode('_', $params['datetime'])));
+        $latestCustomerShop = $customer->customerShops->where('shop_id', $params['shop_id'])->where('visited_at', '>', $checkinDatetime->copy()->subHour())->sortByDesc('visited_at')->first();
 
         return is_null($latestCustomerShop);
+    }
+
+    public function getQueryParams(string $query): array
+    {
+        $params = [];
+
+        foreach (explode('&', $query) as $explode) {
+            $params[strstr($explode, '=', true)] = substr($explode, strpos($explode, '=') + 1, strlen($explode));
+        }
+
+        return $params;
     }
 }
 
