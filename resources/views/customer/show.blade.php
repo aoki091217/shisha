@@ -57,8 +57,8 @@
                                 </span>
                             @endforeach
                         </td>
-                        <td>{{ $billOrder->bill->shop->name }}</td>
-                        <td>{{ $billOrder->bill->bill_datetime }}</td>
+                        <td>{{ $billOrder->bill?->shop->name }}</td>
+                        <td>{{ $billOrder->bill?->bill_datetime }}</td>
                     </tr>
                     @endforeach
                     @endif

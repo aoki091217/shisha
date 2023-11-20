@@ -34,7 +34,7 @@
                             <br>
                             <div>本日はShisha Cafe&Bar SINへお越しくださり、誠にありがとうございます。</div>
                             <div>お手数ではございますが、下記のボタンを押してチェックインを行ってください。</div>
-                            <a href="{{ $messages->uri }}" class="btn btn-sm btn-success w-100 mt-3">チェックイン</a>
+                            <a href="{{ $lineUrl->uri }}" class="btn btn-sm btn-success w-100 mt-3">チェックイン</a>
                         </div>
                         <div class="col-11 border rounded-1 p-3 mt-4 text-secondary">
                             <div>ボタンを押すとLINEの画面が開きます。</div>
@@ -42,14 +42,14 @@
                             <div>完了後、公式アカウントとのトーク画面が開き、チェックイン用のトークンが自動で入力された状態になっています。</div>
                             <div>送信ボタンを押して、そのトークンを送信し、チェックインを完了させてください。</div>
                         </div>
-                        <div class="col-11 mt-3">
+                        {{-- <div class="col-11 mt-3">
                             <details>
                                 <summary>PCをお使いの方</summary>
                                 公式アカウントを友達登録していただいたのち、以下のメッセージをコピペし、公式アカウントとのチャットで送信してください。
 
                                 <div class="w-100 text-wrap">{{ $messages->message->native }}</div>
                             </details>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>

@@ -121,14 +121,14 @@ $(window).on('load', function () {
     $(document).on('click', '#follow, #text, #question, #bill', function (clickedEvent) {
         $('.accordion-item').each(function (index, accordion) {
             if ($(clickedEvent.target).val() == 2) {
-                $(accordion).find(`#send_type_reply_${index}, [data-name=keyword]`).prop('disabled', false);
-                $(accordion).find(`#send_type_push_${index}`).prop('disabled', true);
-                $(accordion).find(`#send_type_reply_${index}`).prop('checked', true);
+                $(accordion).find(`[data-name=keyword]`).prop('disabled', false);
+                // $(accordion).find(`#send_type_push_${index}`).prop('disabled', true);
+                // $(accordion).find(`#send_type_reply_${index}`).prop('checked', true);
                 $('#addMessage').prop('disabled', true);
                 $('.accordion-item:not(:first-of-type)').addClass('d-none').find('[data-name=disabled]').val(1);
             } else {
-                $(accordion).find(`#send_type_reply_${index}, [data-name=keyword]`).prop('disabled', true);
-                $(accordion).find(`#send_type_push_${index}`).prop('checked', true).prop('disabled', false);
+                $(accordion).find(`[data-name=keyword]`).prop('disabled', true);
+                // $(accordion).find(`#send_type_push_${index}`).prop('checked', true).prop('disabled', false);
                 $('#addMessage').prop('disabled', false);
                 $('.accordion-item:not(:first-of-type)').removeClass('d-none').find('[data-name=disabled]').val(0);
             }
@@ -162,9 +162,9 @@ $(window).on('load', function () {
         $('[data-name=send_type]:even').prop('disabled', true);
     }
 
-    if ($('#follow').prop('checked') || $('#unfollow').prop('checked')) {
-        $('[data-name=send_type]:odd').prop('disabled', true);
-    }
+    // if ($('#follow').prop('checked') || $('#unfollow').prop('checked')) {
+    //     $('[data-name=send_type]:odd').prop('disabled', true);
+    // }
 
     let situation = window.situationOld;
     if (situation != null) {
