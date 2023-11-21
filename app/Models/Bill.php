@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Bill extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $primaryKey = 'bill_id';
 

@@ -148,6 +148,7 @@ class BillController extends Controller
     {
         $this->billRepository->delete($id);
         $this->sessionService->putFlashMessage(config('const.session.flash.deleted'));
+
         return redirect()->route('bill.index');
     }
 
