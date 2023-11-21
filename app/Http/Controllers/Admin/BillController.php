@@ -31,7 +31,7 @@ class BillController extends Controller
     public function index(Request $request)
     {
         $shops = $this->shopRepository->get();
-        $bills = $this->billRepository->relate(['shop', 'member'])->search($request->bill)->paginate();
+        $bills = $this->billRepository->relate(['shop', 'member'])->orderByDesc('bill_date')->search($request->bill)->paginate();
 
         return view('bill.index', compact('bills', 'shops'));
     }
