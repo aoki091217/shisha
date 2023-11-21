@@ -90,7 +90,7 @@
                         </a>
                     </td>
                     <td>{{ $bill->shop->name }}</td>
-                    <td>{{ $bill->member->name }}</td>
+                    <td>{{ $bill->member?->name }}</td>
                     <td>¥{{ $bill->amount }}</td>
                     <td>{{ $bill->bill_datetime }}</td>
                     <td>{{ $bill->created_datetime }}</td>
