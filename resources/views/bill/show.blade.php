@@ -19,7 +19,7 @@
     <div class="col-6 mb-3">
         <label class="form-label ps-2">メイカー</label>
         <div class="ps-2">
-            <span>{{ $bill->member->name }}</span>
+            <span>{{ $bill->member?->name }}</span>
         </div>
     </div>
     <div class="col-6 mb-3">
