@@ -44,7 +44,8 @@ class MessageController extends Controller
             $line_token = $event->getUserId();
             $reply_token = $event->getReplyToken();
 
-            $customer = Customer::where('line_token', $line_token)->first();
+            /** @var Customer $customer */
+            $customer = Customer::withTrashed()->where('line_token', $line_token)->first();
 
             switch ($event) {
                 case ($event instanceof FollowEvent):
@@ -52,8 +53,16 @@ class MessageController extends Controller
 
                     if (!is_null($situation)) {
                         foreach ($situation->messages as $message) {
-                            $lineBotService->push($line_token, $message);
+                            $lineBotService->reply($reply_token, $message, $line_token);
                         }
+                    }
+
+                    if (!is_null($customer) && $customer->isDeleted()) {
+                        $customer->restore();
+                    }
+
+                    if (is_null($customer)) {
+                        $customer = $this->customerRepository->store($line_token);
                     }
 
                     return;
@@ -75,30 +84,10 @@ class MessageController extends Controller
                             $this->customerShopRepository->store($customer, $checkin);
                         }
 
-                        if (!is_null($replySituation)) {
-                            foreach ($replySituation->messages as $message) {
-                                $lineBotService->reply($reply_token, $message, $line_token);
-                            }
-                        }
+                        if (is_null($customer->name)) {
+                            $lineBotService->buildReplyMessage($reply_token, 'ニックネームが未登録です。ニックネームを入力してください。');
 
-                        if (Answer::where('customer_id', $customer->id)->count() === 0) {
-                            $question = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 3)->first();
-
-                            if (!is_null($question)) {
-                                foreach ($question->messages as $index => $message) {
-                                    if ($message->type === 1) {
-                                        $lineBotService->push($line_token, $message);
-
-                                        if (isset($question->messages[$index + 1])) {
-                                            $lineBotService->push($line_token, $question->messages[$index + 1]);
-                                            return;
-                                        }
-                                    } else {
-                                        $lineBotService->reply($reply_token, $message, $line_token);
-                                        return;
-                                    }
-                                }
-                            }
+                            return;
                         }
 
                         return;
@@ -116,17 +105,17 @@ class MessageController extends Controller
                         } elseif ($customer->step === 2) {
                             if ($text === 'はい') {
                                 $this->customerRepository->storeStep($customer, 3);
-                                $lineBotService->buildReplyMessage($reply_token, "{$customer->name}様、ご登録ありがとうございます。");
 
-                                // $greeting = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
-                                // if (!is_null($greeting)) {
-                                //     foreach ($greeting->messages as $message) {
-                                //         $lineBotService->push($line_token, $message);
-                                //     }
-                                // }
+                                if (Answer::where('customer_id', $customer->id)->count() === 0) {
+                                    $question = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 3)->first();
+                                    $lineBotService->reply($reply_token, $question->messages->first(), $line_token);
+                                }
+
+                                return;
                             } elseif ($text === 'いいえ') {
                                 $this->customerRepository->deleteName($customer);
                                 $lineBotService->buildReplyMessage($reply_token, '他のニックネームをご入力ください。');
+
                                 return;
                             }
                         }
@@ -159,21 +148,12 @@ class MessageController extends Controller
                         $answer = new Answer();
                         $answer->fill($postbacks)->save();
                     } else {
-                        $lineBotService->buildPushMessage($line_token, 'そのメッセージには、すでに回答済みです');
+                        $lineBotService->buildReplyMessage($reply_token, 'そのメッセージには、すでに回答済みです');
                         return;
                     }
 
                     $message = Message::find($postbacks['next_message_id']);
-
-                    if (is_null($message)) {
-                        $customer = Customer::where('line_token', $line_token)->first();
-                        if (is_null($customer->name)) {
-                            $lineBotService->buildPushMessage($line_token, 'ニックネームが未登録です。ニックネームを入力してください。');
-                        }
-                    } else {
-                        $lineBotService->push($line_token, $message);
-                        return;
-                    }
+                    $lineBotService->reply($reply_token, $message, $line_token);
 
                     return;
                 case ($event instanceof UnfollowEvent):
