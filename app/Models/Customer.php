@@ -29,6 +29,11 @@ class Customer extends Model
         return $this->hasMany(Answer::class);
     }
 
+    public function isDeleted(): bool
+    {
+        return !is_null($this->deleted_at);
+    }
+
     public function getFormatCreatedDateAttribute()
     {
         return Carbon::parse($this->created_at)->format('Y年m月d日 H時i分');
