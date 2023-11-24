@@ -86,7 +86,9 @@ class MessageController extends Controller
 
                         if (is_null($customer->name)) {
                             $lineBotService->buildReplyMessage($reply_token, 'ニックネームが未登録です。ニックネームを入力してください。');
-
+                            return;
+                        } else {
+                            $lineBotService->buildReplyMessage($reply_token, '本日もご来店ありがとうございました。');
                             return;
                         }
 
