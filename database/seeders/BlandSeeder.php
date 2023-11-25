@@ -10,6 +10,8 @@ use Illuminate\Database\Seeder;
 
 class BlandSeeder extends Seeder
 {
+    public const SHOP_ID = 3;
+
     /**
      * Run the database seeds.
      *
@@ -22,7 +24,7 @@ class BlandSeeder extends Seeder
 
         foreach ($blands as $bland) {
             Bland::create([
-                'shop_id' => 3,
+                'shop_id' => self::SHOP_ID,
                 'name' => $bland->name
             ]);
         }

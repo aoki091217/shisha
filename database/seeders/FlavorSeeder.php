@@ -10,6 +10,8 @@ use Illuminate\Database\Seeder;
 
 class FlavorSeeder extends Seeder
 {
+    public const SHOP_ID = 3;
+
     /**
      * Run the database seeds.
      *
@@ -18,13 +20,16 @@ class FlavorSeeder extends Seeder
     public function run()
     {
         Eloquent::unguard();
-        $blands = Bland::with('flavors')->where('shop_id', 1)->get();
+        $oldBlands = Bland::where('shop_id', 1)->get();
+        $newBlands = Bland::where('shop_id', self::SHOP_ID)->get();
 
-        foreach ($blands as $bland) {
-            foreach ($bland->flavors as $flavor) {
+        foreach ($newBlands as $i => $bland) {
+            $flavors = Flavor::where('bland_id', $oldBlands[$i]->bland_id)->where('shop_id', 1)->get();
+
+            foreach ($flavors as $flavor) {
                 Flavor::create([
                     'bland_id' => $bland->bland_id,
-                    'shop_id' => 3,
+                    'shop_id' => self::SHOP_ID,
                     'name' => $flavor->name
                 ]);
             }
