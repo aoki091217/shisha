@@ -21,7 +21,7 @@ class Bland extends Model
 
     public function shop()
     {
-        return $this->belongsTo(Shop::class, 'shop_id', 'shop_id');
+        return $this->belongsTo(Shop::class, 'shop_id', 'shop_id')->withTrashed();
     }
 
     public function flavors()
@@ -38,6 +38,10 @@ class Bland extends Model
     {
         if (auth()->user()->role_id !== 1) {
             $query->where('shop_id', auth()->user()->member->shop_id);
+        } else {
+            if (!empty($words['shop_id'])) {
+                $query->where('shop_id', $words['shop_id']);
+            }
         }
 
         if (isset($words['name'])) {

@@ -7,7 +7,24 @@
     @csrf
     <div id="searchForm">
         <div class="col-12 d-flex justify-content-between align-items-end gap-3">
-            <div class="col-8">
+            <div class="col">
+                <label for="shopName" class="form-label">店舗</label>
+                @if (auth()->user()->role_id === 1)
+                <select name="mix[shop_id]" id="shopName" class="form-select">
+                    <option value=""></option>
+                    @foreach ($shops as $shop)
+                        <option value="{{ $shop->shop_id }}" {{ request('mix.shop_id') == $shop->shop_id ? 'selected' : '' }}>
+                            {{ $shop->name }}
+                        </option>
+                    @endforeach
+                </select>
+                @else
+                <div style="padding: 0.375rem 0">
+                    <span>{{ auth()->user()->member->shop->name }}</span>
+                </div>
+                @endif
+            </div>
+            <div class="col-6">
                 <label for="mixName" class="form-label">ミックス名</label>
                 {{ Form::text(
                     'mix[name]',
@@ -32,8 +49,9 @@
             <thead>
                 <tr>
                     <th class="bg-light col-2" scope="col">ID</th>
-                    <th class="bg-light col-5" scope="col">ミックス名</th>
-                    <th class="bg-light col-5" scope="col">登録日</th>
+                    <th class="bg-light col-2" scope="col">店舗</th>
+                    <th class="bg-light col-4" scope="col">ミックス名</th>
+                    <th class="bg-light col-4" scope="col">登録日</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,6 +62,9 @@
                             {{ $mixPreset->id }}
                         </a>
                     </td>
+                    <td class="{{ $mixPreset->shop->trashed() ? 'text-danger text-decoration-line-through' : '' }}">
+                        {{ $mixPreset->shop->name }}
+                    </td>
                     <td>{{ $mixPreset->name }}</td>
                     <td>{{ $mixPreset->created_datetime }}</td>
                 </tr>
@@ -53,7 +74,7 @@
     </div>
 </form>
 <div class="mt-3" id="footer">
-    {{ $mixPresets->links() }}
+    {{ $mixPresets->appends(request()->all())->links() }}
 </div>
 
 @endsection

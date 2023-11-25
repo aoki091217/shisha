@@ -127,7 +127,7 @@
     </div>
 </form>
 <div class="mt-3" id="footer">
-    {{ $bills->links() }}
+    {{ $bills->appends(request()->all())->links() }}
 </div>
 
 @push('jquery')

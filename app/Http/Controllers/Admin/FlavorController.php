@@ -21,10 +21,10 @@ class FlavorController extends Controller
 
     public function index(Request $request)
     {
-        $blands = $this->blandRepository->get();
+        $shops = $this->shopRepository->get();
         $flavors = $this->flavorRepository->relate()->search($request->flavor)->paginate();
 
-        return view('flavor.index', compact('blands', 'flavors'));
+        return view('flavor.index', compact('shops', 'flavors'));
     }
 
     public function create()

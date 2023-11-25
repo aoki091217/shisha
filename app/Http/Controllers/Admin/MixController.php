@@ -24,9 +24,10 @@ class MixController extends Controller
 
     public function index(Request $request)
     {
+        $shops = $this->shopRepository->get();
         $mixPresets = $this->mixRepository->relate()->search($request->mix)->paginate();
 
-        return view('mix.index', compact('mixPresets'));
+        return view('mix.index', compact('mixPresets', 'shops'));
     }
 
     public function create(Request $request)
