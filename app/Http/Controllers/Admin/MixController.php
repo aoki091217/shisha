@@ -24,11 +24,9 @@ class MixController extends Controller
 
     public function index(Request $request)
     {
-        $blands = $this->blandRepository->get();
-        $flavors = $this->flavorRepository->get();
         $mixPresets = $this->mixRepository->relate()->search($request->mix)->paginate();
 
-        return view('mix.index', compact('mixPresets', 'blands', 'flavors'));
+        return view('mix.index', compact('mixPresets'));
     }
 
     public function create(Request $request)

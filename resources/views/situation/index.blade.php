@@ -55,7 +55,9 @@
                         </a>
                     </td>
                     <td>{{ $situation->receive_event }}</td>
-                    <td>{{ $situation->shop->name }}</td>
+                    <td class="{{ $situation->shop->trashed() ? 'text-danger text-decoration-line-through' : '' }}">
+                        {{ $situation->shop->name }}
+                    </td>
                     <td>{{ $situation->created_datetime }}</td>
                 </tr>
                 @endforeach

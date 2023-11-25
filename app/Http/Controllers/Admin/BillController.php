@@ -41,24 +41,27 @@ class BillController extends Controller
         $shops = $this->shopRepository->relate()->get();
         $members = $this->memberRepository->get();
         $mixPresets = $this->mixRepository->relate()->get();
-        $customerShops = $this->customerShopRepository->relate()->orderByDesc('visited_at')->get();
+        $customerShops = $this->customerShopRepository->relate()->get();
 
-        $latests = new Collection();
-        foreach ($customerShops->groupBy('customer_id') as $i => $customerShop) {
-            $latests = $latests->put($i, $customerShop->first());
+        $latestCustomers = new Collection();
+        /** @var CustomerShop $customerShop */
+        foreach ($customerShops->groupBy('customer_id') as $i => $group) {
+            $rejected = $group->reject(function ($customerShop) {
+                return $customerShop->moreThanHalfDay() || is_null($customerShop->customer);
+            })->sortByDesc('visited_at');
+
+            if (!is_null($rejected->first())) {
+                $latestCustomers = $latestCustomers->put($i, $rejected->first());
+            }
         }
 
         if (auth()->user()->role_id !== 1) {
             $shops = $shops->where('shop_id', auth()->user()->member->shop_id);
             $mixPresets = $mixPresets->where('shop_id', auth()->user()->member->shop_id);
-            $customerShops = $latests->where('shop_id', auth()->user()->member->shop_id);
+            $customerShops = $latestCustomers->where('shop_id', auth()->user()->member->shop_id);
         }
 
-        $customerShops = $latests->reject(function ($item) {
-            return is_null($item->customer);
-        });
-
-        return view('bill.create', compact('shops', 'members', 'customerShops', 'mixPresets'));
+        return view('bill.create', compact('shops', 'members', 'latestCustomers', 'mixPresets'));
     }
 
     public function store(BillRequest $request)
@@ -97,22 +100,25 @@ class BillController extends Controller
         $mixPresets = $this->mixRepository->relate()->get();
         $bill = $this->billRepository->relate(['shop', 'member', 'billCustomers.customer', 'billOrders.mix'])->find($id);
 
-        $latests = new Collection();
-        foreach ($customerShops->groupBy('customer_id') as $i => $customerShop) {
-            $latests = $latests->put($i, $customerShop->first());
+        $latestCustomers = new Collection();
+        /** @var CustomerShop $customerShop */
+        foreach ($customerShops->groupBy('customer_id') as $i => $group) {
+            $rejected = $group->reject(function ($customerShop) {
+                return $customerShop->moreThanHalfDay() || is_null($customerShop->customer);
+            })->sortByDesc('visited_at');
+
+            if (!is_null($rejected->first())) {
+                $latestCustomers = $latestCustomers->put($i, $rejected->first());
+            }
         }
 
         if (auth()->user()->role_id !== 1) {
             $shops = $shops->where('shop_id', auth()->user()->member->shop_id);
             $mixPresets = $mixPresets->where('shop_id', auth()->user()->member->shop_id);
-            $customerShops = $latests->where('shop_id', auth()->user()->member->shop_id);
+            $customerShops = $latestCustomers->where('shop_id', auth()->user()->member->shop_id);
         }
 
-        $customerShops = $latests->reject(function ($item) {
-            return is_null($item->customer);
-        });
-
-        return view('bill.edit', compact('shops', 'members', 'customerShops', 'mixPresets', 'bill'));
+        return view('bill.edit', compact('shops', 'members', 'latestCustomers', 'mixPresets', 'bill'));
     }
 
     public function update(BillRequest $request, $id)

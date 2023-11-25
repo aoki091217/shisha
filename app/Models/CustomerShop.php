@@ -34,6 +34,16 @@ class CustomerShop extends Model
         return Carbon::parse($this->visited_at)->format('Y年m月d日 H時i分');
     }
 
+    public function getVisitedAt(): Carbon
+    {
+        return Carbon::parse($this->visited_at);
+    }
+
+    public function moreThanHalfDay(): bool
+    {
+        return now()->diffInHours($this->getVisitedAt()) >= 12;
+    }
+
     public function scopeSearch($query, $words)
     {
         if (isset($words['name'])) {

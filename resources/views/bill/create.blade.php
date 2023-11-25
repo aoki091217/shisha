@@ -122,7 +122,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($customerShops as $customerShop)
+                        @foreach ($latestCustomers as $customerShop)
                             <tr>
                                 <td>{{ $customerShop->customer->name }}</td>
                                 <td>{{ $customerShop->checkin_datetime }}</td>
