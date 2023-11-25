@@ -19,8 +19,10 @@ class BlandController extends Controller
 
     public function index(Request $request)
     {
+        $shops = $this->shopRepository->get();
         $blands = $this->blandRepository->search($request->bland)->paginate();
-        return view('bland.index', compact('blands'));
+
+        return view('bland.index', compact('blands', 'shops'));
     }
 
     public function create()

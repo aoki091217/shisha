@@ -81,7 +81,7 @@
     </div>
 </form>
 <div class="mt-3" id="footer">
-    {{ $customers->links() }}
+    {{ $customers->appends(request()->all())->links() }}
 </div>
 
 @endsection
