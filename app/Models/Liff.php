@@ -12,6 +12,9 @@ class Liff extends Model
 {
     use HasFactory;
 
+    public const UTM_SOURCE = 'utm_source';
+    public const UTM_CAMPAIGN = 'utm_campaign';
+
     protected $fillable = [
         'line_token',
         'query'

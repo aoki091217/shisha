@@ -183,14 +183,6 @@ class LineBotService
         ];
     }
 
-    public function getLiffUrl($shopId = null): string
-    {
-        $parameter = $this->getEncodeParam($shopId);
-        $liffUrl = 'https://liff.line.me/' . config('services.line.liff_id') . "?{$parameter->native}";
-
-        return $liffUrl;
-    }
-
     private function getEncodeParam($shop_id)
     {
         $shop = Shop::find($shop_id);
