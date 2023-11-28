@@ -7,7 +7,8 @@ use Illuminate\Foundation\Http\FormRequest;
 class LineRequest extends FormRequest
 {
     private const SHOP_ID = 'shop_id';
-    private const LIFF_STATE = 'liff_state';
+    private const LINE_TOKEN = 'line_token';
+    private const QUERY_PARAM = 'query_param';
 
     /**
      * Determine if the user is authorized to make this request.
@@ -27,7 +28,6 @@ class LineRequest extends FormRequest
     public function rules()
     {
         return [
-            'shop_id' => 'nullable|integer'
         ];
     }
 
@@ -36,8 +36,13 @@ class LineRequest extends FormRequest
         return (int) $this->{self::SHOP_ID};
     }
 
-    public function getLiffState(): string
+    public function getLineToken(): string
     {
-        return $this->{self::LIFF_STATE} ?? '';
+        return $this->{self::LINE_TOKEN} ?? '';
+    }
+
+    public function getQueryParam(): string
+    {
+        return $this->{self::QUERY_PARAM} ?? '';
     }
 }

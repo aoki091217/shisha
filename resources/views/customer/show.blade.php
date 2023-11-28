@@ -68,7 +68,7 @@
     </div>
 </div>
 <div class="d-flex align-items-center justify-content-end mt-3 footer-buttons gap-2">
-    <a href="{{ route('customer.index') }}" class="btn btn-secondary">戻る</a>
+    <button class="btn btn-secondary" onclick="history.back()">戻る</button>
 </div>
 
 @endsection

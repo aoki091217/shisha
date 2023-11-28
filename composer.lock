@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "05bb259a1d0e7791521ac211c6037cf0",
+    "content-hash": "207fec8cba3cf19b2591e7cab1d8f5be",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1320,6 +1320,57 @@
                 }
             ],
             "time": "2023-08-27T10:19:19+00:00"
+        },
+        {
+            "name": "hirossyi73/url-shorter",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hirossyi73/url-shorter.git",
+                "reference": "f7244fe22c9547afa2578dcd63f68d590fdfc85a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hirossyi73/url-shorter/zipball/f7244fe22c9547afa2578dcd63f68d590fdfc85a",
+                "reference": "f7244fe22c9547afa2578dcd63f68d590fdfc85a",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": ">=5.5.0",
+                "php": ">=7.0.0"
+            },
+            "type": "project",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Hirossyi73\\UrlShorter\\UrlShorterServiceProvider"
+                    ],
+                    "aliases": {
+                        "UrlShorter": "Hirossyi73\\UrlShorter\\Facades\\UrlShorterFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Hirossyi73\\UrlShorter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hiroshi Sato",
+                    "email": "contact@hirossyi.net"
+                }
+            ],
+            "description": "Encode and decode url shorter.",
+            "support": {
+                "issues": "https://github.com/hirossyi73/url-shorter/issues",
+                "source": "https://github.com/hirossyi73/url-shorter/tree/master"
+            },
+            "time": "2020-07-12T08:39:08+00:00"
         },
         {
             "name": "laravel/framework",
