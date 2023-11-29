@@ -58,7 +58,7 @@ class BillController extends Controller
         if (auth()->user()->role_id !== 1) {
             $shops = $shops->where('shop_id', auth()->user()->member->shop_id);
             $mixPresets = $mixPresets->where('shop_id', auth()->user()->member->shop_id);
-            $customerShops = $latestCustomers->where('shop_id', auth()->user()->member->shop_id);
+            $latestCustomers = $latestCustomers->where('shop_id', auth()->user()->member->shop_id);
         }
 
         return view('bill.create', compact('shops', 'members', 'latestCustomers', 'mixPresets'));
@@ -117,7 +117,7 @@ class BillController extends Controller
         if (auth()->user()->role_id !== 1) {
             $shops = $shops->where('shop_id', auth()->user()->member->shop_id);
             $mixPresets = $mixPresets->where('shop_id', auth()->user()->member->shop_id);
-            $customerShops = $latestCustomers->where('shop_id', auth()->user()->member->shop_id);
+            $latestCustomers = $latestCustomers->where('shop_id', auth()->user()->member->shop_id);
         }
 
         return view('bill.edit', compact('shops', 'members', 'latestCustomers', 'mixPresets', 'bill'));
@@ -171,11 +171,24 @@ class BillController extends Controller
 
     public function getCustomers(Request $request)
     {
-        $customerShops = $this->customerShopRepository->relate()->search($request->search)->orderByDesc('visited_at')->get()
-            ->groupBy('customer_id')
-            ->map(function ($item) {
-                return $item->first();
+        $customerShops = $this->customerShopRepository->relate()->get();
+
+        $latestCustomers = new Collection();
+        /** @var CustomerShop $customerShop */
+        foreach ($customerShops->groupBy('customer_id') as $i => $group) {
+            $rejected = $group->reject(function ($customerShop) {
+                return $customerShop->moreThanHalfDay() || is_null($customerShop->customer);
             });
-        return response()->json($customerShops);
+
+            if (!is_null($rejected->first())) {
+                $latestCustomers = $latestCustomers->put($i, $rejected->first());
+            }
+        }
+
+        if (auth()->user()->role_id !== 1) {
+            $latestCustomers = $latestCustomers->where('shop_id', auth()->user()->member->shop_id);
+        }
+
+        return response()->json($latestCustomers);
     }
 }
