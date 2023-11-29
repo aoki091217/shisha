@@ -55,7 +55,7 @@ $(window).on('load', function () {
         getCustomers().done(function (customerShops) {
             $('.table-wrapper tbody tr').remove();
             customerShops.sort(function (leftItem, rightItem) {
-                return (leftItem.visited_at < rightItem.visited_at ? 1 : -1);
+                return (leftItem.visited_at > rightItem.visited_at ? 1 : -1);
             });
             console.log(customerShops);
             $.each(customerShops, function (index, item) {
