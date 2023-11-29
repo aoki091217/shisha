@@ -96,7 +96,7 @@ class BillController extends Controller
     {
         $shops = $this->shopRepository->relate()->get();
         $members = $this->memberRepository->get();
-        $customerShops = $this->customerShopRepository->relate()->orderByDesc('visited_at')->get();
+        $customerShops = $this->customerShopRepository->relate()->get();
         $mixPresets = $this->mixRepository->relate()->get();
         $bill = $this->billRepository->relate(['shop', 'member', 'billCustomers.customer', 'billOrders.mix'])->find($id);
 
@@ -131,12 +131,14 @@ class BillController extends Controller
         $service = new LineBotService($shopId);
         $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shopId)->where('event_type', 4)->first();
 
-        $customers = $request['bill']['customers'];
-        foreach ($customers as $customer) {
-            $customer = $this->customerRepository->findById((int) $customer['customer_id']);
+        if (!is_null($situation)) {
+            $customers = $request['bill']['customers'];
+            foreach ($customers as $customer) {
+                $customer = $this->customerRepository->findById((int) $customer['customer_id']);
 
-            foreach ($situation->messages as $message) {
-                $service->buildPushMessage($customer->line_token, $message->text);
+                foreach ($situation->messages as $message) {
+                    $service->buildPushMessage($customer->line_token, $message->text);
+                }
             }
         }
 

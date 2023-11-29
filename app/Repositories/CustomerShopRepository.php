@@ -19,7 +19,11 @@ class CustomerShopRepository
 
     public function get()
     {
-        return CustomerShop::get();
+        if (auth()->user()->role_id === 1) {
+            return CustomerShop::get();
+        } else {
+            return CustomerShop::where('shop_id', auth()->user()->member->shop_id)->get();
+        }
     }
 
     public function paginate()
