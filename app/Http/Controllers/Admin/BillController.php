@@ -185,6 +185,10 @@ class BillController extends Controller
             }
         }
 
+        if (auth()->user()->role_id !== 1) {
+            $latestCustomers = $latestCustomers->where('shop_id', auth()->user()->member->shop_id);
+        }
+
         return response()->json($latestCustomers);
     }
 }

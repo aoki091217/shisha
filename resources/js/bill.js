@@ -57,7 +57,7 @@ $(window).on('load', function () {
             customerShops.sort(function (leftItem, rightItem) {
                 return (leftItem.visited_at < rightItem.visited_at ? 1 : -1);
             });
-
+            console.log(customerShops);
             $.each(customerShops, function (index, item) {
                 let selectButton = $('<button>', {
                     type: 'button',
