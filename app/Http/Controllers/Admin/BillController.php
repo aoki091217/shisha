@@ -74,12 +74,14 @@ class BillController extends Controller
         $service = new LineBotService($shopId);
         $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shopId)->where('event_type', 4)->first();
 
-        $customers = $request['bill']['customers'];
-        foreach ($customers as $customer) {
-            $customer = $this->customerRepository->findById((int) $customer['customer_id']);
+        if (!is_null($situation)) {
+            $customers = $request['bill']['customers'];
+            foreach ($customers as $customer) {
+                $customer = $this->customerRepository->findById((int) $customer['customer_id']);
 
-            foreach ($situation->messages as $message) {
-                $service->buildPushMessage($customer->line_token, $message->text);
+                foreach ($situation->messages as $message) {
+                    $service->buildPushMessage($customer->line_token, $message->text);
+                }
             }
         }
 
