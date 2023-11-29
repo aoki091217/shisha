@@ -41,7 +41,7 @@ class BillController extends Controller
         $shops = $this->shopRepository->relate()->get();
         $members = $this->memberRepository->get();
         $mixPresets = $this->mixRepository->relate()->get();
-        $customerShops = $this->customerShopRepository->relate()->get();
+        $customerShops = $this->customerShopRepository->relate()->orderBy('visited_at')->get();
 
         $latestCustomers = new Collection();
         /** @var CustomerShop $customerShop */
@@ -96,7 +96,7 @@ class BillController extends Controller
     {
         $shops = $this->shopRepository->relate()->get();
         $members = $this->memberRepository->get();
-        $customerShops = $this->customerShopRepository->relate()->get();
+        $customerShops = $this->customerShopRepository->relate()->orderBy('visited_at')->get();
         $mixPresets = $this->mixRepository->relate()->get();
         $bill = $this->billRepository->relate(['shop', 'member', 'billCustomers.customer', 'billOrders.mix'])->find($id);
 
