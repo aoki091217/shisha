@@ -171,7 +171,7 @@ class BillController extends Controller
 
     public function getCustomers(Request $request)
     {
-        $customerShops = $this->customerShopRepository->relate()->orderByDesc('visited_at')->search($request->search)->get();
+        $customerShops = $this->customerShopRepository->relate()->search($request->search)->get();
 
         $latestCustomers = new Collection();
         /** @var CustomerShop $customerShop */
@@ -189,7 +189,7 @@ class BillController extends Controller
             $latestCustomers = $latestCustomers->where('shop_id', auth()->user()->member->shop_id);
         }
 
-        // $latestCustomers = $customerShops->sortByDesc('visited_at');
+        $latestCustomers = $customerShops->sortByDesc('visited_at');
 
         return response()->json($latestCustomers);
     }
