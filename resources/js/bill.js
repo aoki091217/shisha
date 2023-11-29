@@ -53,10 +53,10 @@ $(window).on('load', function () {
 
     $('#searchButton, #reloadButton').on('click', function () {
         getCustomers().done(function (customerShops) {
-            console.log(customerShops);
             $('.table-wrapper tbody tr').remove();
 
             $.each(customerShops, function (index, item) {
+                console.log(item);
                 let selectButton = $('<button>', {
                     type: 'button',
                     class: 'btn btn-sm btn-outline-primary w-100',
