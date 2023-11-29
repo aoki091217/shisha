@@ -122,7 +122,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($latestCustomers as $customerShop)
+                        @foreach ($latestCustomers->sortByDesc('visited_at') as $customerShop)
                             <tr>
                                 <td>{{ $customerShop->customer->name }}</td>
                                 <td>{{ $customerShop->checkin_datetime }}</td>
