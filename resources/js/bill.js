@@ -54,8 +54,11 @@ $(window).on('load', function () {
     $('#searchButton, #reloadButton').on('click', function () {
         getCustomers().done(function (customerShops) {
             $('.table-wrapper tbody tr').remove();
-            customerShops.sort(function (leftItem, rightItem) {
-                return (leftItem.visited_at > rightItem.visited_at ? 1 : -1);
+            customerShops.sort((leftItem, rightItem) => {
+                let x = new Date(leftItem.visited_at);
+                let y = new Date(rightItem.visited_at);
+
+                return -(x.date.getTime()) - (y.date.getTime());
             });
 
             $.each(customerShops, function (index, item) {
