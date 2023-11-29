@@ -9,7 +9,6 @@
         "diglactic/laravel-breadcrumbs": "^8.0",
         "endroid/qr-code": "^4.8",
         "guzzlehttp/guzzle": "^7.2",
-        "hirossyi73/url-shorter": "^1.0",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
