@@ -41,14 +41,14 @@ class BillController extends Controller
         $shops = $this->shopRepository->relate()->get();
         $members = $this->memberRepository->get();
         $mixPresets = $this->mixRepository->relate()->get();
-        $customerShops = $this->customerShopRepository->relate()->orderBy('visited_at')->get();
+        $customerShops = $this->customerShopRepository->relate()->get();
 
         $latestCustomers = new Collection();
         /** @var CustomerShop $customerShop */
         foreach ($customerShops->groupBy('customer_id') as $i => $group) {
             $rejected = $group->reject(function ($customerShop) {
                 return $customerShop->moreThanHalfDay() || is_null($customerShop->customer);
-            })->sortByDesc('visited_at');
+            });
 
             if (!is_null($rejected->first())) {
                 $latestCustomers = $latestCustomers->put($i, $rejected->first());
@@ -96,7 +96,7 @@ class BillController extends Controller
     {
         $shops = $this->shopRepository->relate()->get();
         $members = $this->memberRepository->get();
-        $customerShops = $this->customerShopRepository->relate()->orderBy('visited_at')->get();
+        $customerShops = $this->customerShopRepository->relate()->get();
         $mixPresets = $this->mixRepository->relate()->get();
         $bill = $this->billRepository->relate(['shop', 'member', 'billCustomers.customer', 'billOrders.mix'])->find($id);
 
@@ -105,7 +105,7 @@ class BillController extends Controller
         foreach ($customerShops->groupBy('customer_id') as $i => $group) {
             $rejected = $group->reject(function ($customerShop) {
                 return $customerShop->moreThanHalfDay() || is_null($customerShop->customer);
-            })->sortByDesc('visited_at');
+            });
 
             if (!is_null($rejected->first())) {
                 $latestCustomers = $latestCustomers->put($i, $rejected->first());
