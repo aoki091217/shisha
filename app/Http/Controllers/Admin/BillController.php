@@ -189,7 +189,7 @@ class BillController extends Controller
             $latestCustomers = $latestCustomers->where('shop_id', auth()->user()->member->shop_id);
         }
 
-        $latestCustomers = $customerShops->sortByDesc('visited_at');
+        // $latestCustomers = $customerShops->sortByDesc('visited_at');
 
         return response()->json($latestCustomers);
     }
