@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class LineRequest extends FormRequest
 {
-    private const SHOP_ID = 'shop_id';
+    private const SHOP_ID = 'sid';
     private const LINE_TOKEN = 'line_token';
     private const QUERY_PARAM = 'query_param';
 

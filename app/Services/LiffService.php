@@ -22,8 +22,14 @@ class LiffService
 
     public function getLiffUrl($shopId = null): string
     {
-        // $parameter = $this->getEncodeParam($shopId);
-        $liffUrl = 'https://liff.line.me/' . config('services.line.liff_id');
+        if (is_null($shopId)) {
+            $shop = Shop::first();
+        } else {
+            $shop = Shop::find($shopId);
+        }
+
+        $parameter = "?sid={$shop->shop_id}";
+        $liffUrl = 'https://liff.line.me/' . config('services.line.liff_id') . $parameter;
 
         return $liffUrl;
     }
