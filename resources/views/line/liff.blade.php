@@ -53,7 +53,7 @@
                     headers: {
                         'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')
                     },
-                    url: @json(config('services.line.ngrok') . '/api/line/save_liff'),
+                    url: @json(route('line.saveLiff')),
                     method: 'POST',
                     data: {
                         line_token: profile.userId,
