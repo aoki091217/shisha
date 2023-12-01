@@ -26,11 +26,10 @@
             height="0" width="0" style="display:none;visibility:hidden"></iframe>
         </noscript>
         <!-- End Google Tag Manager (noscript) -->
-        <h2 style="color: red">LIFFリダイレクト中</h2>
     </body>
 
     <script>
-        const queryParam = @json($request->getQueryParam());
+        const queryParams = @json($queryParams);
         const timeout = 2000;
 
         setTimeout(() => {
@@ -40,14 +39,14 @@
                 if (liff.isLoggedIn() === false) {
                     liff.login({})
                 }
-                getUserInfo();
+                getUserInfo(queryParams);
             })
             .catch((err) => {
                 console.log(err.code, err.message);
             });
         }, timeout);
 
-        const getUserInfo = () => {
+        const getUserInfo = (queryParams) => {
             liff.getProfile().then(profile => {
 
                 $.ajax({
@@ -57,12 +56,12 @@
                     url: @json(config('services.line.ngrok') . '/api/line/save_liff'),
                     method: 'POST',
                     data: {
-                        query_param: queryParam,
-                        line_token: profile.userId
+                        line_token: profile.userId,
+                        query_params: queryParams
                     }
                 })
-                .done(function (data) {
-                    console.log(data);
+                .done(function (response) {
+                    window.location.href = @json($lineUrl);
                 })
                 .fail(function (error) {
                     console.log(error);
