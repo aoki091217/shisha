@@ -29,7 +29,7 @@
     </body>
 
     <script>
-        const queryParams = @json($queryParams);
+        const queryParams = @json($request->session()->get('query_params'));
         const timeout = 2000;
 
         setTimeout(() => {
