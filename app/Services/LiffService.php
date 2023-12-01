@@ -11,13 +11,26 @@ class LiffService
 {
     public function save(LineRequest $request): void
     {
-        if (!empty($request->getLineToken()) && !empty($request->getQueryParam())) {
+        if (!empty($request->getLineToken()) && !empty($request->getQueryParams())) {
+            $queryParam = $this->createQueryParam($request->getQueryParams());
+
             $liff = new Liff();
             $liff->fill([
                 'line_token' => $request->getLineToken(),
-                'query' => $request->getQueryParam()
+                'query' => $queryParam
             ])->save();
         }
+    }
+
+    public function createQueryParam(array $queryParams): string
+    {
+        if (empty($queryParams)) return '';
+
+        foreach ($queryParams as $key => $value) {
+            $params[] = "{$key}={$value}";
+        }
+
+        return join('&', $params);
     }
 
     public function getLiffUrl($shopId = null): string

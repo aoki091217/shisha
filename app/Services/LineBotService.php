@@ -19,7 +19,7 @@ use Storage;
 class LineBotService
 {
     protected $bot;
-    private $shop_id;
+    private Shop $shop;
 
     public function __construct($id)
     {
@@ -32,7 +32,7 @@ class LineBotService
         $client = new CurlHTTPClient($shop->line_token);
         $this->bot = new LINEBot($client, ['channelSecret' => $shop->channel_secret]);
 
-        $this->shop_id = $shop->shop_id;
+        $this->shop = $shop;
     }
 
     /**
@@ -166,16 +166,19 @@ class LineBotService
         $this->bot->replyMessage($reply_token, $builder);
     }
 
-    public function getLineUrl($shopId = null)
+    public function getLineUrl()
     {
-        if (is_null($shopId)) {
-            $shop = Shop::first();
-        } else {
-            $shop = Shop::find($shopId);
-        }
-        $accountId = urlencode($shop->account_id);
-        $message = $this->getEncodeParam($shopId);
-        $uri = "https://line.me/R/oaMessage/{$accountId}/?{$message->encode}";
+        $accountId = urlencode($this->shop->account_id);
+
+        return "https://line.me/R/oaMessage/{$accountId}/";
+    }
+
+    public function getLineUrlWithMessage()
+    {
+        $uri = $this->getLineUrl();
+
+        $message = $this->getEncodeParam();
+        $uri = "{$uri}?{$message->encode}";
 
         return (object) [
             'uri' => $uri,
@@ -183,12 +186,10 @@ class LineBotService
         ];
     }
 
-    private function getEncodeParam($shop_id)
+    private function getEncodeParam()
     {
-        $shop = Shop::find($shop_id);
-        if (is_null($shop_id) || is_null($shop)) {
-            $shop_id = $this->shop_id;
-        }
+        $shop_id = $this->shop->shop_id;
+
         $now = Carbon::now()->format('Y-m-d_H:i:s');
         $message = config('line.message');
         $encode = urlencode($message . join('&', ['action=checkin', "shop_id={$shop_id}", "datetime={$now}"]));

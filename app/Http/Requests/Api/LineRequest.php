@@ -8,7 +8,8 @@ class LineRequest extends FormRequest
 {
     private const SHOP_ID = 'sid';
     private const LINE_TOKEN = 'line_token';
-    private const QUERY_PARAM = 'query_param';
+    private const UTM_RESOURCE = 'utm_resource';
+    private const QUERY_PARAMS = 'query_params';
 
     /**
      * Determine if the user is authorized to make this request.
@@ -41,8 +42,13 @@ class LineRequest extends FormRequest
         return $this->{self::LINE_TOKEN} ?? '';
     }
 
-    public function getQueryParam(): string
+    public function getUtmResouce(): string
     {
-        return $this->{self::QUERY_PARAM} ?? '';
+        return $this->{self::UTM_RESOURCE} ?? '';
+    }
+
+    public function getQueryParams(): array
+    {
+        return $this->{self::QUERY_PARAMS} ?? [];
     }
 }
