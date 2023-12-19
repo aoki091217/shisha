@@ -29,8 +29,6 @@ class SituationRequest extends FormRequest
         return [
             'situation.shop_id' => 'required',
             'situation.name' => 'required|max:50',
-            'situation.event_type' => 'required',
-            // 'situation.messages.*.text' => 'required',
             'situation.messages.*.message_type' => 'required',
             'situation.messages.*.keyword' => 'nullable|max:50',
             'situation.messages.*.alt_text' => 'nullable|max:400',
@@ -91,6 +89,11 @@ class SituationRequest extends FormRequest
         }
 
         $situation = array_merge($this->situation, ['messages' => $messages]);
+
+        if (empty($this->situation['is_default'])) {
+            $situation['is_default'] = 0;
+        }
+
         $this->merge(['situation' => $situation]);
     }
 

@@ -16,7 +16,8 @@ class Situation extends Model
     protected $fillable = [
         'shop_id',
         'name',
-        'event_type'
+        'event_type',
+        'is_default'
     ];
 
     public static function boot()
@@ -42,11 +43,13 @@ class Situation extends Model
             case 1:
                 return '友達追加';
             case 2:
-                return 'テキストの受信';
+                return 'メッセージの受信';
             case 3:
                 return 'アンケート';
             case 4:
                 return '会計確定';
+            case 5:
+                return 'プッシュメッセージ';
         }
     }
 

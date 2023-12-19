@@ -1,9 +1,9 @@
 @extends('layouts.parent')
 
 @section('content')
-{{ Breadcrumbs::render('situation.index') }}
+{{ Breadcrumbs::render('situation.follow.index') }}
 <div class="text-success text-center fw-bold">{{ session('situation') }}</div>
-<form action="{{ route('situation.index') }}" method="GET" autocomplete="off" id="form">
+<form action="{{ route('situation.follow.index') }}" method="GET" autocomplete="off" id="form">
     @csrf
     <div id="searchForm">
         <div class="col-12 d-flex justify-content-between align-items-end gap-3">
@@ -29,10 +29,10 @@
             </div>
             <div class="col btn-group">
                 <button type="submit" class="col-6 btn btn-warning">検索</button>
-                <a href="{{ route('situation.index') }}" class="col-6 btn btn-secondary">リセット</a>
+                <a href="{{ route('situation.follow.index') }}" class="col-6 btn btn-secondary">リセット</a>
             </div>
             <div class="col">
-                <a href="{{ route('situation.create') }}" class="col-12 btn btn-primary">登録</a>
+                <a href="{{ route('situation.follow.create') }}" class="col-12 btn btn-primary">登録</a>
             </div>
         </div>
     </div>
@@ -50,7 +50,7 @@
                 @foreach ($situations as $situation)
                 <tr>
                     <td>
-                        <a href="{{ route('situation.show', $situation->id) }}" class="d-block w-100">
+                        <a href="{{ route('situation.follow.show', $situation->id) }}" class="d-block w-100">
                             {{ $situation->name }}
                         </a>
                     </td>
