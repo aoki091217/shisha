@@ -5,8 +5,8 @@
 @endpush
 
 @section('content')
-{{ Breadcrumbs::render('situation.create') }}
-<form action="{{ route('situation.store') }}" method="POST" autocomplete="off" enctype="multipart/form-data">
+{{ Breadcrumbs::render('situation.push.create') }}
+<form action="{{ route('situation.push.store') }}" method="POST" autocomplete="off" enctype="multipart/form-data">
     @csrf
     <div class="d-flex flex-wrap">
 
@@ -35,7 +35,7 @@
             @endif
         </div>
 
-        <div class="col-6 pe-2">
+        <div class="col-6 mb-3 pe-2">
             <div>
                 <div>
                     <label for="situationName" class="form-label">シチュエーション名</label>
@@ -57,30 +57,18 @@
                 <span class="text-danger">{{ $errors->first('situation.name') }}</span>
             </div>
         </div>
-        <div class="col-6 mb-3 ps-2">
-            <div>
-                <div>
-                    <label class="form-label"> 受信イベント</label>
-                    <small class="text-secondary">カスタムした一連のメッセージの送信するタイミングを変更できます。</small>
-                </div>
-                <div class="text-danger font-weight-bold">※メッセージの受信イベントでは、1つのみメッセージを設定できます。</div>
-            </div>
-            <div class="d-flex">
-                @foreach (config('situation.event_type') as $key => $event_type)
-                <div class="radio-group">
-                    {{ Form::radio(
-                        'situation[event_type]',
-                        $loop->iteration,
-                        old('situation.event_type') == $loop->iteration || $loop->first ? 'checked' : '',
-                        [
-                            'class' => 'form-check-input form-check-radio',
-                            'id' => $key
-                        ]
-                    ) }}
-                    <label for="{{ $key }}" class="form-check-label">{{ $event_type }}</label>
-                </div>
-                @endforeach
-                <span class="text-danger">{{ $errors->first('situation.event_type') }}</span>
+        <div class="col-6 mb-3 ps-2 d-flex align-items-end">
+            <div class="mb-2">
+                {{ Form::checkbox(
+                    'situation[is_default]',
+                    1,
+                    old('situation.is_default') == 1 ? 'checked' : '',
+                    [
+                        'class' => 'form-check-input form-check-radio',
+                        'id' => 'isDefault'
+                    ]
+                ) }}
+                <label for="isDefault" class="form-check-label">このメッセージをデフォルトとして設定する</label>
             </div>
         </div>
         <div class="col-12 mb-3">
@@ -367,7 +355,7 @@
         </div>
     </div>
     <div class="d-flex align-items-center justify-content-end mt-3 footer-buttons gap-2">
-        <a href="{{ route('situation.index') }}" class="btn btn-secondary">戻る</a>
+        <a href="{{ route('situation.push.index') }}" class="btn btn-secondary">戻る</a>
         <button type="submit" class="btn btn-primary">追加</button>
     </div>
 </form>

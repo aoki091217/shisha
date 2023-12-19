@@ -5,19 +5,29 @@
 @endpush
 
 @section('content')
-{{ Breadcrumbs::render('situation.show', $situation->id) }}
+{{ Breadcrumbs::render('situation.reply.show', $situation->id) }}
 <div class="d-flex flex-wrap">
-    <div class="col-4 mb-3 pe-2">
+    <div class="col-3 mb-3 pe-2">
         <label class="form-label">店舗</label>
         <div>{{ $situation->shop->name }}</div>
     </div>
-    <div class="col-4 mb-3 pe-2">
+    <div class="col-3 mb-3 pe-2">
         <label class="form-label">シチュエーション名</label>
         <div>{{ $situation->name }}</div>
     </div>
-    <div class="col-4 mb-3 ps-2">
-        <label class="form-label"> 受信イベント</label>
+    <div class="col-3 mb-3 ps-2">
+        <label class="form-label">受信イベント</label>
         <div>{{ $situation->receive_event }}</div>
+    </div>
+    <div class="col-3 mb-3 ps-2">
+        <label class="form-label">初期設定</label>
+        <div>
+            @if ($situation->is_default)
+                <i class="fa-solid fa-square-check"></i>
+            @else
+                <i class="fa-regular fa-square"></i>
+            @endif
+        </div>
     </div>
     <div class="col-12 mb-3">
         <div class="accordion mb-3" id="accordionMessages">
@@ -112,9 +122,9 @@
     </div>
 </div>
 <div class="d-flex align-items-center justify-content-end mt-3 footer-buttons gap-2">
-    <a href="{{ route('situation.index') }}" class="btn btn-secondary">戻る</a>
-    <a href="{{ route('situation.edit', $situation->id) }}" class="btn btn-success">編集</a>
-    <button type="button" class="btn btn-danger" id="deleteButton" data-route="{{ route('situation.destroy', $situation->id) }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
+    <a href="{{ route('situation.reply.index') }}" class="btn btn-secondary">戻る</a>
+    <a href="{{ route('situation.reply.edit', $situation->id) }}" class="btn btn-success">編集</a>
+    <button type="button" class="btn btn-danger" id="deleteButton" data-route="{{ route('situation.reply.destroy', $situation->id) }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
         削除
     </button>
 </div>

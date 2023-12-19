@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin\Situation;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SituationRequest;
@@ -10,47 +10,52 @@ use App\Models\Message;
 use App\Models\Situation;
 use App\Repositories\ShopRepository;
 use App\Services\SessionService;
+use App\Services\SituationService;
 use DB;
 use Illuminate\Http\Request;
 use Route;
 
-class SituationController extends Controller
+class PushController extends Controller
 {
     public function __construct(
         private ShopRepository $shopRepository,
-        private SessionService $sessionService
+        private SessionService $sessionService,
+        private SituationService $situationService
     ) {}
 
     public function index(Request $request)
     {
+        $eventType = $this->situationService->getSituationType('push');
+
         if (auth()->user()->role_id === 1) {
-            $situations = Situation::with('messages')->search($request->situation)->paginate();
+            $situations = Situation::with('messages')->whereIn('event_type', $eventType)->search($request->situation)->paginate();
         } else {
             $situations = Situation::with('messages')
                 ->where('shop_id', auth()->user()->member->shop_id)
+                ->whereIn('event_type', $eventType)
                 ->search($request->situation)
                 ->paginate();
         }
 
-        return view('situation.index', compact('situations'));
+        return view('situation.push.index', compact('situations'));
     }
 
     public function create()
     {
         $shops = $this->shopRepository->get();
 
-        return view('situation.create', compact('shops'));
+        return view('situation.push.create', compact('shops'));
     }
 
     public function store(SituationRequest $request)
     {
         DB::transaction(function () use ($request) {
             $situation = new Situation();
-            $situation->fill($request->situation)->save();
+            $situation->fill(array_merge($request->situation, ['event_type' => 5]))->save();
 
             foreach ($request->situation['messages'] as $templateIndex => $template) {
 
-                $insert = array_merge($template, ['situation_id' => $situation->id], ['send_type' => 2]);
+                $insert = array_merge($template, ['situation_id' => $situation->id], ['send_type' => 1]);
                 switch ($template['message_type']) {
                     case 'text':
                         $insert = array_merge($insert, ['type' => 1]);
@@ -104,7 +109,7 @@ class SituationController extends Controller
 
         $this->sessionService->putFlashMessage(config('const.session.flash.stored'));
 
-        return redirect()->route('situation.index');
+        return redirect()->route('situation.push.index');
     }
 
     public function show($id)
@@ -115,7 +120,7 @@ class SituationController extends Controller
             return redirect()->route("{$current}.index");
         }
 
-        return view('situation.show', compact('situation'));
+        return view('situation.push.show', compact('situation'));
     }
 
     public function edit($id)
@@ -128,7 +133,7 @@ class SituationController extends Controller
             return redirect()->route("{$current}.index");
         }
 
-        return view('situation.edit', compact('situation', 'shops'));
+        return view('situation.push.edit', compact('situation', 'shops'));
     }
 
     public function update(SituationRequest $request, $id)
@@ -147,7 +152,7 @@ class SituationController extends Controller
 
             foreach ($request->situation['messages'] as $templateIndex => $template) {
 
-                $insert = array_merge($template, ['situation_id' => $situation->id], ['send_type' => 2]);
+                $insert = array_merge($template, ['situation_id' => $situation->id], ['send_type' => 1]);
                 switch ($template['message_type']) {
                     case 'text':
                         $insert = array_merge($insert, ['type' => 1]);
@@ -200,7 +205,7 @@ class SituationController extends Controller
 
         $this->sessionService->putFlashMessage(config('const.session.flash.updated'));
 
-        return redirect()->route('situation.index');
+        return redirect()->route('situation.push.index');
     }
 
     public function destroy($id)
@@ -208,7 +213,7 @@ class SituationController extends Controller
         $situation = Situation::with('messages.carousels.carouselActions')->find($id);
         if (is_null($situation)) {
             $current = strstr(Route::currentRouteName(), '.', true);
-            return redirect()->route("{$current}.index");
+            return redirect()->route("{$current}.push.index");
         }
 
         foreach ($situation->messages as $message) {
@@ -218,6 +223,6 @@ class SituationController extends Controller
         }
 
         $situation->delete();
-        return redirect()->route('situation.index');
+        return redirect()->route('situation.push.index');
     }
 }

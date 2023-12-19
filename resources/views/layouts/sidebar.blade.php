@@ -60,11 +60,35 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('situation.index') }}" class="nav-link {{ $routeService->getActiveForTab('situation.*') }}">
-                <i class="fa-regular fa-comment-dots"></i>
-                メッセージ
+            <a href="{{ route('situation.follow.index') }}" class="nav-link {{ $routeService->getActiveForTab('situation.follow.*') }}">
+                <i class="fa-solid fa-user-plus"></i>
+                友達追加メッセージ
             </a>
         </li>
+        <li>
+            <a href="{{ route('situation.question.index') }}" class="nav-link {{ $routeService->getActiveForTab('situation.question.*') }}">
+                <i class="fa-solid fa-clipboard-question"></i>
+                アンケート
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('situation.reply.index') }}" class="nav-link {{ $routeService->getActiveForTab('situation.reply.*') }}">
+                <i class="fa-solid fa-reply"></i>
+                応答メッセージ
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('situation.push.index') }}" class="nav-link {{ $routeService->getActiveForTab('situation.push.*') }}">
+                <i class="fa-regular fa-comment-dots"></i>
+                プッシュメッセージ
+            </a>
+        </li>
+        {{-- <li>
+            <a href="{{ route('situation.push.index') }}" class="nav-link {{ $routeService->getActiveForTab('situation.push.*') }}">
+                <i class="fa-regular fa-comment-dots"></i>
+                プッシュメッセージ
+            </a>
+        </li> --}}
         @endif
     </ul>
 </div>

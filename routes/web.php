@@ -8,7 +8,10 @@ use App\Http\Controllers\Admin\FlavorController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\MixController;
-use App\Http\Controllers\Admin\SituationController;
+use App\Http\Controllers\Admin\Situation\FollowController;
+use App\Http\Controllers\Admin\Situation\PushController;
+use App\Http\Controllers\Admin\Situation\QuestionController;
+use App\Http\Controllers\Admin\Situation\ReplyController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Line\LoginController as LineLoginController;
@@ -80,5 +83,22 @@ Route::middleware('auth')->group(function () {
     Route::resource('/customer', CustomerController::class)->only(['index', 'show'])->parameters(['customer' => 'id']);
 
     Route::resource('/user', UserController::class)->middleware('role:mid')->except('show')->parameters(['user' => 'id']);
-    Route::resource('/situation', SituationController::class)->middleware('role:mid')->parameters(['situation' => 'id']);
+
+    Route::prefix('situation')->as('situation.')->middleware('role:mid')->group(function () {
+        Route::prefix('follow')->as('follow.')->group(function () {
+            Route::resource('/', FollowController::class)->parameters(['' => 'id']);
+        });
+
+        Route::prefix('question')->as('question.')->group(function () {
+            Route::resource('/', QuestionController::class)->parameters(['' => 'id']);
+        });
+
+        Route::prefix('reply')->as('reply.')->group(function () {
+            Route::resource('/', ReplyController::class)->parameters(['' => 'id']);
+        });
+
+        Route::prefix('push')->as('push.')->group(function () {
+            Route::resource('/', PushController::class)->parameters(['' => 'id']);
+        });
+    });
 });
