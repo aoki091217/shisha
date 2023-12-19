@@ -125,7 +125,6 @@ class CustomerShopRepository
 
     public function store($customer, $checkin)
     {
-	\Log::debug($customer);
         $customer_shop = new CustomerShop();
         $customer_shop->fill(array_merge($checkin, [
             'customer_id' => $customer->id
