@@ -12,6 +12,8 @@ class Shop extends Model
     use HasFactory;
     use SoftDeletes;
 
+    public const SHOP_ID = 'shop_id';
+
     protected $primaryKey = 'shop_id';
 
     protected $fillable = [

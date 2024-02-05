@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BillRequest;
+use App\Models\BillCustomer;
+use App\Models\BillOrder;
 use App\Models\Situation;
 use App\Repositories\BillRepository;
 use App\Repositories\CustomerRepository;
@@ -11,6 +13,7 @@ use App\Repositories\CustomerShopRepository;
 use App\Repositories\MemberRepository;
 use App\Repositories\MixRepository;
 use App\Repositories\ShopRepository;
+use App\Services\BillService;
 use App\Services\LineBotService;
 use App\Services\SessionService;
 use Illuminate\Http\Request;
@@ -19,6 +22,7 @@ use Illuminate\Support\Collection;
 class BillController extends Controller
 {
     public function __construct(
+        private BillService $billService,
         private BillRepository $billRepository,
         private MixRepository $mixRepository,
         private ShopRepository $shopRepository,

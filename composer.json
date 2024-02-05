@@ -13,7 +13,8 @@
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "laravelcollective/html": "^6.3",
-        "linecorp/line-bot-sdk": "^3.6"
+        "linecorp/line-bot-sdk": "^3.6",
+        "vinkla/hashids": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12",
