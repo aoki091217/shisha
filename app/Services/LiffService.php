@@ -51,11 +51,12 @@ class LiffService
     {
         $state = Str::random(32);
         $nonce  = Str::random(32);
+        $domain = app()->isProduction() ? env('APP_URL') : env('APP_NGROK');
 
         $uri = 'https://access.line.me/oauth2/v2.1/authorize?';
         $response_type = 'response_type=code';
         $client_id = '&client_id='.config('services.line.client_id');
-        $redirect_uri ='&redirect_uri='. route('line.saveLiff');
+        $redirect_uri = "&redirect_uri={$domain}/api/line/save_liff";
         $state_uri = "&state={$state}";
         $scope = '&scope=openid%20profile';
         $prompt = '&prompt=consent';

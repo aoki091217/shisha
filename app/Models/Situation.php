@@ -13,6 +13,11 @@ class Situation extends Model
     use HasFactory;
     use SoftDeletes;
 
+    public const SHOP_ID = 'shop_id';
+    public const NAME = 'name';
+    public const EVENT_TYPE = 'event_type';
+    public const IS_DEFAULT = 'is_default';
+
     protected $fillable = [
         'shop_id',
         'name',

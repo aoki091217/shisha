@@ -180,4 +180,21 @@ Breadcrumbs::for('situation.push.edit', function ($trail, $id) {
     $trail->parent('situation.push.show', $id);
     $trail->push('編集', route('situation.push.edit', $id));
 });
+
+
+Breadcrumbs::for('code.index', function ($trail) {
+    $trail->push('一覧', route('code.index'));
+});
+Breadcrumbs::for('code.create', function ($trail) {
+    $trail->parent('code.index');
+    $trail->push('登録', route('code.create'));
+});
+Breadcrumbs::for('code.show', function ($trail, $id) {
+    $trail->parent('code.index');
+    $trail->push('詳細', route('code.show', $id));
+});
+Breadcrumbs::for('code.edit', function ($trail, $id) {
+    $trail->parent('code.show', $id);
+    $trail->push('編集', route('code.edit', $id));
+});
 ?>

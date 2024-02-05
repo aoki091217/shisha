@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\HomeViewController;
 use App\Http\Controllers\Admin\BlandController;
 use App\Http\Controllers\Admin\BillController;
+use App\Http\Controllers\Admin\CodeController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\FlavorController;
 use App\Http\Controllers\Admin\ShopController;
@@ -100,5 +101,9 @@ Route::middleware('auth')->group(function () {
         Route::prefix('push')->as('push.')->group(function () {
             Route::resource('/', PushController::class)->parameters(['' => 'id']);
         });
+    });
+
+    Route::prefix('code')->as('code.')->middleware('role:mid')->group(function () {
+        Route::resource('/', CodeController::class)->parameters(['' => 'id']);
     });
 });

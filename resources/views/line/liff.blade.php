@@ -13,7 +13,7 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>タイトル</title>
+        <title></title>
 
         <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
 
@@ -28,9 +28,14 @@
         <!-- End Google Tag Manager (noscript) -->
     </body>
 
+    @php
+        $domain = app()->isProduction() ? env('APP_URL') : env('APP_NGROK');
+    @endphp
+
     <script>
         const queryParams = @json($request->session()->get('query_params'));
         const timeout = 2000;
+        const domain = @json($domain)
 
         setTimeout(() => {
             liff.init({
@@ -53,7 +58,7 @@
                     headers: {
                         'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')
                     },
-                    url: @json(route('line.saveLiff')),
+                    url: `${domain}/api/line/save_liff`,
                     method: 'POST',
                     data: {
                         line_token: profile.userId,
@@ -61,6 +66,7 @@
                     }
                 })
                 .done(function (response) {
+                    console.log(response);
                     window.location.href = @json($lineUrl);
                 })
                 .fail(function (error) {
