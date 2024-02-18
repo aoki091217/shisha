@@ -8,6 +8,15 @@ use DB;
 
 class CodeRepository
 {
+    public function get()
+    {
+        if (auth()->user()->role_id === 1) {
+            return Code::get();
+        } else {
+            return Code::where('shop_id', auth()->user()->member->shop_id)->get();
+        }
+    }
+
     public function findByCodeId(int $codeId): Code
     {
         return Code::find($codeId);

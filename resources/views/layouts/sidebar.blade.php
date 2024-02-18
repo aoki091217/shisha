@@ -6,12 +6,12 @@
                 ホーム
             </a>
         </li>
-        <li>
-            <a href="{{ route('home.index') }}" class="nav-link py-1 {{ $routeService->getActiveForTab('home.*') }}">
+        {{-- <li>
+            <a href="{{ route('report.index') }}" class="nav-link py-1 {{ $routeService->getActiveForTab('report.*') }}">
                 <i class="fa-regular fa-newspaper"></i>
                 レポート
             </a>
-        </li>
+        </li> --}}
         @if (auth()->user()->role_id === 1)
         <li>
             <a href="{{ route('shop.index') }}" class="nav-link py-1 {{ $routeService->getActiveForTab('shop.*') }}">

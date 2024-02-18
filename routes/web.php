@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\FlavorController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\MixController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\Situation\FollowController;
 use App\Http\Controllers\Admin\Situation\PushController;
 use App\Http\Controllers\Admin\Situation\QuestionController;
@@ -59,6 +60,8 @@ Route::controller(LineLoginController::class)->as('line.')->prefix('line')->grou
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeViewController::class, 'index'])->name('home.index');
+
+    // Route::get('/report', [ReportController::class, 'index'])->name('report.index');
 
     Route::prefix('shop')->as('shop.')->middleware('role:high')->group(function () {
         Route::resource('/', ShopController::class)->except('show')->parameters(['' => 'id']);
