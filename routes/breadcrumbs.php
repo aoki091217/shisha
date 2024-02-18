@@ -197,4 +197,9 @@ Breadcrumbs::for('code.edit', function ($trail, $id) {
     $trail->parent('code.show', $id);
     $trail->push('編集', route('code.edit', $id));
 });
+
+
+Breadcrumbs::for('report.index', function ($trail) {
+    $trail->push('レポート', route('report.index'));
+});
 ?>

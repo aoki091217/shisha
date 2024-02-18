@@ -65,6 +65,7 @@ class LiffService
 
         return $uri . $response_type . $client_id . $redirect_uri . $state_uri . $scope . $prompt . $nonce_uri . $bot_prompt;
     }
+
 }
 
 ?>
