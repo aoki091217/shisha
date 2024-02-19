@@ -23,7 +23,7 @@ class LoginController extends Controller
     {
         $decode = $this->codeService->getCheckinDecode($request);
 
-        $lineBotService = new LineBotService($decode['shop_id']);
+        $lineBotService = new LineBotService($request['shop_id']);
         $lineUrl = $lineBotService->getLineUrlWithMessage();
 
         return view('line.checkin', compact('lineUrl'));

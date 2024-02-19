@@ -39,7 +39,7 @@ class CodeService
 
     public function getCheckinDecode(Request $request): array
     {
-        $codeStr = collect($request->all())->keys()->first();
+	$codeStr = collect($request->all())->keys()->first();
         $code = Code::where('hash', $codeStr)->first();
         if (is_null($code)) {
             return [];
