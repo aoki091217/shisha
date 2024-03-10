@@ -22,6 +22,7 @@ export default defineConfig({
                 'resources/js/user.js',
                 'resources/js/bill.js',
                 'resources/js/mix.js',
+                'resources/js/code.js',
                 'resources/js/situation.js'
             ],
             refresh: true,
