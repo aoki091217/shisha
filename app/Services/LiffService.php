@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Requests\Api\LineRequest;
+use App\Http\Requests\ReportRequest;
 use App\Models\Liff;
 use App\Models\Shop;
 use Str;
@@ -16,6 +17,7 @@ class LiffService
 
             $liff = new Liff();
             $liff->fill([
+                'shop_id' => $request->getQueryParams()['sid'],
                 'line_token' => $request->getLineToken(),
                 'query' => $queryParam
             ])->save();
@@ -66,6 +68,21 @@ class LiffService
         return $uri . $response_type . $client_id . $redirect_uri . $state_uri . $scope . $prompt . $nonce_uri . $bot_prompt;
     }
 
+    public function getPeriodReport(ReportRequest $reportRequest): array
+    {
+        $period = [
+            'start_year' => now()->year,
+            'end_year' => now()->year
+        ];
+        if (isset($reportRequest[ReportRequest::START_YEAR]) && isset($reportRequest[ReportRequest::END_YEAR])) {
+            $period = [
+                'start_year' => $reportRequest[ReportRequest::START_YEAR],
+                'end_year' => $reportRequest[ReportRequest::END_YEAR]
+            ];
+        }
+
+        return $period;
+    }
 }
 
 ?>
