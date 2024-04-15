@@ -7,9 +7,10 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ReportRequest extends FormRequest
 {
-    const START_DATE = 'start_date';
-    const END_DATE = 'end_date';
+    const START_YEAR = 'start_year';
+    const END_YEAR = 'end_year';
     const HASH = 'hash';
+    const QUERY = 'query';
 
     /**
      * Determine if the user is authorized to make this request.
@@ -33,14 +34,14 @@ class ReportRequest extends FormRequest
         ];
     }
 
-    public function getStartDate(): Carbon
+    public function getStartYear(): Carbon
     {
-        return Carbon::parse($this->{self::START_DATE});
+        return Carbon::parse($this->{self::START_YEAR});
     }
 
-    public function getEndDate(): Carbon
+    public function getEndYear(): Carbon
     {
-        return Carbon::parse($this->{self::END_DATE});
+        return Carbon::parse($this->{self::END_YEAR});
     }
 
     public function getHash(): ?string
@@ -48,4 +49,8 @@ class ReportRequest extends FormRequest
         return $this->{self::HASH};
     }
 
+    public function getQuery(): ?string
+    {
+        return $this->{self::QUERY};
+    }
 }
