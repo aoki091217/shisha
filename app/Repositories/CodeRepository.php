@@ -24,7 +24,7 @@ class CodeRepository
 
     public function findByHash(string $hash): Code
     {
-        return Code::where(Code::HASH, $hash)->first();
+        return Code::where(Code::HASH, $hash)->firstOrNew();
     }
 
 
