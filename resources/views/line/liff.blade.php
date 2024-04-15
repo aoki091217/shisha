@@ -17,7 +17,7 @@
     </head>
 
     @php
-        $domain = app()->isProduction() ? env('APP_URL') . '/shisha' : env('APP_NGROK');
+        $domain = app()->isProduction() ? config('app.url') . '/shisha' : config('app.ngrok');
     @endphp
 
     <script>

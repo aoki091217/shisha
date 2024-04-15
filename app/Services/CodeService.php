@@ -27,7 +27,7 @@ class CodeService
 
     public function getHashedUrl(int $codeId)
     {
-        $domain = app()->isProduction() ? env('APP_URL') : env('APP_NGROK');
+        $domain = app()->isProduction() ? config('app.url') : config('app.ngrok');
 
         $code = Code::find($codeId);
         $hash = $code->getHash();
