@@ -53,7 +53,7 @@ class LiffService
     {
         $state = Str::random(32);
         $nonce  = Str::random(32);
-        $domain = app()->isProduction() ? env('APP_URL') : env('APP_NGROK');
+        $domain = app()->isProduction() ? env('APP_URL') . '/shisha' : env('APP_NGROK');
 
         $uri = 'https://access.line.me/oauth2/v2.1/authorize?';
         $response_type = 'response_type=code';
