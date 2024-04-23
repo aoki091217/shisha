@@ -27,12 +27,12 @@ class CodeService
 
     public function getHashedUrl(int $codeId)
     {
-        $domain = app()->isProduction() ? config('app.url') : config('app.ngrok');
+        $domain = app()->isProduction() ? config('app.url') . '/shisha' : config('app.ngrok');
 
         $code = Code::find($codeId);
         $hash = $code->getHash();
         $kind = $code->getKind();
-        $prefix = $kind == 1 ? $domain . '/shisha/line/liff/' : $domain . '/shisha/line/checkin';
+        $prefix = $kind == 1 ? $domain . '/line/liff/' : $domain . '/line/checkin';
 
         return $prefix . '?' . $hash;
     }

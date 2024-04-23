@@ -13,11 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('liffs', function (Blueprint $table) {
-            $table->bigIncrements('liff_id');
-            $table->foreignId('shop_id');
-            $table->string('line_token');
-            $table->string('query');
+        Schema::create('liff_accesses', function (Blueprint $table) {
+            $table->id();
+            $table->string('ip');
+            $table->string('liff_id', 50);
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('liffs');
+        Schema::dropIfExists('liff_accesses');
     }
 };

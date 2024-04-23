@@ -23,6 +23,7 @@ class ShopController extends Controller
     public function index(Request $request)
     {
         $shops = $this->shopRepository->relate()->search($request->shop)->paginate();
+
         return view('shop.index', compact('shops'));
     }
 

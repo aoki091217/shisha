@@ -21,7 +21,8 @@ class Shop extends Model
         'user_id',
         'account_id',
         'line_token',
-        'channel_secret'
+        'channel_secret',
+        'liff_id'
     ];
 
     public function blands()

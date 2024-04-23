@@ -44,7 +44,7 @@ class LiffService
         }
 
         $parameter = "?sid={$shop->shop_id}";
-        $liffUrl = 'https://liff.line.me/' . config('services.line.liff_id') . $parameter;
+        $liffUrl = 'https://liff.line.me/' . $shop->liff_id . $parameter;
 
         return $liffUrl;
     }
