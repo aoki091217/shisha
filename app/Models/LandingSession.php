@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use DB;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,36 +13,26 @@ class LandingSession extends Model
     use SoftDeletes;
 
     public const CONVERSION_STATUS_MARK_CONVERSION = 'mark_conversion';
+    public const CONVERSION_STATUS_INVALID_FRIEND_STATUS = 'invalid_friend_status';
+    public const CONVERSION_STATUS_INVALID_LIFF_STATUS = 'invalid_liff_status';
+    public const CONVERSION_STATUS_CUSTOMER_ALREADY_REGISTERED = 'already_registered';
     public const CONVERSION_STATUSES = [
-        self::FRIEND_STATUS_FOLLOWED,
-        self::FRIEND_STATUS_UNFOLLOWED,
-        self::FRIEND_STATUS_UNKNOWN,
+        self::CONVERSION_STATUS_MARK_CONVERSION,
+        self::CONVERSION_STATUS_INVALID_FRIEND_STATUS,
+        self::CONVERSION_STATUS_INVALID_LIFF_STATUS,
+        self::CONVERSION_STATUS_CUSTOMER_ALREADY_REGISTERED,
     ];
 
-    protected $fillable = [
-        'customer_id',
-        'shop_id',
-        'visited_at'
+    protected $guarded = [
+        'id',
     ];
 
-    protected function friendStatus(): Attribute
+    protected function conversionStatus(): Attribute
     {
         return Attribute::make(
             set: function (string $value) {
-                if (!in_array($value, self::FRIEND_STATUSES)) {
+                if (!in_array($value, self::CONVERSION_STATUSES)) {
                     throw new \InvalidArgumentException('Invalid friend_status');
-                }
-                return $value;
-            },
-        );
-    }
-
-    protected function liffStatus(): Attribute
-    {
-        return Attribute::make(
-            set: function (string $value) {
-                if (!in_array($value, self::LIFF_STATUSES)) {
-                    throw new \InvalidArgumentException('Invalid liff_status');
                 }
                 return $value;
             },
