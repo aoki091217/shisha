@@ -66,6 +66,18 @@
         ) }}
         <span class="text-danger">{{ $errors->first('shop.liff_id') }}</span>
     </div>
+    <label for="liffChannelId" class="form-label">Liff チャネルID<span class="text-danger">※</span></label>
+    <div class="col-8 mb-3">
+        {{ Form::text(
+            'shop[liff_channel_id]',
+            old('shop.liff_channel_id', $shop->liff_channel_id),
+            [
+                'class' => 'form-control',
+                'id' => 'liffChannelId'
+            ]
+        ) }}
+        <span class="text-danger">{{ $errors->first('shop.liff_channel_id') }}</span>
+    </div>
     <div class="col-8 d-flex align-items-center justify-content-end mt-3 footer-buttons gap-2">
         <a href="{{ route('shop.index') }}" class="btn btn-secondary">戻る</a>
         <button type="submit" class="btn btn-primary">更新</button>

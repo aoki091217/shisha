@@ -29,7 +29,9 @@ class ShopRequest extends FormRequest
             'shop.name' => 'required|max:50',
             'shop.account_id' => 'nullable',
             'shop.line_token' => 'nullable',
-            'shop.channel_secret' => 'nullable'
+            'shop.channel_secret' => 'nullable',
+            'shop.liff_id' => 'nullable',
+            'shop.liff_channel_id' => 'nullable',
         ];
     }
 
