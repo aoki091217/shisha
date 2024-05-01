@@ -22,7 +22,13 @@ class Shop extends Model
         'account_id',
         'line_token',
         'channel_secret',
-        'liff_id'
+        'liff_channel_id',
+        'liff_id',
+    ];
+
+    protected $hidden = [
+        'line_token',
+        'channel_secret',
     ];
 
     public function blands()
