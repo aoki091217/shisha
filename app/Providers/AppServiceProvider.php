@@ -25,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // ngrok使っているとroute()で生成されるURLがhttpsにならないときがあるのでその対策
+        if ($this->app->environment('local')) {
+            \URL::forceScheme('https');
+        }
+
         Paginator::useBootstrapFive();
         Paginator::defaultView('layouts.paginator');
     }
