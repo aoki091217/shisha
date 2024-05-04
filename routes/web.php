@@ -60,6 +60,9 @@ Route::controller(LineLoginController::class)->as('line.')->prefix('line')->grou
 
 Route::controller(LiffController::class)->as('liff.')->prefix('line/liff/{shop_id}')->group(function () {
     Route::get('/', 'index')->name('index');
+    Route::get('/code', 'code')->name('code');
+    Route::get('/callback/{session_token}', 'callback')->name('callback');
+    Route::get('/callback/{session_token}/thanks', 'thanks')->name('thanks');
 
     // LIFF認証用のエンドポイント
     Route::post('/verify', 'verify')->name('verify');

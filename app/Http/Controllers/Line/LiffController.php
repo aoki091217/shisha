@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Line;
 
 use App\External\Line\LineLoginApi;
 use App\Http\Controllers\Controller;
+use App\Models\LandingSession;
 use App\Models\Shop;
+use App\Repositories\CodeRepository;
+use App\Repositories\LandingSessionRepository;
 use App\Repositories\ShopRepository;
 use App\Services\CustomerService;
-use App\Services\LineBotService;
+use App\Services\LandingSessionService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -28,7 +31,46 @@ class LiffController extends Controller
     public function index(Request $request): View
     {
         $shop = $this->getShop($request);
-        return view('line.liff.index', compact('shop'));
+        $session = null;
+        return view('line.liff', compact('shop', 'session'));
+    }
+
+    /**
+     * 広告トラッキングのランディングページ
+     * @param Request $request
+     * @param LandingSessionRepository $landingSessionRepository
+     * @return View
+     */
+    public function code(
+        Request $request,
+        LandingSessionRepository $landingSessionRepository,
+    ): View
+    {
+        $shop = $this->getShop($request);
+        $session = $landingSessionRepository->store($shop, $request->query(), $request->header('referer'));
+
+        return view('line.liff', compact('shop', 'session'));
+    }
+
+    /**
+     * 広告トラッキングでLIFF認証後のリダイレクトページ
+     * @param Request $request
+     * @param LandingSessionRepository $landingSessionRepository
+     * @return View
+     */
+    public function callback(
+        Request $request,
+        LandingSessionRepository $landingSessionRepository,
+    ): View
+    {
+        $shop = $this->getShop($request);
+        $sessionToken = $request->route('session_token');
+        $session = $landingSessionRepository->findByToken($sessionToken);
+        if (!$session || $session->shop_id !== $shop->shop_id) {
+            throw new HttpResponseException(response('not found', 404));
+        }
+
+        return view('line.liff', compact('shop', 'session'));
     }
 
     /**
@@ -40,6 +82,7 @@ class LiffController extends Controller
         Request $request,
         LineLoginApi $loginApi,
         CustomerService $customerService,
+        LandingSessionService $landingSessionService,
     ): JsonResponse
     {
         $shop = $this->getShop($request);
@@ -62,14 +105,68 @@ class LiffController extends Controller
 
         $data = $customerService->storeByLineUser($shop, $lineUser);
 
-        $lineBotService = new LineBotService($shop->shop_id);
-        $redirectUri = $lineBotService->getLineUrl();
+        // セッションを更新する
+        if ($sessionToken) {
+            try {
+                $session = $landingSessionService->completeSession($sessionToken, $data['customer'], $data['conversion_status']);
+                if ($session->conversion_status === LandingSession::CONVERSION_STATUS_MARK_CONVERSION) {
+                    // コンバージョン判定の時のみサンクスページにリダイレクト
+                    return response()->json([
+                        'redirectUri' => route('liff.thanks', ['shop_id' => $shop->shop_id, 'session_token' => $session->session_token]),
+                    ]);
+                }
+            } catch (\InvalidArgumentException $e) {
+                // ユーザー起因で発生しうるエラーだが、念のためwarningエラーとして記録しておく
+                \Log::warning($e->getMessage(), [
+                    'shop_id' => $shop->shop_id,
+                    'session_token' => $sessionToken,
+                ]);
+            }
+        }
 
-        // TODO: セッション周りの処理
-
+        // 非コンバージョン判定時はLINEのルームに遷移
         return response()->json([
-            'redirectUri' => $redirectUri,
+            'redirectUri' => $shop->getRoomUri(),
         ]);
+    }
+
+    /**
+     * コンバージョン発生時にコンバージョンタグを発火させるためのページ
+     * このページにLIFFのタグは入っていない
+     * @param Request $request
+     * @param LandingSessionRepository $landingSessionRepository
+     * @param CodeRepository $codeRepository
+     * @return View
+     */
+    public function thanks(
+        Request $request,
+        LandingSessionRepository $landingSessionRepository,
+        CodeRepository $codeRepository,
+    ): View
+    {
+        $shop = $this->getShop($request);
+        $sessionToken = $request->route('session_token');
+        $session = $landingSessionRepository->findByToken($sessionToken);
+        if (!$session || $session->shop_id !== $shop->shop_id || $session->conversion_status !== LandingSession::CONVERSION_STATUS_MARK_CONVERSION) {
+            throw new HttpResponseException(response('not found', 404));
+        }
+
+        $script = null;
+        try {
+            $hash = $session->parameters['hash'] ?? null;
+            if ($hash) {
+                $code = $codeRepository->findByHash($hash);
+                $script = $code->script;
+            }
+        } catch (\Throwable $e) {
+            // ここのエラーはログだけ残して握りつぶす
+            \Log::error($e->getMessage(), [
+                'shop_id' => $shop->shop_id,
+                'session_token' => $sessionToken,
+            ]);
+        }
+
+        return view('line.thanks', compact('shop', 'session', 'script'));
     }
 
     /**

@@ -57,4 +57,14 @@ class Shop extends Model
             return $query->where('name', 'LIKE', "%{$words['name']}%");
         }
     }
+
+    /**
+     * LINEのルームに遷移するURI
+     * @see: https://developers.line.biz/ja/docs/line-login/using-line-url-scheme/#opening-chat-screen
+     * @return string
+     */
+    public function getRoomUri(): string
+    {
+        return 'https://line.me/R/ti/p/' . urlencode($this->account_id);
+    }
 }

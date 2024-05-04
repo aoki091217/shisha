@@ -32,9 +32,10 @@ class CodeService
         $code = Code::find($codeId);
         $hash = $code->getHash();
         $kind = $code->getKind();
-        $prefix = $kind == 1 ? $domain . '/line/liff/' : $domain . '/line/checkin';
+        // TODO: `route()`を使ってURLを作るようにする
+        $prefix = $kind == 1 ? $domain . "/line/liff/{$code->shop_id}/code" : $domain . '/line/checkin';
 
-        return $prefix . '?' . $hash;
+        return $prefix . '?' . http_build_query(['hash' => $hash]);
     }
 
     public function getCheckinDecode(Request $request): array
