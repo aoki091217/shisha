@@ -35,7 +35,7 @@ class LineLoginApi
         if (!isset($verify['client_id']) || $verify['client_id'] !== $shop->liff_channel_id) {
             \Log::error('Invalid access_token', [
                 'endpoint' => '/oauth2/v2.1/verify',
-                'shopId' => $shop->id,
+                'shopId' => $shop->shop_id,
                 'response' => $verifyResponse->getBody(),
                 'status' => $verifyResponse->getStatusCode(),
             ]);
@@ -52,7 +52,7 @@ class LineLoginApi
         if (!isset($userinfo['sub'])) {
             \Log::error('Invalid token', [
                 'endpoint' => '/oauth2/v2.1/userinfo',
-                'shopId' => $shop->id,
+                'shopId' => $shop->shop_id,
                 'response' => $userinfoResponse->getBody(),
                 'status' => $userinfoResponse->getStatusCode(),
             ]);
@@ -69,7 +69,7 @@ class LineLoginApi
         if (!isset($friendship['friendFlag'])) {
             \Log::error('Invalid token', [
                 'endpoint' => '/friendship/v1/status',
-                'shopId' => $shop->id,
+                'shopId' => $shop->shop_id,
                 'response' => $friendshipResponse->getBody(),
                 'status' => $friendshipResponse->getStatusCode(),
             ]);
