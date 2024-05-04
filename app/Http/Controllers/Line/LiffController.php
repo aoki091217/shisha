@@ -47,7 +47,7 @@ class LiffController extends Controller
         $sessionToken = $request->input('sessionToken');
 
         if (!$accessToken) {
-            return response()->json(['error' => 'invalid token'], JsonResponse::HTTP_UNAUTHORIZED);
+            return response()->json(['error' => 'token is required'], JsonResponse::HTTP_UNAUTHORIZED);
         }
 
         try {
