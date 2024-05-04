@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Line;
 
+use App\External\Line\LineLoginApi;
 use App\Http\Controllers\Controller;
 use App\Models\Shop;
 use App\Repositories\ShopRepository;
+use App\Services\CustomerService;
+use App\Services\LineBotService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class LiffController extends Controller
 {
@@ -31,12 +34,42 @@ class LiffController extends Controller
     /**
      * accessTokenでLINE認証を行うAPI
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
-    public function verify(Request $request): Response
+    public function verify(
+        Request $request,
+        LineLoginApi $loginApi,
+        CustomerService $customerService,
+    ): JsonResponse
     {
-        // TODO
-        return response('ISE', 500);
+        $shop = $this->getShop($request);
+        $accessToken = $request->input('accessToken');
+        $sessionToken = $request->input('sessionToken');
+
+        if (!$accessToken) {
+            return response()->json(['error' => 'invalid token'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        try {
+            $lineUser = $loginApi->verifyByAccessToken($shop, $accessToken);
+        } catch (\Exception $e) {
+            \Log::error('LINE verify error', [
+                'shop_id' => $shop->shop_id,
+                'error' => $e->getMessage(),
+            ]);
+            return response()->json(['error' => 'invalid token'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        $data = $customerService->storeByLineUser($shop, $lineUser);
+
+        $lineBotService = new LineBotService($shop->shop_id);
+        $redirectUri = $lineBotService->getLineUrl();
+
+        // TODO: セッション周りの処理
+
+        return response()->json([
+            'redirectUri' => $redirectUri,
+        ]);
     }
 
     /**
