@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Customer;
 use App\Models\CustomerShop;
 use App\Models\External\LineUser;
+use App\Models\LandingSession;
 use App\Models\Shop;
 use App\Repositories\CustomerRepository;
 use App\Repositories\CustomerShopRepository;
@@ -21,7 +22,7 @@ class CustomerService
      * LineUserからCustomerとCustomerShopを登録/更新する
      * @param Shop $shop
      * @param LineUser $lineUser
-     * @return array{customer: Customer, customer_shop: CustomerShop, isConversion: bool, markActivated: bool}
+     * @return array{customer: Customer, customer_shop: CustomerShop, conversion_status: string}
      * @throws \Throwable
      */
     public function storeByLineUser(Shop $shop, LineUser $lineUser)
@@ -34,8 +35,17 @@ class CustomerService
 
         // Note: 未登録の顧客の場合でも、LIFF認証で友だち登録したときのWebHookでCustomerShopのレコードが既に存在する可能性がある
         $markActivated = $lineUser->is_friend && $lineUser->is_liff_active && (!$customer_shop || !$customer_shop->activated_at);
-        // TODO: 条件あとで考え直す
-        $isConversion = $markActivated && (!$customer_shop || !$customer_shop->activated_at || $customer_shop->created_at->clone()->addMinutes(5)->isFeature());
+        if (!$lineUser->is_friend) {
+            $conversion_status = LandingSession::CONVERSION_STATUS_INVALID_FRIEND_STATUS;
+        } elseif ($customer_shop && $customer_shop->activated_at) {
+            $conversion_status = LandingSession::CONVERSION_STATUS_ALREADY_ACTIVATED;
+        } elseif ($customer_shop && $customer_shop->created_at < now()->subMinutes(1)) {
+            // 1分以内に友だち登録していない場合も、セッション開始前から友だちだったとみなしてコンバージョン対象外とする
+            $conversion_status = LandingSession::CONVERSION_STATUS_ALREADY_ACTIVATED;
+        } else {
+            // ここまでくればコンバージョン判定とする
+            $conversion_status = LandingSession::CONVERSION_STATUS_MARK_CONVERSION;
+        }
 
         [$customer, $customer_shop] = \DB::transaction(function () use ($shop, $lineUser, $customer, $customer_shop, $markActivated) {
             if (!$customer) {
@@ -63,7 +73,7 @@ class CustomerService
             return [$customer, $customer_shop];
         });
 
-        return compact('customer', 'customer_shop', 'isConversion', 'markActivated');
+        return compact('customer', 'customer_shop', 'conversion_status');
     }
 }
 
