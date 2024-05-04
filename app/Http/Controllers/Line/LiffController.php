@@ -59,11 +59,11 @@ class LiffController extends Controller
 
         // 店舗にliff_idとliff_channel_idが登録されていないと機能が使えないので内部エラーにする
         if (!$shop->liff_id) {
-            throw new \Exception("liff_channel_id is not set. shop_id={$shop->id}");
+            throw new \Exception("liff_channel_id is not set. shop_id={$shop->shop_id}");
         }
 
         if (!$shop->liff_channel_id) {
-            throw new \Exception("liff_channel_id is not set. shop_id={$shop->id}");
+            throw new \Exception("liff_channel_id is not set. shop_id={$shop->shop_id}");
         }
 
         return $shop;
