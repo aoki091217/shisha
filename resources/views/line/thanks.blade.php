@@ -13,7 +13,7 @@
 <script>
 setTimeout(function () {
     location.href = @json($shop->getRoomUri());
-}, 1500);
+}, 2000);
 </script>
 </body>
 </html>

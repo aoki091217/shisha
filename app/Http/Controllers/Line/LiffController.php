@@ -111,8 +111,10 @@ class LiffController extends Controller
                 $session = $landingSessionService->completeSession($sessionToken, $data['customer'], $data['conversion_status']);
                 if ($session->conversion_status === LandingSession::CONVERSION_STATUS_MARK_CONVERSION) {
                     // コンバージョン判定の時のみサンクスページにリダイレクト
+                    $parameters = is_array($session->parameters) ? $session->parameters : [];
+                    $query = http_build_query($parameters);
                     return response()->json([
-                        'redirectUri' => route('liff.thanks', ['shop_id' => $shop->shop_id, 'session_token' => $session->session_token]),
+                        'redirectUri' => route('liff.thanks', ['shop_id' => $shop->shop_id, 'session_token' => $session->session_token]) . '?' . $query,
                     ]);
                 }
             } catch (\InvalidArgumentException $e) {
