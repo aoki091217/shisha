@@ -17,6 +17,11 @@
             ]
         ) }}
     </div>
+    <div class="form-label">LIFFエンドポイントURL</div>
+    {{-- TODO: #89 をマージしたらコメントアウトを外す --}}
+    <div class="col-8 mb-3">{{-- route('liff.index', ['shop_id' => $shop->shop_id]) --}}</div>
+    <div class="form-label">MessagingAPI WebHook URL</div>
+    <div class="col-8 mb-3">{{ route('line.webhook', ['id' => $shop->shop_id]) }}</div>
     <span class="text-danger">{{ $errors->first('shop.name') }}</span>
     <label for="accountId" class="form-label">ボットベーシックID<span class="text-danger">※</span></label>
     <div class="col-8 mb-3">
