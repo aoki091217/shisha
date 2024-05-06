@@ -34,7 +34,7 @@ class LoginController extends Controller
 
     public function liff(LineRequest $request): View
     {
-        $decode = $this->codeService->getCheckinDecode($request);
+	$decode = $this->codeService->getCheckinDecode($request);
         $request->session()->put('query_params', $decode);
 
         $hash = is_null(collect($request->all())->keys()->first()) ? '' : collect($request->all())->keys()->first();
