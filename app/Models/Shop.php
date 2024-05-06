@@ -21,7 +21,14 @@ class Shop extends Model
         'user_id',
         'account_id',
         'line_token',
-        'channel_secret'
+        'channel_secret',
+        'liff_channel_id',
+        'liff_id',
+    ];
+
+    protected $hidden = [
+        'line_token',
+        'channel_secret',
     ];
 
     public function blands()

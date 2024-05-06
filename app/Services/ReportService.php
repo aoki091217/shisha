@@ -22,7 +22,8 @@ class ReportService
             $this->reportRepository->getFollowerCount($reportRequest, $shops),
             $this->reportRepository->getBlockCount($reportRequest, $shops),
             //$this->reportRepository->getUsedCouponCount($reportRequest),
-            $this->reportRepository->getVisitedCount($reportRequest, $shops)
+            $this->reportRepository->getVisitedCount($reportRequest, $shops),
+            $this->reportRepository->getVisitRate($reportRequest, $shops)
         ];
     }
 }
