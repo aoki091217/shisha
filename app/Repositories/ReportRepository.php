@@ -35,10 +35,10 @@ class ReportRepository
                     $query->where(Liff::SHOP_ID, $shop->shop_id)
                         ->whereBetween(Liff::CREATED_AT, [$startMonth, $endMonth]);
 
-                    // if (isset($reportRequest[ReportRequest::HASH])) {
-                    //     $code = $this->codeRepository->findByHash($reportRequest->getHash());
-                    //     $query->where(ReportRequest::QUERY, $code);
-                    // }
+                    if (isset($reportRequest[ReportRequest::HASH]) && !is_null($reportRequest[ReportRequest::HASH])) {
+                        $code = $this->codeRepository->findByHash($reportRequest->getHash());
+                        $query->where(ReportRequest::QUERY, $code->getParameter());
+                    }
 
                     $result[$year][$i]['data'][$month] = $query->count();
                 }
@@ -106,6 +106,31 @@ class ReportRepository
     // }
 
     public function getVisitedCount(ReportRequest $reportRequest, Collection $shops): array
+    {
+        $period = $this->liffService->getPeriodReport($reportRequest);
+
+        foreach (range($period['start_year'], $period['end_year']) as $year) {
+            foreach ($shops as $i => $shop) {
+                $result[$year][$i]['shop'] = $shop;
+
+                foreach (range(1, 12) as $month) {
+                    $startMonth = Carbon::createFromDate($year, $month)->startOfMonth()->startOfDay();
+                    $endMonth = Carbon::createFromDate($year, $month)->endOfMonth()->endOfDay();
+
+                    $checkinQuery = CustomerShop::query();
+                    $checkinQuery->leftJoin('shops', 'customer_shops.shop_id', 'shops.shop_id')
+                            ->where('shops.shop_id', $shop->shop_id)
+                            ->whereBetween('customer_shops.visited_at', [$startMonth, $endMonth]);
+
+                    $result[$year][$i]['data'][$month] = $checkinQuery->count();
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public function getVisitRate(ReportRequest $reportRequest, Collection $shops): array
     {
         $period = $this->liffService->getPeriodReport($reportRequest);
 

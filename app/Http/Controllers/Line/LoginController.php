@@ -44,8 +44,9 @@ class LoginController extends Controller
 
         $lineBotService = new LineBotService($request->session()->get('query_params.sid'));
         $lineUrl = $lineBotService->getLineUrl();
+        $liffId = $lineBotService->getLiffId($request);
 
-        return view('line.liff', compact('code', 'request', 'loginUrl', 'lineUrl'));
+        return view('line.liff', compact('code', 'request', 'loginUrl', 'lineUrl', 'liffId'));
     }
 
     public function saveLiff(LineRequest $request)

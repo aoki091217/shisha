@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Http\Requests\Api\LineRequest;
 use App\Models\Customer;
+use App\Models\LiffAccess;
 use App\Models\Shop;
 use Carbon\Carbon;
 use LINE\LINEBot;
@@ -171,6 +173,19 @@ class LineBotService
         $accountId = urlencode($this->shop->account_id);
 
         return "https://line.me/R/oaMessage/{$accountId}/";
+    }
+
+    public function getLiffId(LineRequest $request)
+    {
+        $ip = $request->ip();
+        $liffAccess = LiffAccess::where('ip', $ip)->where('created_at', now()->subMinutes(1))->orderByDesc('created_at')->first();
+
+        if (is_null($liffAccess)) {
+            $liffAccess = new LiffAccess();
+            $liffAccess->fill(['ip' => $ip, 'liff_id' => $this->shop->liff_id])->save();
+        }
+
+        return $liffAccess->liff_id;
     }
 
     public function getLineUrlWithMessage()

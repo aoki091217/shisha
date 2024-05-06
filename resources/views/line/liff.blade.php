@@ -27,7 +27,7 @@
 
         setTimeout(() => {
             liff.init({
-                liffId: @json(config('services.line.liff_id')),
+                liffId: @json($liffId),
             }).then(() => {
                 if (liff.isLoggedIn() === false) {
                     liff.login({})
