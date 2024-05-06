@@ -54,25 +54,27 @@
                 <div>
                     @foreach ($clickReport as $year => $reports)
                         <h3 class="fw-bold">{{ $year }}年</h3>
-                        @foreach ($reports as $report)
-                        @php
-                            $shop = $report['shop'];
-                        @endphp
-                            <table class="table table-bordered">
-                                <tr>
-                                    <th></th>
-                                    @foreach (collect($report['data'])->keys() as $month)
-                                        <th>{{ $month }}月</th>
-                                    @endforeach
-                                </tr>
+                        <table class="table table-bordered">
+                            @foreach ($reports as $report)
+                            @php
+                                $shop = $report['shop'];
+                            @endphp
+                            @if ($loop->first)
+                            <tr>
+                                <th></th>
+                                @foreach (collect($report['data'])->keys() as $month)
+                                    <th>{{ $month }}月</th>
+                                @endforeach
+                            </tr>
+                            @endif
                                 <tr>
                                     <th>{{ $shop->name }}</th>
                                     @foreach ($report['data'] as $turn => $data)
                                         <td>{{ $data }}</td>
                                     @endforeach
                                 </tr>
-                            </table>
-                        @endforeach
+                            @endforeach
+                        </table>
                     @endforeach
                 </div>
             </div>
@@ -82,25 +84,27 @@
                 <div>
                     @foreach ($followReport as $year => $reports)
                         <h3 class="fw-bold">{{ $year }}年</h3>
-                        @foreach ($reports as $report)
-                        @php
-                            $shop = $report['shop'];
-                        @endphp
-                            <table class="table table-bordered">
+                        <table class="table table-bordered">
+                            @foreach ($reports as $report)
+                            @php
+                                $shop = $report['shop'];
+                            @endphp
+                                @if ($loop->first)
                                 <tr>
                                     <th></th>
                                     @foreach (collect($report['data'])->keys() as $month)
                                         <th>{{ $month }}月</th>
                                     @endforeach
                                 </tr>
-                                <tr>
-                                    <th>{{ $shop->name }}</th>
-                                    @foreach ($report['data'] as $turn => $data)
-                                        <td>{{ $data }}</td>
-                                    @endforeach
-                                </tr>
-                            </table>
-                        @endforeach
+                                @endif
+                                    <tr>
+                                        <th>{{ $shop->name }}</th>
+                                        @foreach ($report['data'] as $turn => $data)
+                                            <td>{{ $data }}</td>
+                                        @endforeach
+                                    </tr>
+                            @endforeach
+                        </table>
                     @endforeach
                 </div>
             </div>
@@ -110,25 +114,27 @@
                 <div>
                     @foreach ($blockReport as $year => $reports)
                         <h3 class="fw-bold">{{ $year }}年</h3>
-                        @foreach ($reports as $report)
-                        @php
-                            $shop = $report['shop'];
-                        @endphp
-                            <table class="table table-bordered">
+                        <table class="table table-bordered">
+                            @foreach ($reports as $report)
+                            @php
+                                $shop = $report['shop'];
+                            @endphp
+                                @if ($loop->first)
                                 <tr>
                                     <th></th>
                                     @foreach (collect($report['data'])->keys() as $month)
                                         <th>{{ $month }}月</th>
                                     @endforeach
                                 </tr>
-                                <tr>
-                                    <th>{{ $shop->name }}</th>
-                                    @foreach ($report['data'] as $turn => $data)
-                                        <td>{{ $data }}</td>
-                                    @endforeach
-                                </tr>
-                            </table>
-                        @endforeach
+                                @endif
+                                    <tr>
+                                        <th>{{ $shop->name }}</th>
+                                        @foreach ($report['data'] as $turn => $data)
+                                            <td>{{ $data }}</td>
+                                        @endforeach
+                                    </tr>
+                            @endforeach
+                        </table>
                     @endforeach
                 </div>
             </div>
@@ -138,25 +144,27 @@
                 <div>
                     @foreach ($visitedCountReport as $year => $reports)
                         <h3 class="fw-bold">{{ $year }}年</h3>
-                        @foreach ($reports as $report)
-                        @php
-                            $shop = $report['shop'];
-                        @endphp
-                            <table class="table table-bordered">
+                        <table class="table table-bordered">
+                            @foreach ($reports as $report)
+                            @php
+                                $shop = $report['shop'];
+                            @endphp
+                                @if ($loop->first)
                                 <tr>
                                     <th></th>
                                     @foreach (collect($report['data'])->keys() as $month)
                                         <th>{{ $month }}月</th>
                                     @endforeach
                                 </tr>
+                                @endif
                                 <tr>
                                     <th>{{ $shop->name }}</th>
                                     @foreach ($report['data'] as $turn => $data)
                                         <td>{{ $data }}</td>
                                     @endforeach
                                 </tr>
-                            </table>
-                        @endforeach
+                            @endforeach
+                        </table>
                     @endforeach
                 </div>
             </div>
@@ -166,25 +174,27 @@
                 <div>
                     @foreach ($visitRateReport as $year => $reports)
                         <h3 class="fw-bold">{{ $year }}年</h3>
-                        @foreach ($reports as $report)
-                        @php
-                            $shop = $report['shop'];
-                        @endphp
-                            <table class="table table-bordered">
+                        <table class="table table-bordered">
+                            @foreach ($reports as $report)
+                            @php
+                                $shop = $report['shop'];
+                            @endphp
+                                @if ($loop->first)
                                 <tr>
                                     <th></th>
                                     @foreach (collect($report['data'])->keys() as $month)
                                         <th>{{ $month }}月</th>
                                     @endforeach
                                 </tr>
-                                <tr>
-                                    <th>{{ $shop->name }}</th>
-                                    @foreach ($report['data'] as $turn => $data)
-                                        <td>{{ $data }}</td>
-                                    @endforeach
-                                </tr>
-                            </table>
-                        @endforeach
+                                @endif
+                                    <tr>
+                                        <th>{{ $shop->name }}</th>
+                                        @foreach ($report['data'] as $turn => $data)
+                                            <td>{{ $data }}</td>
+                                        @endforeach
+                                    </tr>
+                            @endforeach
+                        </table>
                     @endforeach
                 </div>
             </div>
