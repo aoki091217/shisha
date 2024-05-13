@@ -29,7 +29,7 @@ class CustomerService
         $customer = $this->customerRepository->find($lineUser->line_id);
         $customer_shop = null;
         if ($customer) {
-            $customer_shop = $customer->shops()->where('shop_id', $shop->shop_id)->first();
+            $customer_shop = $customer->customerShops()->where('shop_id', $shop->shop_id)->first();
         }
 
         // Note: 未登録の顧客の場合でも、LIFF認証で友だち登録したときのWebHookでCustomerShopのレコードが既に存在する可能性がある
