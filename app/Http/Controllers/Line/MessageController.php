@@ -79,6 +79,7 @@ class MessageController extends Controller
                     if (preg_match('/checkin/', $text)) {
                         $params = $lineBotService->getQueryParams($text);
 
+                        // 気になり: この実装だと、 同一shop_id/customer_id のレコードが複数できることがありそう？
                         if ($lineBotService->checkDuplicate($params, $customer)) {
                             $checkin = $lineBotService->getParamsFromCheckin($params);
                             $this->customerShopRepository->store($customer, $checkin);
