@@ -2,7 +2,7 @@
 
 namespace App\Models\External;
 
-use App\Models\CustomerShop;
+use App\Models\CustomerShopStatus;
 use Illuminate\Contracts\Support\Arrayable;
 
 /**
@@ -48,9 +48,9 @@ class LineUser implements Arrayable
     public function getFriendStatus()
     {
         if (is_null($this->is_friend)) {
-            return CustomerShop::LIFF_STATUS_UNKNOWN;
+            return CustomerShopStatus::LIFF_STATUS_UNKNOWN;
         }
-        return $this->is_friend ? CustomerShop::FRIEND_STATUS_FOLLOWED : CustomerShop::FRIEND_STATUS_UNFOLLOWED;
+        return $this->is_friend ? CustomerShopStatus::FRIEND_STATUS_FOLLOWED : CustomerShopStatus::FRIEND_STATUS_UNFOLLOWED;
     }
 
     /**
@@ -59,8 +59,8 @@ class LineUser implements Arrayable
     public function getLiffStatus()
     {
         if (is_null($this->is_liff_active)) {
-            return CustomerShop::LIFF_STATUS_UNKNOWN;
+            return CustomerShopStatus::LIFF_STATUS_UNKNOWN;
         }
-        return $this->is_liff_active ? CustomerShop::LIFF_STATUS_ACTIVE : CustomerShop::LIFF_STATUS_INACTIVE;
+        return $this->is_liff_active ? CustomerShopStatus::LIFF_STATUS_ACTIVE : CustomerShopStatus::LIFF_STATUS_INACTIVE;
     }
 }
