@@ -12,6 +12,8 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        'line/webhook'
+        'line/webhook',
+        // POSTされたLINEのaccessTokenで認証を行うためCSRF対策は不要
+        'line/liff/*/verify',
     ];
 }

@@ -123,12 +123,20 @@ class CustomerShopRepository
             ->get();
     }
 
-    public function store($customer, $checkin)
+    public function store($customer, array $attributes): CustomerShop
     {
         $customer_shop = new CustomerShop();
-        $customer_shop->fill(array_merge($checkin, [
+        $customer_shop->fill(array_merge($attributes, [
             'customer_id' => $customer->id
         ]))->save();
+
+        return $customer_shop;
+    }
+
+    public function update($customer_shop, array $attributes): CustomerShop
+    {
+        $customer_shop->fill($attributes)->save();
+        return $customer_shop;
     }
 }
 
