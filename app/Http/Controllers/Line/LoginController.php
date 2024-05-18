@@ -34,12 +34,8 @@ class LoginController extends Controller
 
     public function liff(LineRequest $request): View
     {
-        \Log::debug($request->all());
-        $decode = $this->codeService->getCheckinDecode($request);
-        if (isset($decode['sid'])) {
-            $request->session()->put('query_params', $decode);
-        }
-        \Log::debug($request->session()->get('query_params.sid'));
+	$decode = $this->codeService->getCheckinDecode($request);
+        $request->session()->put('query_params', $decode);
 
         $hash = is_null(collect($request->all())->keys()->first()) ? '' : collect($request->all())->keys()->first();
         $code = $this->codeRepository->findByHash($hash);
@@ -49,8 +45,6 @@ class LoginController extends Controller
         $lineBotService = new LineBotService($request->session()->get('query_params.sid'));
         $lineUrl = $lineBotService->getLineUrl();
         $liffId = $lineBotService->getLiffId($request);
-        \Log::debug($lineUrl);
-        \Log::debug($liffId);
 
         return view('line.liff', compact('code', 'request', 'loginUrl', 'lineUrl', 'liffId'));
     }
