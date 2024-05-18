@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Line;
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Customer;
+use App\Models\CustomerShopStatus;
 use App\Models\Message;
+use App\Models\Shop;
 use App\Models\Situation;
 use App\Repositories\CustomerRepository;
 use App\Repositories\CustomerShopRepository;
+use App\Repositories\CustomerShopStatusRepository;
 use App\Repositories\ShopRepository;
 use App\Services\LineBotService;
 use App\Services\MessageService;
@@ -26,6 +29,7 @@ class MessageController extends Controller
         private ShopRepository $shopRepository,
         private CustomerRepository $customerRepository,
         private CustomerShopRepository $customerShopRepository,
+        private CustomerShopStatusRepository $customerShopStatusRepository,
         private MessageService $messageService
     ) {}
 
@@ -65,6 +69,8 @@ class MessageController extends Controller
                         $customer = $this->customerRepository->store($line_token);
                     }
 
+                    $customer_shop_status = $this->firstOrCreateCustomerShopStatus($shop, $customer);
+
                     return;
                 case ($event instanceof TextMessage):
                     if (is_null($customer)) {
@@ -79,10 +85,12 @@ class MessageController extends Controller
                     if (preg_match('/checkin/', $text)) {
                         $params = $lineBotService->getQueryParams($text);
 
-                        // 気になり: この実装だと、 同一shop_id/customer_id のレコードが複数できることがありそう？
                         if ($lineBotService->checkDuplicate($params, $customer)) {
                             $checkin = $lineBotService->getParamsFromCheckin($params);
                             $this->customerShopRepository->store($customer, $checkin);
+
+                            $customer_shop_status = $this->firstOrCreateCustomerShopStatus($shop, $customer);
+                            $customer_shop_status = $this->customerShopStatusRepository->checkin($customer_shop_status);
                         }
 
                         if (is_null($customer->name)) {
@@ -92,7 +100,6 @@ class MessageController extends Controller
                             $lineBotService->buildReplyMessage($reply_token, '本日もご来店ありがとうございます、ごゆっくりお過ごしください。');
                             return;
                         }
-
                         return;
                     } else {
                         if ($customer->step === 1) {
@@ -165,10 +172,32 @@ class MessageController extends Controller
                         $customer->delete();
                     }
 
+                    $customer_shop_status = CustomerShopStatus::where('shop_id', $shop->shop_id)->where('customer_id', $customer->id)->first();
+                    $customer_shop_status = $this->customerShopStatusRepository->update($customer_shop_status, [
+                        'friend_status' => CustomerShopStatus::FRIEND_STATUS_UNFOLLOWED,
+                    ]);
+
                     return;
             }
         }
 
         return response('OK', 200);
+    }
+
+    private function firstOrCreateCustomerShopStatus(Shop $shop, Customer $customer): CustomerShopStatus
+    {
+        $customer_shop_status = CustomerShopStatus::where('shop_id', $shop->shop_id)->where('customer_id', $customer->id)->first();
+        if ($customer_shop_status) {
+            $customer_shop_status = $this->customerShopStatusRepository->update($customer_shop_status, [
+                'friend_status' => CustomerShopStatus::FRIEND_STATUS_FOLLOWED,
+            ]);
+        } else {
+            $customer_shop_status = $this->customerShopStatusRepository->store($shop, $customer, [
+                'friend_status' => CustomerShopStatus::FRIEND_STATUS_FOLLOWED,
+                'liff_status' => CustomerShopStatus::LIFF_STATUS_UNKNOWN,
+            ]);
+        }
+
+        return $customer_shop_status;
     }
 }

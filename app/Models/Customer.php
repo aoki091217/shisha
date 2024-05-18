@@ -29,6 +29,11 @@ class Customer extends Model
         return $this->hasMany(Answer::class);
     }
 
+    public function customerShopStatuses()
+    {
+        return $this->hasMany(CustomerShopStatus::class);
+    }
+
     public function isDeleted(): bool
     {
         return !is_null($this->deleted_at);
