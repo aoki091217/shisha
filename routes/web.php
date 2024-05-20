@@ -72,6 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeViewController::class, 'index'])->name('home.index');
 
     Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+    Route::get('/report/code', [ReportController::class, 'code'])->name('report.code');
 
     Route::prefix('shop')->as('shop.')->middleware('role:high')->group(function () {
         Route::resource('/', ShopController::class)->except('show')->parameters(['' => 'id']);

@@ -163,4 +163,70 @@ class ReportRepository
 
         return $result;
     }
+
+    public function getCodeReport(array $filters): array
+    {
+        $wheres = [];
+        $params = [];
+
+        if (empty($filters['codeIds'])) {
+            throw new \InvalidArgumentException('codeIds is required');
+        } else {
+            $wheres[] = 'codes.code_id IN (' . implode(',', array_fill(0, count($filters['codeIds']), '?')) . ')';
+            array_push($params, ...$filters['codeIds']);
+        }
+
+        if (empty($filters['shopIds'])) {
+            throw new \InvalidArgumentException('shopIds is required');
+        } else {
+            $wheres[] = 'landing_sessions.shop_id IN (' . implode(',', array_fill(0, count($filters['shopIds']), '?')) . ')';
+            array_push($params, ...$filters['shopIds']);
+        }
+
+        if (!empty($filters['startDate'])) {
+            $wheres[] = 'landing_sessions.created_at >= ?';
+            $params[] = $filters['startDate']->startOfDay();
+        }
+
+        if (!empty($filters['endDate'])) {
+            $wheres[] = 'landing_sessions.created_at <= ?';
+            $params[] = $filters['endDate']->endOfDay();
+        }
+
+        $where_str = implode("\n      AND ", $wheres);
+
+        return \DB::select(
+            <<<"SQL"
+            WITH A AS (
+                SELECT
+                    DATE(landing_sessions.created_at) AS date,
+                    1 AS clicked,
+                    IF(landing_sessions.conversion_status = 'mark_conversion', 1, 0) AS followed,
+                    IF(customer_shop_statuses.first_visited_at IS NOT NULL, 1, 0) AS visited,
+                    IF(customer_shop_statuses.friend_status = 'unfollowed', 1, 0) AS blocked
+                FROM
+                    landing_sessions
+                JOIN
+                    codes
+                    ON landing_sessions.parameters->>"$.hash" = codes.hash
+                LEFT JOIN
+                    customer_shop_statuses
+                    ON landing_sessions.customer_id = customer_shop_statuses.customer_id
+                    AND landing_sessions.shop_id = customer_shop_statuses.shop_id
+                    AND landing_sessions.conversion_status = 'mark_conversion'
+                WHERE ${where_str}
+            )
+            SELECT
+                date,
+                SUM(clicked) AS click_count,
+                SUM(followed) AS follow_count,
+                SUM(visited) AS visit_count,
+                SUM(visited) / SUM(followed) AS visited_rate,
+                SUM(blocked) AS block_count
+            FROM A
+            GROUP BY date
+            SQL,
+            $params
+        );
+    }
 }
