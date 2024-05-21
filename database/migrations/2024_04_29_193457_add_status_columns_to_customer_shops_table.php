@@ -15,10 +15,10 @@ return new class extends Migration
     public function up()
     {
         Schema::table('customer_shops', function (Blueprint $table) {
-            $table->string('friend_status', 16)->default(CustomerShop::FRIEND_STATUS_UNKNOWN)
+            $table->string('friend_status', 16)->default('unknown')
                 ->comment('友だち登録のステータス')
                 ->after('shop_id');
-            $table->string('liff_status', 16)->default(CustomerShop::LIFF_STATUS_UNKNOWN)
+            $table->string('liff_status', 16)->default('unknown')
                 ->comment('LIFF認証のステータス')
                 ->after('friend_status');
             $table->dateTime('activated_at')->nullable()

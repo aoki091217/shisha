@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\Situation\QuestionController;
 use App\Http\Controllers\Admin\Situation\ReplyController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Line\LiffController;
 use App\Http\Controllers\Line\LoginController as LineLoginController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,13 +56,23 @@ Route::controller(LoginController::class)->group(function () {
 
 Route::controller(LineLoginController::class)->as('line.')->prefix('line')->group(function () {
     Route::get('/checkin', 'checkin')->name('checkin');
-    Route::get('/liff', 'liff')->name('liff');
+});
+
+Route::controller(LiffController::class)->as('liff.')->prefix('line/liff/{shop_id}')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/code', 'code')->name('code');
+    Route::get('/callback/{session_token}', 'callback')->name('callback');
+    Route::get('/callback/{session_token}/thanks', 'thanks')->name('thanks');
+
+    // LIFF認証用のエンドポイント
+    Route::post('/verify', 'verify')->name('verify');
 });
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeViewController::class, 'index'])->name('home.index');
 
     Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+    Route::get('/report/code', [ReportController::class, 'code'])->name('report.code');
 
     Route::prefix('shop')->as('shop.')->middleware('role:high')->group(function () {
         Route::resource('/', ShopController::class)->except('show')->parameters(['' => 'id']);
