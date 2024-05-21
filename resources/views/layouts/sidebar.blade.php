@@ -7,10 +7,24 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('report.index') }}" class="nav-link py-1 {{ $routeService->getActiveForTab('report.*') }}">
+            <a href="#" class="nav-link py-1">
                 <i class="fa-regular fa-newspaper"></i>
                 レポート
             </a>
+            <ul style="list-style: none" class="my-1">
+                <li>
+                    <a href="{{ route('report.index') }}" class="nav-link py-1 {{ $routeService->getActiveForTab('report.index') }}">
+                        <i class="fa-regular fa-newspaper"></i>
+                        サマリー
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('report.code') }}" class="nav-link py-1 {{ $routeService->getActiveForTab('report.code') }}">
+                        <i class="fa-regular fa-newspaper"></i>
+                        コード分析
+                    </a>
+                </li>
+            </ul>
         </li>
         @if (auth()->user()->role_id === 1)
         <li>

@@ -2,10 +2,12 @@
 
 namespace App\Repositories;
 
+use App\Models\Code;
 use App\Models\Shop;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Storage;
 
@@ -17,6 +19,15 @@ class ShopRepository
             return Shop::get();
         } else {
             return Shop::where('shop_id', auth()->user()->member->shop_id)->get();
+        }
+    }
+
+    public function getShops(): Collection
+    {
+        if (auth()->user()->role_id === 1) {
+            return Shop::get();
+        } else {
+            return Code::where('shop_id', auth()->user()->member->shop_id)->get();
         }
     }
 

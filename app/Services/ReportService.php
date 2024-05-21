@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Requests\CodeReportRequest;
 use App\Http\Requests\ReportRequest;
 use App\Models\Shop;
 use App\Repositories\ReportRepository;
