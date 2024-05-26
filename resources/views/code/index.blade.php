@@ -65,8 +65,8 @@
                     </td>
                     <td>{{ $codeService->getHashedUrl($code->getCodeId()) }}</td>
                     <td>{{ $code->getKind() == 1 ? '流入経路計測' : 'チェックイン' }}</td>
-                    <td>{{ $code->shop->name }}</td>
-                    <td>{{ $code->situation->name }}</td>
+                    <td>{{ $code->shop?->name }}</td>
+                    <td>{{ $code->situation?->name }}</td>
                     <td>{{ $code->getCreatedAt() }}</td>
                 </tr>
                 @endforeach
