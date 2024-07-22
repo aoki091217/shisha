@@ -229,4 +229,94 @@ class ReportRepository
             $params
         );
     }
+    public function getCustomerReport(array $filters): array
+    {
+        $wheres = [];
+        $params = [];
+
+
+        if (empty($filters['shopIds'])) {
+            throw new \InvalidArgumentException('shopIds is required');
+        } else {
+            $wheres[] = 'customer_shops.shop_id IN (' . implode(',', array_fill(0, count($filters['shopIds']), '?')) . ')';
+            array_push($params, ...$filters['shopIds']);
+        }
+
+        if (!empty($filters['startDate'])) {
+            $wheres[] = 'customer_shops.created_at >= ?';
+            $params[] = $filters['startDate']->startOfDay();
+        }
+
+        if (!empty($filters['endDate'])) {
+            $wheres[] = 'customer_shops.created_at <= ?';
+            $params[] = $filters['endDate']->endOfDay();
+        }
+
+        $where_str = implode("\n      AND ", $wheres);
+
+        return \DB::select(
+            <<<"SQL"
+            WITH filtered_shops AS (
+                SELECT customer_id, visited_at, DATE(created_at) AS date
+                FROM sin_crm.customer_shops
+                WHERE ${where_str}
+
+            )
+            SELECT 
+                -- 最初のSQL: 月に初めて来店した顧客数
+                (SELECT COUNT(customer_id)
+                 FROM filtered_shops
+                ) AS first_time_visitors,
+        
+                -- 第二のSQL: 一度しか来店していない新規顧客数
+                (SELECT COUNT(DISTINCT customer_id) AS new_unique_customers
+                 FROM (
+                     SELECT customer_id, MIN(visited_at) AS first_visit_date
+                     FROM filtered_shops
+                     GROUP BY customer_id
+                     HAVING COUNT(*) = 1
+                 ) AS first_visits
+                ) AS new_unique_customers,
+        
+                -- 第三のSQL: 複数回訪れた顧客数
+                (SELECT COUNT(*) AS repeater_count
+                 FROM (
+                     SELECT customer_id
+                     FROM filtered_shops
+                     GROUP BY customer_id
+                     HAVING COUNT(*) > 1
+                 ) AS repeaters
+                ) AS repeater_count,
+        
+                -- 第四のSQL: 14日以内に再訪問したリピーター数
+                (SELECT COUNT(DISTINCT first_visit.customer_id) AS repeater_within_14_days
+                 FROM (
+                     SELECT customer_id, MIN(visited_at) AS first_visit_date
+                     FROM filtered_shops
+                     GROUP BY customer_id
+                 ) AS first_visit
+                 JOIN filtered_shops AS second_visit ON first_visit.customer_id = second_visit.customer_id
+                 WHERE second_visit.visited_at > first_visit.first_visit_date
+                 AND second_visit.visited_at <= DATE_ADD(first_visit.first_visit_date, INTERVAL 14 DAY)
+                ) AS repeater_within_14_days,
+        
+                -- 最後のSQL: 2月に来店したユニークな顧客数
+                (SELECT COUNT(DISTINCT customer_id) AS unique_visitors_in_month
+                 FROM filtered_shops
+                ) AS unique_visitors_in_month,
+
+                -- 日付フィールドを追加してエラーを回避
+                (SELECT MIN(date) AS min_date
+                 FROM filtered_shops
+                ) AS min_date,
+
+                (SELECT MAX(date) AS max_date
+                 FROM filtered_shops
+                ) AS max_date
+            SQL,
+            $params
+        );
+        
+        
+    }
 }

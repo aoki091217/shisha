@@ -73,6 +73,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/report', [ReportController::class, 'index'])->name('report.index');
     Route::get('/report/code', [ReportController::class, 'code'])->name('report.code');
+    Route::get('/report/customer', [ReportController::class, 'customer'])->name('report.customer');
 
     Route::prefix('shop')->as('shop.')->middleware('role:high')->group(function () {
         Route::resource('/', ShopController::class)->except('show')->parameters(['' => 'id']);

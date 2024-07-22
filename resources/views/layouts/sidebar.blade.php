@@ -24,6 +24,12 @@
                         コード分析
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('report.customer') }}" class="nav-link py-1 {{ $routeService->getActiveForTab('report.code') }}">
+                        <i class="fa-regular fa-newspaper"></i>
+                        顧客分析
+                    </a>
+                </li>
             </ul>
         </li>
         @if (auth()->user()->role_id === 1)

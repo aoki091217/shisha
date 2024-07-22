@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CustomerReportRequest;
 use App\Http\Requests\CodeReportRequest;
 use App\Http\Requests\ReportRequest;
 use App\Models\Code;
@@ -52,5 +53,21 @@ class ReportController extends Controller
         $report = $this->reportRepository->getCodeReport($filters);
 
         return view('report.code', compact('shops', 'codes', 'report'));
+    }
+
+    public function customer(CustomerReportRequest $reportRequest): View
+    {
+        $shops = $this->shopRepository->getShops()->keyBy('shop_id');
+        $shop_ids = $shops->keys()->toArray();
+
+        // TODO: SQLでフィルタしたい
+        $filters = [
+            'startDate' => $reportRequest->startDate(),
+            'endDate' => $reportRequest->endDate(),
+            'shopIds' => empty($reportRequest->shopIds()) ? $shop_ids :array_intersect($reportRequest->shopIds(), $shop_ids),
+        ];
+        $report = $this->reportRepository->getCustomerReport($filters);
+
+        return view('report.customer', compact('shops', 'report'));
     }
 }
