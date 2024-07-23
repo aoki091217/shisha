@@ -4,7 +4,7 @@
 @endpush
 
 @section('content')
-{{ Breadcrumbs::render('report.code') }}
+{{ Breadcrumbs::render('report.customer') }}
 <div>
     <form action="{{ route('report.customer') }}" method="GET" autocomplete="off" id="form">
         <div id="searchForm">
@@ -58,36 +58,42 @@
                         </thead>
                         <tbody>
                         @php
-                            $total = ['first_time_visitors' => 0, 'new_unique_customers' => 0, 'repeater_count' => 0, 'repeater_within_14_days' => 0, 'unique_visitors_in_month' => 0]
+                            $total = [
+                                'check_in_count' => 0,
+                                'new_unique_customers' => 0,
+                                'repeater_unique_customers' => 0,
+                                'unique_repeater_within_14_days' => 0,
+                                'monthly_unique_visitors' => 0
+                            ];
                         @endphp
                         @foreach($report as $row)
                             @php
-                                $total['first_time_visitors'] += $row->first_time_visitors;
+                                $total['check_in_count'] += $row->check_in_count;
                                 $total['new_unique_customers'] += $row->new_unique_customers;
-                                $total['repeater_count'] += $row->repeater_count;
-                                $total['repeater_within_14_days'] += $row->repeater_within_14_days;
-                                $total['unique_visitors_in_month'] += $row->unique_visitors_in_month;
+                                $total['repeater_unique_customers'] += $row->repeater_unique_customers;
+                                $total['unique_repeater_within_14_days'] += $row->unique_repeater_within_14_days;
+                                $total['monthly_unique_visitors'] += $row->monthly_unique_visitors;
                             @endphp
                             <tr>
                                 <td>{{ $row->min_date }}~{{ $row->max_date }}</td>
-                                <td>{{ $row->first_time_visitors }}</td>
-                                <td>{{ $row->first_time_visitors-$row->new_unique_customers }}</td>
+                                <td>{{ $row->check_in_count }}</td>
+                                <td>{{ $row->check_in_count - $row->new_unique_customers }}</td>
                                 <td>{{ $row->new_unique_customers }}</td>
-                                <td>{{ $row->repeater_count }}</td>
-                                <td>{{ $row->repeater_within_14_days }}</td>
-                                <td>{{ $row->unique_visitors_in_month }}</td>
+                                <td>{{ $row->repeater_unique_customers }}</td>
+                                <td>{{ $row->unique_repeater_within_14_days }}</td>
+                                <td>{{ $row->monthly_unique_visitors }}</td>
                             </tr>
                         @endforeach
                         </tbody>
                         <tfoot>
                             <tr>
                                 <th>合計</th>
-                                <th>{{ $total['first_time_visitors'] }}</th>
-                                <th>{{ $total['first_time_visitors']-$total['new_unique_customers'] }}</th>
+                                <th>{{ $total['check_in_count'] }}</th>
+                                <th>{{ $total['check_in_count'] - $total['new_unique_customers'] }}</th>
                                 <th>{{ $total['new_unique_customers'] }}</th>
-                                <th>{{ $total['repeater_count'] }}</th>
-                                <th>{{ $total['repeater_within_14_days'] }}</th>
-                                <th>{{ $total['unique_visitors_in_month'] }}</th>
+                                <th>{{ $total['repeater_unique_customers'] }}</th>
+                                <th>{{ $total['unique_repeater_within_14_days'] }}</th>
+                                <th>{{ $total['monthly_unique_visitors'] }}</th>
                             </tr>
                         </tfoot>
                     </table>

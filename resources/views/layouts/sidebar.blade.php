@@ -25,7 +25,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('report.customer') }}" class="nav-link py-1 {{ $routeService->getActiveForTab('report.code') }}">
+                    <a href="{{ route('report.customer') }}" class="nav-link py-1 {{ $routeService->getActiveForTab('report.customer') }}">
                         <i class="fa-regular fa-newspaper"></i>
                         顧客分析
                     </a>

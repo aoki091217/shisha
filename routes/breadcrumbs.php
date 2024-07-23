@@ -205,4 +205,7 @@ Breadcrumbs::for('report.index', function ($trail) {
 Breadcrumbs::for('report.code', function ($trail) {
     $trail->push('コード', route('report.index'));
 });
+Breadcrumbs::for('report.customer', function ($trail) {
+    $trail->push('顧客分析', route('report.index'));
+});
 ?>
