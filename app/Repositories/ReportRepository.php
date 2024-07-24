@@ -302,13 +302,14 @@ class ReportRepository
             )
             ) AS new_unique_customers,
 
-            -- 指定期間で来店したリピート客のユニーク数
+            -- 指定期間内に来店し、かつ、指定期間以前に初めて来店したリピーターのユニーク数
             (SELECT COUNT(DISTINCT customer_id)
             FROM filtered_shops
             WHERE customer_id IN (
                 SELECT customer_id
                 FROM sin_crm.customer_shops
                 WHERE shop_id IN (SELECT DISTINCT shop_id FROM filtered_shops)
+                AND visited_at < ?
                 GROUP BY customer_id
                 HAVING COUNT(*) > 1
             )
@@ -339,6 +340,7 @@ class ReportRepository
             $filters['startDate']->format('Y-m-d H:i:s'), 
             $filters['endDate']->format('Y-m-d H:i:s'),
             $filters['startDate']->format('Y-m-d H:i:s'), 
+            $filters['endDate']->format('Y-m-d H:i:s'),
             $filters['endDate']->format('Y-m-d H:i:s')
         ]));
 
