@@ -246,13 +246,27 @@ class ReportRepository
         // 開始日付のチェック
         if (!empty($filters['startDate'])) {
             $wheres[] = 'customer_shops.created_at >= ?';
-            $params[] = $filters['startDate']->startOfDay();
+            $params[] = $startDate = $filters['startDate']->startOfDay();
+        } else {
+            //$startDate = Carbon::now()->startOfMonth();
+            $oldestDate = \DB::table('sin_crm.customer_shops')
+                ->whereIn('shop_id', $filters['shopIds'])
+                ->orderBy('created_at', 'asc')
+                ->value('created_at');
+            
+            if ($oldestDate) {
+                $startDate = Carbon::parse($oldestDate);
+            } else {
+                throw new \InvalidArgumentException('endDate is required and no data found');
+            }
         }
 
         // 終了日付のチェック
         if (!empty($filters['endDate'])) {
             $wheres[] = 'customer_shops.created_at <= ?';
-            $params[] = $filters['endDate']->endOfDay();
+            $params[] = $endDate = $filters['endDate']->endOfDay();
+        } else {
+            $endDate = Carbon::now();
         }
 
         $where_str = implode("\n      AND ", $wheres);
@@ -337,11 +351,11 @@ class ReportRepository
 
         // クエリの結果を取得
         $results = \DB::select($query, array_merge($params, [
-            $filters['startDate']->format('Y-m-d H:i:s'), 
-            $filters['endDate']->format('Y-m-d H:i:s'),
-            $filters['startDate']->format('Y-m-d H:i:s'), 
-            $filters['endDate']->format('Y-m-d H:i:s'),
-            $filters['endDate']->format('Y-m-d H:i:s')
+            $startDate->format('Y-m-d H:i:s'), 
+            $endDate->format('Y-m-d H:i:s'),
+            $startDate->format('Y-m-d H:i:s'), 
+            $endDate->format('Y-m-d H:i:s'),
+            $endDate->format('Y-m-d H:i:s')
         ]));
 
         return $results;
