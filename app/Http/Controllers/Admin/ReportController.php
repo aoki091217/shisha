@@ -43,7 +43,7 @@ class ReportController extends Controller
         $codes = $this->codeRepository->get()
             ->filter(fn(Code $code) => $code->getKind() === 1 && in_array($code->shop_id, $shop_ids));
 
-        $code_ids = $codes->pluck('code_id')->toArray();
+	$code_ids = $codes->pluck('code_id')->toArray();
         $filters = [
             'startDate' => $reportRequest->startDate(),
             'endDate' => $reportRequest->endDate(),
@@ -58,14 +58,15 @@ class ReportController extends Controller
     public function customer(CustomerReportRequest $reportRequest): View
     {
         $shops = $this->shopRepository->getShops()->keyBy('shop_id');
-        $shop_ids = $shops->keys()->toArray();
+	$shop_ids = $shops->keys()->toArray();
 
         // TODO: SQLでフィルタしたい
         $filters = [
             'startDate' => $reportRequest->startDate(),
             'endDate' => $reportRequest->endDate(),
             'shopIds' => empty($reportRequest->shopIds()) ? $shop_ids :array_intersect($reportRequest->shopIds(), $shop_ids),
-        ];
+	];
+
         $report = $this->reportRepository->getCustomerReport($filters);
 
         return view('report.customer', compact('shops', 'report'));
