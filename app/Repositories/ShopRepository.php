@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Models\Code;
 use App\Models\Shop;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
@@ -27,7 +26,7 @@ class ShopRepository
         if (auth()->user()->role_id === 1) {
             return Shop::get();
         } else {
-            return Code::where('shop_id', auth()->user()->member->shop_id)->get();
+            return Shop::where('shop_id', auth()->user()->member->shop_id)->get();
         }
     }
 
