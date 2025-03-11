@@ -24,7 +24,7 @@
     <div class="col-12 mb-3">
         <label class="form-label">友達追加時送信メッセージ</label>
         <div>
-            <span>{{ $code->situation->name }}</span>
+            <span>{{ !empty($code->situation) ? $code->situation->name : '' }}</span>
         </div>
     </div>
     <div class="col-12 mb-3">

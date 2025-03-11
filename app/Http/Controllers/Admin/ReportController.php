@@ -22,9 +22,7 @@ class ReportController extends Controller
         private ShopRepository   $shopRepository,
         private ReportService    $reportService,
         private ReportRepository $reportRepository,
-    )
-    {
-    }
+    ) {}
 
     public function index(ReportRequest $reportRequest): View
     {

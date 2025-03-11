@@ -10,9 +10,9 @@
     @csrf
     <div class="d-flex flex-wrap">
 
-        <div class="col-12 mb-3 pe-2">
+        <div class="col-6 mb-3 pe-2">
             @if (auth()->user()->role_id === 1)
-            <div class="col-6">
+            <div>
                 <div>
                     <label for="shopName" class="form-label">店舗</label>
                     <span class="text-danger">※</span>
@@ -29,10 +29,24 @@
             </div>
             @else
             <label for="shopName" class="form-label">店舗</label>
-            <div class="col-6">
+            <div>
                 <span>{{ auth()->user()->member->shop->name }}</span>
             </div>
             @endif
+        </div>
+        <div class="col-6 mb-3 ps-2 d-flex align-items-end">
+            <label class="form-check-label mb-2">
+                {{ Form::checkbox(
+                    'situation[purpose]',
+                    2,
+                    old('situation.purpose') == 2 ? 'checked' : '',
+                    [
+                        'class' => 'form-check-input form-check-radio',
+                        'data-name' => 'purpose'
+                    ]
+                ) }}
+                広告に使用
+            </label>
         </div>
 
         <div class="col-6 mb-3 pe-2">
