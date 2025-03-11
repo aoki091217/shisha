@@ -17,12 +17,14 @@ class Situation extends Model
     public const NAME = 'name';
     public const EVENT_TYPE = 'event_type';
     public const IS_DEFAULT = 'is_default';
+    public const PURPOSE = 'purpose';
 
     protected $fillable = [
         'shop_id',
         'name',
         'event_type',
-        'is_default'
+        'is_default',
+        'purpose'
     ];
 
     public static function boot()

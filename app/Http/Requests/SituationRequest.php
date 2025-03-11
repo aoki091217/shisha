@@ -29,6 +29,7 @@ class SituationRequest extends FormRequest
         return [
             'situation.shop_id' => 'required',
             'situation.name' => 'required|max:50',
+            'situation.purpose' => 'nullable',
             'situation.messages.*.message_type' => 'required',
             'situation.messages.*.keyword' => 'nullable|max:50',
             'situation.messages.*.alt_text' => 'nullable|max:400',
