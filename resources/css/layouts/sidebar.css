@@ -4,6 +4,8 @@
     overflow-y: auto;
     position: fixed;
     left: 0;
+    padding: 1rem;
+    padding-bottom: 8rem;
 }
 .sidebar .nav-link:not(.active):hover {
     background-color: #eae9e9 !important;

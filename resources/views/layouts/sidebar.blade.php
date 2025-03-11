@@ -1,4 +1,4 @@
-<div class="p-3 sidebar shadow bg-white">
+<div class="sidebar shadow bg-white">
     <ul class="nav nav-pills flex-column mb-auto gap-1">
         <li>
             <a href="{{ route('home.index') }}" class="nav-link py-1 {{ $routeService->getActiveForTab('home.*') }}">
