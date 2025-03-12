@@ -12,7 +12,9 @@ use App\Models\Situation;
 use App\Repositories\CustomerRepository;
 use App\Repositories\CustomerShopRepository;
 use App\Repositories\CustomerShopStatusRepository;
+use App\Repositories\LandingSessionRepository;
 use App\Repositories\ShopRepository;
+use App\Repositories\SituationRepository;
 use App\Services\LineBotService;
 use App\Services\MessageService;
 use Illuminate\Http\Request;
@@ -30,7 +32,9 @@ class MessageController extends Controller
         private CustomerRepository $customerRepository,
         private CustomerShopRepository $customerShopRepository,
         private CustomerShopStatusRepository $customerShopStatusRepository,
-        private MessageService $messageService
+        private MessageService $messageService,
+        private LandingSessionRepository $landingSessionRepository,
+        private SituationRepository $situationRepository
     ) {}
 
     public function webhook(Request $request, $id)
@@ -53,10 +57,21 @@ class MessageController extends Controller
 
             switch ($event) {
                 case ($event instanceof FollowEvent):
+                    $landingSession = $this->landingSessionRepository->findLatestByShopId($shop->getShopId());
+                    if ($landingSession->exists) {
+                        $useAdSituation = $this->situationRepository->findUseAdByFollow($shop->getShopId());
+                    }
+
                     $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
 
                     if (!is_null($situation)) {
                         foreach ($situation->messages as $message) {
+                            $lineBotService->reply($reply_token, $message, $line_token);
+                        }
+                    }
+
+                    if (!empty($useAdSituation)) {
+                        foreach ($useAdSituation->messages as $message) {
                             $lineBotService->reply($reply_token, $message, $line_token);
                         }
                     }

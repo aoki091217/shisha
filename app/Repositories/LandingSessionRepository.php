@@ -7,6 +7,10 @@ use App\Models\Shop;
 
 class LandingSessionRepository
 {
+    public function __construct(
+        private LandingSession $model
+    ){}
+
     public function findByToken(string $sessionToken): ?LandingSession
     {
         return LandingSession::where('session_token', $sessionToken)->first();
@@ -26,5 +30,10 @@ class LandingSessionRepository
     {
         $landingSession->fill($attributes)->save();
         return $landingSession;
+    }
+
+    public function findLatestByShopId(int $shopId): LandingSession|null
+    {
+        return $this->model->query()->where(LandingSession::SHOP_ID, $shopId)->orderByDesc(LandingSession::CREATED_AT)->first();
     }
 }

@@ -67,4 +67,9 @@ class Shop extends Model
     {
         return 'https://line.me/R/ti/p/' . urlencode($this->account_id);
     }
+
+    public function getShopId(): int
+    {
+        return (int) $this->{self::SHOP_ID};
+    }
 }
