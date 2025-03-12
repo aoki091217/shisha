@@ -57,11 +57,6 @@ class MessageController extends Controller
 
             switch ($event) {
                 case ($event instanceof FollowEvent):
-                    $landingSession = $this->landingSessionRepository->findLatestByShopId($shop->getShopId());
-                    if ($landingSession->exists) {
-                        $useAdSituation = $this->situationRepository->findUseAdByFollow($shop->getShopId());
-                    }
-
                     $situation = Situation::with('messages.carousels.carouselActions')->where('shop_id', $shop->shop_id)->where('event_type', 1)->first();
 
                     if (!is_null($situation)) {
@@ -70,9 +65,13 @@ class MessageController extends Controller
                         }
                     }
 
-                    if (!empty($useAdSituation)) {
-                        foreach ($useAdSituation->messages as $message) {
-                            $lineBotService->reply($reply_token, $message, $line_token);
+                    $landingSession = $this->landingSessionRepository->findLatestByShopId($shop->getShopId());
+                    if (!empty($landingSession)) {
+                        $useAdSituation = $this->situationRepository->findUseAdByFollow($shop->getShopId());
+                        if (!empty($useAdSituation)) {
+                            foreach ($useAdSituation->messages as $message) {
+                                $lineBotService->reply($reply_token, $message, $line_token);
+                            }
                         }
                     }
 
