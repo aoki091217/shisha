@@ -21,6 +21,8 @@ class LandingSession extends Model
         self::CONVERSION_STATUS_UNKNOWN,
     ];
 
+    public const SHOP_ID = 'shop_id';
+
     protected $guarded = [
         'id',
     ];
